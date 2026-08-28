@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #0066b3;
+  --color-primary-dark: #004a85;
+  --color-accent: #e30613;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-500: #6b7280;
+  --color-neutral-100: #f5f6f8;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+}
+
+body {
+  color: var(--color-neutral-900);
+  background-color: #ffffff;
+}
+
+/* dialog (Modal) mac dinh co margin/border cua trinh duyet - reset de Tailwind kiem soat */
+dialog {
+  border: none;
+  max-height: 90vh;
+}
+
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.prose img {
+  border-radius: 8px;
+}

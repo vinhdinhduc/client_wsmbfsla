@@ -1,0 +1,153 @@
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { usersApi, UserFormValues } from '@/lib/api/users';
+import { AdminUser } from '@/types/user';
+import { Table, TableColumn } from '@/components/ui/Table';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { TextField, SelectField } from '@/components/ui/FormField';
+import { useToast } from '@/components/ui/Toast';
+
+const ROLE_OPTIONS = [
+  { value: 'admin', label: 'Quản trị viên' },
+  { value: 'chuyen_vien', label: 'Chuyên viên' },
+  { value: 'giao_dich_vien', label: 'Giao dịch viên' },
+  { value: 'nhan_vien', label: 'Nhân viên' },
+];
+const STATUS_OPTIONS = [
+  { value: 'active', label: 'Đang hoạt động' },
+  { value: 'locked', label: 'Đã khóa' },
+];
+
+const userSchema = z.object({
+  username: z.string().min(3, 'Tối thiểu 3 ký tự').max(50),
+  password: z.string().min(6, 'Tối thiểu 6 ký tự').max(100).optional().or(z.literal('')),
+  full_name: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
+  email: z.string().email('Email không hợp lệ').max(100),
+  phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
+  role: z.enum(['admin', 'chuyen_vien', 'giao_dich_vien', 'nhan_vien']),
+  status: z.enum(['active', 'locked']),
+});
+
+type UserSchemaValues = z.infer<typeof userSchema>;
+
+export default function AdminUsersPage() {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [modalState, setModalState] = useState<{ mode: 'create' | 'edit'; item?: AdminUser } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+
+  const { data: users, isLoading } = useQuery({ queryKey: ['admin-users'], queryFn: () => usersApi.list() });
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<UserSchemaValues>({
+    resolver: zodResolver(userSchema),
+  });
+
+  function openCreate() {
+    reset({ username: '', password: '', full_name: '', email: '', phone: '', role: 'nhan_vien', status: 'active' });
+    setModalState({ mode: 'create' });
+  }
+
+  function openEdit(item: AdminUser) {
+    reset({ username: item.username, password: '', full_name: item.full_name, email: item.email, phone: item.phone, role: item.role, status: item.status });
+    setModalState({ mode: 'edit', item });
+  }
+
+  const saveMutation = useMutation({
+    mutationFn: (values: UserFormValues) =>
+      modalState?.mode === 'edit' && modalState.item ? usersApi.update(modalState.item.id, values) : usersApi.create(values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      showToast('Đã lưu tài khoản thành công');
+      setModalState(null);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => usersApi.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      showToast('Đã xóa tài khoản');
+      setDeleteTarget(null);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+
+  function onSubmit(values: UserSchemaValues) {
+    const payload: UserFormValues = { ...values };
+    if (!payload.password) delete payload.password;
+    saveMutation.mutate(payload);
+  }
+
+  const columns: TableColumn<AdminUser>[] = [
+    { key: 'full_name', header: 'Họ tên', render: (u) => u.full_name, sortAccessor: (u) => u.full_name },
+    { key: 'username', header: 'Tên đăng nhập', render: (u) => u.username },
+    { key: 'role', header: 'Vai trò', render: (u) => ROLE_OPTIONS.find((r) => r.value === u.role)?.label },
+    { key: 'status', header: 'Trạng thái', render: (u) => <Badge tone={u.status === 'active' ? 'success' : 'danger'}>{STATUS_OPTIONS.find((s) => s.value === u.status)?.label}</Badge> },
+    {
+      key: 'actions', header: '', className: 'text-right',
+      render: (u) => (
+        <div className="flex justify-end gap-1">
+          <button type="button" onClick={() => openEdit(u)} aria-label="Sửa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-primary before:absolute before:-inset-1 before:content-['']">
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button type="button" onClick={() => setDeleteTarget(u)} aria-label="Xóa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-danger before:absolute before:-inset-1 before:content-['']">
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="font-heading text-2xl font-bold text-neutral-900">Quản lý Tài khoản</h1>
+        <Button onClick={openCreate}><Plus className="h-4 w-4" /> Thêm tài khoản</Button>
+      </div>
+
+      <Table columns={columns} data={users ?? []} rowKey={(u) => u.id} isLoading={isLoading} />
+
+      <Modal isOpen={modalState !== null} onClose={() => setModalState(null)} title={modalState?.mode === 'edit' ? 'Sửa tài khoản' : 'Thêm tài khoản'}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <TextField label="Tên đăng nhập" disabled={modalState?.mode === 'edit'} error={errors.username?.message} {...register('username')} />
+          <TextField
+            type="password"
+            label={modalState?.mode === 'edit' ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu'}
+            error={errors.password?.message}
+            {...register('password')}
+          />
+          <TextField label="Họ tên" error={errors.full_name?.message} {...register('full_name')} />
+          <div className="grid grid-cols-2 gap-4">
+            <TextField type="email" label="Email" error={errors.email?.message} {...register('email')} />
+            <TextField label="Số điện thoại" error={errors.phone?.message} {...register('phone')} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField label="Vai trò" options={ROLE_OPTIONS} error={errors.role?.message} {...register('role')} />
+            <SelectField label="Trạng thái" options={STATUS_OPTIONS} error={errors.status?.message} {...register('status')} />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setModalState(null)}>Hủy</Button>
+            <Button type="submit" isLoading={saveMutation.isPending}>Lưu</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Xác nhận xóa">
+        <p className="text-neutral-900">Bạn có chắc muốn xóa tài khoản <strong>{deleteTarget?.full_name}</strong>?</p>
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setDeleteTarget(null)}>Hủy</Button>
+          <Button variant="danger" isLoading={deleteMutation.isPending} onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>Xóa</Button>
+        </div>
+      </Modal>
+    </div>
+  );
+}
