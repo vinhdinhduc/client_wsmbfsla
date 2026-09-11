@@ -1,0 +1,134 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+
+.filter {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-neutral-900);
+}
+
+.paginationWrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.detailPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.label {
+  margin: 0;
+  color: var(--color-neutral-500);
+}
+
+.value {
+  margin: 0.25rem 0 0;
+  color: var(--color-neutral-900);
+  font-weight: 500;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-neutral-900);
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.875rem;
+  border-top: 1px solid var(--color-neutral-100);
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.itemType {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--color-neutral-500);
+  text-transform: uppercase;
+}
+
+.itemName {
+  margin: 0;
+  color: var(--color-neutral-900);
+}
+
+.itemPrice {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.iconButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+  &:hover {
+    background: var(--color-neutral-100);
+    color: var(--color-primary);
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.25rem;
+  }
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}

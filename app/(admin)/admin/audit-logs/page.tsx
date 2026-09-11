@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Pagination } from '@/components/ui/Pagination';
 import { AuditLog } from '@/types/user';
 import { formatDateTime } from '@/lib/format';
+import styles from './page.module.scss';
 
 const ACTION_OPTIONS = [
   { value: '', label: 'Tất cả hành động' },
@@ -43,40 +44,66 @@ export default function AdminAuditLogsPage() {
   });
 
   const columns: TableColumn<AuditLog>[] = [
-    { key: 'created_at', header: 'Thời gian', render: (l) => formatDateTime(l.created_at), sortAccessor: (l) => l.created_at },
+    {
+      key: 'created_at',
+      header: 'Thời gian',
+      render: (l) => formatDateTime(l.created_at),
+      sortAccessor: (l) => l.created_at,
+    },
     { key: 'user', header: 'Người thực hiện', render: (l) => l.user?.full_name ?? '(Hệ thống)' },
     { key: 'module', header: 'Module', render: (l) => l.module },
-    { key: 'action', header: 'Hành động', render: (l) => <Badge tone={ACTION_TONE[l.action]}>{ACTION_OPTIONS.find((a) => a.value === l.action)?.label ?? l.action}</Badge> },
+    {
+      key: 'action',
+      header: 'Hành động',
+      render: (l) => (
+        <Badge tone={ACTION_TONE[l.action]}>
+          {ACTION_OPTIONS.find((a) => a.value === l.action)?.label ?? l.action}
+        </Badge>
+      ),
+    },
     { key: 'description', header: 'Mô tả', render: (l) => l.description ?? '' },
     { key: 'ip_address', header: 'IP', render: (l) => l.ip_address ?? '' },
   ];
 
   return (
-    <div className="space-y-4">
-      <h1 className="font-heading text-2xl font-bold text-neutral-900">Nhật ký thao tác</h1>
+    <div className={styles.page}>
+      <h1 className={styles.title}>Nhật ký thao tác</h1>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={styles.filters}>
         <input
           value={module}
-          onChange={(e) => { setModule(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setModule(e.target.value);
+            setPage(1);
+          }}
           placeholder="Lọc theo module (vd: news, sims...)"
-          className="h-10 rounded-lg border border-neutral-100 px-3 text-sm"
+          className={styles.control}
         />
         <select
           value={action}
-          onChange={(e) => { setAction(e.target.value); setPage(1); }}
-          className="h-10 rounded-lg border border-neutral-100 px-3 text-sm"
+          onChange={(e) => {
+            setAction(e.target.value);
+            setPage(1);
+          }}
+          className={styles.control}
         >
           {ACTION_OPTIONS.map((a) => (
-            <option key={a.value} value={a.value}>{a.label}</option>
+            <option key={a.value} value={a.value}>
+              {a.label}
+            </option>
           ))}
         </select>
       </div>
 
-      <Table columns={columns} data={data?.items ?? []} rowKey={(l) => l.id} isLoading={isLoading} />
+      <Table
+        columns={columns}
+        data={data?.items ?? []}
+        rowKey={(l) => l.id}
+        isLoading={isLoading}
+      />
 
       {data && (
-        <div className="flex justify-center pt-2">
+        <div className={styles.pagination}>
           <Pagination page={page} pageSize={PAGE_SIZE} total={data.total} onPageChange={setPage} />
         </div>
       )}

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { packagesApi } from '@/lib/api/packages';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { PackageFilterBar } from './_components/PackageFilterBar';
+import styles from './page.module.scss';
 
 export const revalidate = 60;
 
@@ -14,9 +15,9 @@ export default async function PackagesPage() {
   const packages = await packagesApi.listPublic(undefined, { next: { revalidate: 60 } });
 
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Gói cước' }]} />
-      <h1 className="mb-6 mt-3 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">Gói cước</h1>
+      <h1 className={styles.title}>Gói cước</h1>
       <PackageFilterBar packages={packages} />
     </div>
   );

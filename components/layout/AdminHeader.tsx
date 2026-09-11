@@ -2,9 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
+import { useTheme } from '@/contexts/ThemeContext';
+import { usePathname } from 'next/navigation';
+import { ADMIN_MENU } from '@/lib/rbac';
+import styles from './AdminHeader.module.scss';
 
 const ROLE_LABEL: Record<string, string> = {
   admin: 'Quản trị viên',
@@ -13,11 +17,16 @@ const ROLE_LABEL: Record<string, string> = {
   nhan_vien: 'Nhân viên',
 };
 
-export function AdminHeader() {
+export function AdminHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
+  const { theme, toggleTheme } = useTheme();
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const pageTitle =
+    ADMIN_MENU.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+      ?.label ?? 'Tổng quan';
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -32,26 +41,47 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-neutral-100 bg-white px-4 sm:px-6">
-      <div />
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-sm">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <UserIcon className="h-4 w-4" />
+    <header className={styles.header}>
+      <div className={styles.heading}>
+        <button
+          type="button"
+          className={styles.menuButton}
+          onClick={onMenuToggle}
+          aria-label="Mở menu"
+        >
+          <Menu />
+        </button>
+        <div>
+          <p className={styles.eyebrow}>MobiFone Admin</p>
+          <h1 className={styles.title}>{pageTitle}</h1>
+        </div>
+      </div>
+      <div className={styles.account}>
+        <button
+          type="button"
+          className={styles.themeToggle}
+          onClick={toggleTheme}
+          aria-label={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+        >
+          {theme === 'light' ? <Moon /> : <Sun />}
+        </button>
+        <div className={styles.identity}>
+          <div className={styles.avatar}>
+            <UserIcon className={styles.avatarIcon} />
           </div>
-          <div className="hidden text-right sm:block">
-            <p className="font-medium text-neutral-900">{user?.full_name}</p>
-            <p className="text-xs text-neutral-500">{user ? ROLE_LABEL[user.role] : ''}</p>
+          <div className={styles.userInfo}>
+            <p className={styles.name}>{user?.full_name}</p>
+            <p className={styles.role}>{user ? ROLE_LABEL[user.role] : ''}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-100 disabled:opacity-60"
+          className={styles.logout}
         >
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Đăng xuất</span>
+          <LogOut className={styles.logoutIcon} />
+          <span className={styles.logoutLabel}>Đăng xuất</span>
         </button>
       </div>
     </header>

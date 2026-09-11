@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { searchApi } from '@/lib/api/search';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { SimCard, PackageCard, NewsCard } from '@/components/ui/Card';
+import styles from './page.module.scss';
 
 /**
  * Trang tim kiem tong hop - Client Component (CSR), khong can SEO, noi dung
@@ -22,42 +23,47 @@ function SearchResults() {
     enabled: q.length > 0,
   });
 
-  const hasResults = data && (data.sims.length > 0 || data.packages.length > 0 || data.news.length > 0);
+  const hasResults =
+    data && (data.sims.length > 0 || data.packages.length > 0 || data.news.length > 0);
 
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Tìm kiếm' }]} />
-      <h1 className="mb-6 mt-3 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">
-        Kết quả tìm kiếm cho &quot;{q}&quot;
-      </h1>
+      <h1 className={styles.title}>Kết quả tìm kiếm cho &quot;{q}&quot;</h1>
 
       {isLoading ? (
-        <p className="py-12 text-center text-neutral-500">Đang tìm kiếm...</p>
+        <p className={styles.empty}>Đang tìm kiếm...</p>
       ) : !hasResults ? (
-        <p className="py-12 text-center text-neutral-500">Không tìm thấy kết quả phù hợp</p>
+        <p className={styles.empty}>Không tìm thấy kết quả phù hợp</p>
       ) : (
-        <div className="space-y-10">
+        <div className={styles.results}>
           {data!.sims.length > 0 && (
             <section>
-              <h2 className="mb-4 font-heading text-xl font-semibold text-neutral-900">Sim số đẹp</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {data!.sims.map((sim) => <SimCard key={sim.id} sim={sim} />)}
+              <h2 className={styles.sectionTitle}>Sim số đẹp</h2>
+              <div className={styles.gridFour}>
+                {data!.sims.map((sim) => (
+                  <SimCard key={sim.id} sim={sim} />
+                ))}
               </div>
             </section>
           )}
           {data!.packages.length > 0 && (
             <section>
-              <h2 className="mb-4 font-heading text-xl font-semibold text-neutral-900">Gói cước</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {data!.packages.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} />)}
+              <h2 className={styles.sectionTitle}>Gói cước</h2>
+              <div className={styles.gridFour}>
+                {data!.packages.map((pkg) => (
+                  <PackageCard key={pkg.id} pkg={pkg} />
+                ))}
               </div>
             </section>
           )}
           {data!.news.length > 0 && (
             <section>
-              <h2 className="mb-4 font-heading text-xl font-semibold text-neutral-900">Tin tức</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {data!.news.map((news) => <NewsCard key={news.id} news={news} />)}
+              <h2 className={styles.sectionTitle}>Tin tức</h2>
+              <div className={styles.gridThree}>
+                {data!.news.map((news) => (
+                  <NewsCard key={news.id} news={news} />
+                ))}
               </div>
             </section>
           )}

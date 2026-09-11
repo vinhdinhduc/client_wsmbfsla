@@ -1,0 +1,58 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page {
+  width: min(100%, var(--container-width));
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  @include breakpoint(sm) {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  @include breakpoint(lg) {
+    padding-right: 2rem;
+    padding-left: 2rem;
+  }
+}
+
+.title {
+  margin: 0.75rem 0 1.5rem;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  @include breakpoint(sm) {
+    font-size: 2.5rem;
+  }
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  @include breakpoint(lg) {
+    flex-direction: row;
+  }
+}
+
+.content {
+  flex: 1;
+}
+
+.emptyText {
+  padding: 4rem 1rem;
+  text-align: center;
+  color: var(--color-neutral-500);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  @include breakpoint(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @include breakpoint(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

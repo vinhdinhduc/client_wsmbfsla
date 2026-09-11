@@ -1,0 +1,9 @@
+@use 'variables' as *;
+
+$breakpoints: (
+  sm: $breakpoint-sm,
+  md: $breakpoint-md,
+  lg: $breakpoint-lg,
+  xl: $breakpoint-xl,
+  2xl: $breakpoint-2xl,
+);

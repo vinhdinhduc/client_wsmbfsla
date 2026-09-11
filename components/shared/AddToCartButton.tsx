@@ -4,6 +4,7 @@ import { ShoppingCart, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
 import { CartItem } from '@/types/order';
+import styles from './AddToCartButton.module.scss';
 
 export function AddToCartButton({
   item,
@@ -25,7 +26,7 @@ export function AddToCartButton({
       disabled={inCart || disabled}
       onClick={() => addItem(item)}
     >
-      {inCart ? <Check className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
+      {inCart ? <Check className={styles.icon} /> : <ShoppingCart className={styles.icon} />}
       {disabled ? 'Hết hàng' : inCart ? 'Đã có trong giỏ hàng' : 'Đăng ký mua'}
     </Button>
   );

@@ -1,0 +1,30 @@
+@use '../../../../styles/variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}

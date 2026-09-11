@@ -9,6 +9,7 @@ import { newsletterApi } from '@/lib/api/newsletter';
 import { settingsApi } from '@/lib/api/settings';
 import { useToast } from '@/components/ui/Toast';
 import { Button } from '@/components/ui/Button';
+import styles from './Footer.module.scss';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -36,49 +37,69 @@ export function Footer() {
   }
 
   return (
-    <footer className="mt-12 bg-neutral-900 text-neutral-100">
-      <div className="mx-auto grid max-w-container grid-cols-1 gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        <div>
-          <h3 className="font-heading text-lg font-semibold text-white">{settings?.site_name ?? 'MobiFone Sơn La'}</h3>
-          <p className="mt-3 text-sm text-neutral-100/70">
-            Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La
+    <footer className={styles.footer}>
+      <div className={styles.footer__inner}>
+        <div className={styles.footer__column}>
+          <h3 className={styles.footer__title}>{settings?.site_name ?? 'MobiFone Sơn La'}</h3>
+          <p className={styles.footer__description}>
+            {settings?.footer_description ?? 'Thông tin liên hệ chính thức của MobiFone Sơn La'}
           </p>
-          <div className="mt-3 space-y-1.5 text-sm text-neutral-100/70">
-            <p className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0" /> Chi nhánh MobiFone tỉnh Sơn La
+          <div className={styles.footer__details}>
+            <p className={styles.footer__detail}>
+              <MapPin className={styles.footer__detailIcon} />
+              {settings?.footer_address ?? 'Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La'}
             </p>
-            <p className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0" /> sonla@mobifone.vn
+            <p className={styles.footer__detail}>
+              <MapPin className={styles.footer__detailIcon} />
+              {settings?.footer_branch_name ?? 'Chi nhánh MobiFone tỉnh Sơn La'}
+            </p>
+            <p className={styles.footer__detail}>
+              <Mail className={styles.footer__detailIcon} />
+              {settings?.footer_email ?? 'sonla@mobifone.vn'}
             </p>
           </div>
         </div>
 
-        <div>
-          <h3 className="font-heading text-lg font-semibold text-white">Liên hệ nhanh</h3>
-          <p className="mt-3 flex items-center gap-2 text-lg font-bold text-accent">
-            <Phone className="h-5 w-5" />
-            <a href={`tel:${dutyStaff?.phone ?? settings?.hotline ?? ''}`}>{dutyStaff?.phone ?? settings?.hotline ?? '1800 xxxx'}</a>
+        <div className={styles.footer__column}>
+          <h3 className={styles.footer__title}>Liên hệ nhanh</h3>
+          <p className={styles.footer__hotline}>
+            <Phone className={styles.footer__hotlineIcon} />
+            <a href={`tel:${dutyStaff?.phone ?? settings?.hotline ?? ''}`}>
+              {dutyStaff?.phone ?? settings?.hotline ?? '1800 xxxx'}
+            </a>
           </p>
-          <p className="mt-1 text-sm text-neutral-100/70">{dutyStaff?.name ?? 'Tổng đài chăm sóc khách hàng'}</p>
-          <ul className="mt-4 space-y-1.5 text-sm text-neutral-100/70">
-            <li><Link href="/lien-he" className="hover:text-white">Liên hệ</Link></li>
-            <li><Link href="/tuyen-dung" className="hover:text-white">Tuyển dụng</Link></li>
-            <li><Link href="/chinh-sach-bao-mat" className="hover:text-white">Chính sách bảo mật</Link></li>
-            <li><Link href="/dieu-khoan-su-dung" className="hover:text-white">Điều khoản sử dụng</Link></li>
+          <p className={styles.footer__description}>
+            {dutyStaff?.name ?? 'Tổng đài chăm sóc khách hàng'}
+          </p>
+          <ul className={styles.footer__links}>
+            <li>
+              <Link href="/lien-he">Liên hệ</Link>
+            </li>
+            <li>
+              <Link href="/tuyen-dung">Tuyển dụng</Link>
+            </li>
+            <li>
+              <Link href="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
+            </li>
+            <li>
+              <Link href="/dieu-khoan-su-dung">Điều khoản sử dụng</Link>
+            </li>
           </ul>
         </div>
 
-        <div>
-          <h3 className="font-heading text-lg font-semibold text-white">Đăng ký nhận ưu đãi</h3>
-          <p className="mt-3 text-sm text-neutral-100/70">Nhận thông tin khuyến mãi mới nhất qua email.</p>
-          <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
+        <div className={styles.footer__column}>
+          <h3 className={styles.footer__title}>Đăng ký nhận ưu đãi</h3>
+          <p className={styles.footer__description}>
+            Nhận thông tin khuyến mãi mới nhất qua email.
+          </p>
+          <form onSubmit={handleSubmit} className={styles.footer__form}>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email của bạn"
-              className="h-10 flex-1 rounded-lg border border-white/20 bg-white/10 px-3 text-sm text-white placeholder:text-neutral-100/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className={styles.footer__input}
             />
             <Button type="submit" size="sm" isLoading={subscribe.isPending}>
               Đăng ký
@@ -86,22 +107,22 @@ export function Footer() {
           </form>
         </div>
 
-        <div>
-          <h3 className="font-heading text-lg font-semibold text-white">Mạng xã hội</h3>
-          <div className="mt-3 flex gap-3">
+        <div className={styles.footer__column}>
+          <h3 className={styles.footer__title}>Mạng xã hội</h3>
+          <div className={styles.footer__socials}>
             <a
-              href="https://facebook.com/mobifonesonla"
+              href={settings?.footer_facebook_url ?? 'https://facebook.com/mobifonesonla'}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook MobiFone Sơn La"
-              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
+              className={styles.footer__socialLink}
             >
-              <Facebook className="h-4 w-4" />
+              <Facebook className={styles.footer__socialIcon} />
             </a>
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-neutral-100/50">
+      <div className={styles.footer__copyright}>
         © {new Date().getFullYear()} MobiFone Chi nhánh Sơn La. Bảo lưu mọi quyền.
       </div>
     </footer>

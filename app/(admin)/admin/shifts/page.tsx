@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { TextField, SelectField, TextareaField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
+import styles from './page.module.scss';
 
 const WEEKDAY_LABELS = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
 
@@ -50,18 +51,35 @@ export default function AdminShiftsPage() {
 
   const weekDates = useMemo(() => getWeekDates(weekAnchor), [weekAnchor]);
 
-  const { data: shifts } = useQuery({ queryKey: ['admin-shifts'], queryFn: () => shiftsApi.list() });
-  const { data: users } = useQuery({ queryKey: ['admin-users-for-shift'], queryFn: () => usersApi.list() });
+  const { data: shifts } = useQuery({
+    queryKey: ['admin-shifts'],
+    queryFn: () => shiftsApi.list(),
+  });
+  const { data: users } = useQuery({
+    queryKey: ['admin-users-for-shift'],
+    queryFn: () => usersApi.list(),
+  });
   const staffOptions = (users ?? [])
     .filter((u) => u.role === 'giao_dich_vien')
     .map((u) => ({ value: String(u.id), label: u.full_name }));
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ShiftSchemaValues>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ShiftSchemaValues>({
     resolver: zodResolver(shiftSchema),
   });
 
   function openCreate(date: string) {
-    reset({ user_id: staffOptions[0] ? Number(staffOptions[0].value) : 0, shift_date: date, start_time: '08:00', end_time: '17:00', note: '' });
+    reset({
+      user_id: staffOptions[0] ? Number(staffOptions[0].value) : 0,
+      shift_date: date,
+      start_time: '08:00',
+      end_time: '17:00',
+      note: '',
+    });
     setModalState({ date });
   }
 
@@ -94,64 +112,85 @@ export default function AdminShiftsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900">Xếp lịch trực Giao dịch viên</h1>
-        <div className="flex items-center gap-2">
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Xếp lịch trực Giao dịch viên</h1>
+        <div className={styles.weekNav}>
           <button
             type="button"
-            onClick={() => setWeekAnchor((d) => { const n = new Date(d); n.setDate(n.getDate() - 7); return n; })}
-            className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-neutral-100"
+            onClick={() =>
+              setWeekAnchor((d) => {
+                const n = new Date(d);
+                n.setDate(n.getDate() - 7);
+                return n;
+              })
+            }
+            className={styles.navButton}
             aria-label="Tuần trước"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className={styles.navIcon} />
           </button>
-          <span className="text-sm font-medium text-neutral-900">
+          <span className={styles.range}>
             {formatDate(weekDates[0])} - {formatDate(weekDates[6])}
           </span>
           <button
             type="button"
-            onClick={() => setWeekAnchor((d) => { const n = new Date(d); n.setDate(n.getDate() + 7); return n; })}
-            className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-neutral-100"
+            onClick={() =>
+              setWeekAnchor((d) => {
+                const n = new Date(d);
+                n.setDate(n.getDate() + 7);
+                return n;
+              })
+            }
+            className={styles.navButton}
             aria-label="Tuần sau"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className={styles.navIcon} />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+      <div className={styles.grid}>
         {weekDates.map((date, idx) => {
           const dateStr = toDateStr(date);
           const dayShifts = shiftsForDate(dateStr);
           return (
-            <div key={dateStr} className="rounded-lg border border-neutral-100 bg-white p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold text-neutral-500">{WEEKDAY_LABELS[idx]}</p>
-                  <p className="text-sm font-semibold text-neutral-900">{formatDate(date)}</p>
+            <div key={dateStr} className={styles.dayCard}>
+              <div className={styles.dayHeader}>
+                <div className={styles.dayMeta}>
+                  <p className={styles.dayLabel}>{WEEKDAY_LABELS[idx]}</p>
+                  <p className={styles.dayDate}>{formatDate(date)}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => openCreate(dateStr)}
                   aria-label="Thêm ca trực"
-                  className="relative rounded p-1 text-primary hover:bg-primary/10 before:absolute before:-inset-1 before:content-['']"
+                  className={styles.addButton}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className={styles.navIcon} />
                 </button>
               </div>
-              <div className="space-y-1.5">
+              <div className={styles.shiftList}>
                 {dayShifts.length === 0 ? (
-                  <p className="text-xs text-neutral-500">Chưa xếp ca</p>
+                  <p className={styles.emptyState}>Chưa xếp ca</p>
                 ) : (
                   dayShifts.map((s) => (
-                    <div key={s.id} className="flex items-center justify-between rounded bg-neutral-100 px-2 py-1.5 text-xs">
+                    <div key={s.id} className={styles.shiftItem}>
                       <div>
-                        <p className="font-medium text-neutral-900">{s.staff?.full_name ?? `NV #${s.user_id}`}</p>
-                        <p className="text-neutral-500">{s.start_time} - {s.end_time}</p>
+                        <p className={styles.shiftPerson}>
+                          {s.staff?.full_name ?? `NV #${s.user_id}`}
+                        </p>
+                        <p className={styles.shiftHours}>
+                          {s.start_time} - {s.end_time}
+                        </p>
                       </div>
-                      <button type="button" onClick={() => setDeleteTarget(s)} aria-label="Xóa ca" className="relative text-neutral-500 hover:text-danger before:absolute before:-inset-1 before:content-['']">
-                        <Trash2 className="h-3.5 w-3.5" />
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(s)}
+                        aria-label="Xóa ca"
+                        className={styles.removeShift}
+                      >
+                        <Trash2 className={styles.navIcon} />
                       </button>
                     </div>
                   ))
@@ -163,26 +202,62 @@ export default function AdminShiftsPage() {
       </div>
 
       <Modal isOpen={modalState !== null} onClose={() => setModalState(null)} title="Xếp ca trực">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <SelectField label="Giao dịch viên" options={staffOptions} error={errors.user_id?.message} {...register('user_id')} />
-          <TextField type="date" label="Ngày trực" error={errors.shift_date?.message} {...register('shift_date')} />
-          <div className="grid grid-cols-2 gap-4">
-            <TextField type="time" label="Giờ bắt đầu" error={errors.start_time?.message} {...register('start_time')} />
-            <TextField type="time" label="Giờ kết thúc" error={errors.end_time?.message} {...register('end_time')} />
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <SelectField
+            label="Giao dịch viên"
+            options={staffOptions}
+            error={errors.user_id?.message}
+            {...register('user_id')}
+          />
+          <TextField
+            type="date"
+            label="Ngày trực"
+            error={errors.shift_date?.message}
+            {...register('shift_date')}
+          />
+          <div className={styles.formRow}>
+            <TextField
+              type="time"
+              label="Giờ bắt đầu"
+              error={errors.start_time?.message}
+              {...register('start_time')}
+            />
+            <TextField
+              type="time"
+              label="Giờ kết thúc"
+              error={errors.end_time?.message}
+              {...register('end_time')}
+            />
           </div>
           <TextareaField label="Ghi chú" error={errors.note?.message} {...register('note')} />
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setModalState(null)}>Hủy</Button>
-            <Button type="submit" isLoading={saveMutation.isPending}>Lưu</Button>
+          <div className={styles.confirm}>
+            <Button type="button" variant="outline" onClick={() => setModalState(null)}>
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={saveMutation.isPending}>
+              Lưu
+            </Button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Xác nhận xóa">
-        <p className="text-neutral-900">Bạn có chắc muốn xóa ca trực này?</p>
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleteTarget(null)}>Hủy</Button>
-          <Button variant="danger" isLoading={deleteMutation.isPending} onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>Xóa</Button>
+      <Modal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Xác nhận xóa"
+      >
+        <p className={styles.shiftPerson}>Bạn có chắc muốn xóa ca trực này?</p>
+        <div className={styles.confirm}>
+          <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+            Hủy
+          </Button>
+          <Button
+            variant="danger"
+            isLoading={deleteMutation.isPending}
+            onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+          >
+            Xóa
+          </Button>
         </div>
       </Modal>
     </div>

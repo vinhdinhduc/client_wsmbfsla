@@ -1,0 +1,62 @@
+@use '../../styles/variables' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-neutral-900);
+}
+.editor {
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.editorError {
+  border-color: var(--color-danger);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.375rem;
+  border-bottom: 1px solid var(--color-neutral-100);
+}
+.toolbarButton {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-neutral-900);
+  cursor: pointer;
+  &:hover {
+    background: var(--color-neutral-100);
+  }
+}
+.toolbarActive {
+  background: var(--color-primary);
+  color: #fff;
+}
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+.editorContent {
+  min-height: 12.5rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+}
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-danger);
+}

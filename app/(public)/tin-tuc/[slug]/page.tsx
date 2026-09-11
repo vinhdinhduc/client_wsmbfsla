@@ -5,6 +5,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { buildMetadata } from '@/lib/metadata';
 import { ArticleBody } from './_components/ArticleBody';
+import styles from './page.module.scss';
 
 export const revalidate = 60;
 
@@ -23,7 +24,11 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   try {
     const news = await newsApi.getPublicBySlug(params.slug);
     return buildMetadata({
@@ -46,12 +51,12 @@ export default async function NewsDetailPage({ params }: { params: { slug: strin
   }
 
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Tin tức', href: '/tin-tuc' }, { label: news.title }]} />
-      <div className="mx-auto mt-4 max-w-3xl">
+      <div className={styles.content}>
         <Badge tone="accent">{CATEGORY_LABEL[news.category] ?? news.category}</Badge>
-        <h1 className="mt-3 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">{news.title}</h1>
-        <div className="mt-6">
+        <h1 className={styles.title}>{news.title}</h1>
+        <div className={styles.body}>
           <ArticleBody news={news} />
         </div>
       </div>

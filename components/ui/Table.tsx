@@ -3,6 +3,7 @@
 import { ReactNode, useMemo, useState } from 'react';
 import { ChevronUp, ChevronDown, Inbox } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import styles from './Table.module.scss';
 
 export interface TableColumn<T> {
   key: string;
@@ -25,7 +26,13 @@ interface TableProps<T> {
  * theo cot khi cot co sortAccessor. Phan trang xu ly rieng boi <Pagination />
  * o tang page (server-driven) hoac component cha (client-driven).
  */
-export function Table<T>({ columns, data, rowKey, isLoading, emptyMessage = 'Không có dữ liệu' }: TableProps<T>) {
+export function Table<T>({
+  columns,
+  data,
+  rowKey,
+  isLoading,
+  emptyMessage = 'Không có dữ liệu',
+}: TableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -52,52 +59,56 @@ export function Table<T>({ columns, data, rowKey, isLoading, emptyMessage = 'Kh�
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-neutral-100 bg-white">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="bg-neutral-100">
+    <div className={styles.wrapper}>
+      <table className={styles.table}>
+        <thead className={styles.head}>
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
                 className={cn(
-                  'px-4 py-3 font-semibold text-neutral-900',
-                  column.sortAccessor && 'cursor-pointer select-none',
+                  styles.headerCell,
+                  column.sortAccessor && styles.sortable,
                   column.className,
                 )}
                 onClick={() => handleSort(column)}
               >
-                <span className="inline-flex items-center gap-1">
+                <span className={styles.headerContent}>
                   {column.header}
-                  {column.sortAccessor && sortKey === column.key && (
-                    sortDir === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />
-                  )}
+                  {column.sortAccessor &&
+                    sortKey === column.key &&
+                    (sortDir === 'asc' ? (
+                      <ChevronUp className={styles.sortIcon} />
+                    ) : (
+                      <ChevronDown className={styles.sortIcon} />
+                    ))}
                 </span>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className={styles.body}>
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-neutral-500">
+              <td colSpan={columns.length} className={styles.emptyCell}>
                 Đang tải dữ liệu...
               </td>
             </tr>
           ) : sortedData.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-neutral-500">
-                <div className="flex flex-col items-center gap-2">
-                  <Inbox className="h-8 w-8" />
+              <td colSpan={columns.length} className={styles.emptyCellLarge}>
+                <div className={styles.emptyContent}>
+                  <Inbox className={styles.emptyIcon} />
                   {emptyMessage}
                 </div>
               </td>
             </tr>
           ) : (
             sortedData.map((row) => (
-              <tr key={rowKey(row)} className="hover:bg-neutral-100/60">
+              <tr key={rowKey(row)} className={styles.row}>
                 {columns.map((column) => (
-                  <td key={column.key} className={cn('px-4 py-3 text-neutral-900', column.className)}>
+                  <td key={column.key} className={cn(styles.cell, column.className)}>
                     {column.render(row)}
                   </td>
                 ))}

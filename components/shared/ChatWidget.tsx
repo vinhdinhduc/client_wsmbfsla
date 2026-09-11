@@ -7,6 +7,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { chatbotApi } from '@/lib/api/chatbot';
 import { settingsApi } from '@/lib/api/settings';
 import { cn } from '@/lib/cn';
+import styles from './ChatWidget.module.scss';
 
 const SESSION_STORAGE_KEY = 'mfsl_chat_session_id';
 
@@ -36,7 +37,11 @@ export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 'welcome', role: 'assistant', text: 'Xin chào! Tôi là trợ lý ảo MobiFone Sơn La, tôi có thể giúp gì cho bạn?' },
+    {
+      id: 'welcome',
+      role: 'assistant',
+      text: 'Xin chào! Tôi là trợ lý ảo MobiFone Sơn La, tôi có thể giúp gì cho bạn?',
+    },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -48,10 +53,16 @@ export function ChatWidget() {
   const sendMessage = useMutation({
     mutationFn: (message: string) => chatbotApi.sendMessage(getOrCreateSessionId(), message),
     onSuccess: (result) => {
-      setMessages((prev) => [...prev, { id: `a-${Date.now()}`, role: 'assistant', text: result.reply }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: `a-${Date.now()}`, role: 'assistant', text: result.reply },
+      ]);
     },
     onError: (err: Error) => {
-      setMessages((prev) => [...prev, { id: `e-${Date.now()}`, role: 'assistant', text: err.message }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: `e-${Date.now()}`, role: 'assistant', text: err.message },
+      ]);
     },
   });
 
@@ -67,7 +78,7 @@ export function ChatWidget() {
   if (settings?.ai_chatbot_enabled === 'false') return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
+    <div className={styles.wrapper}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -75,50 +86,72 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.95 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
-            className="mb-3 flex h-[28rem] w-[22rem] max-w-[90vw] flex-col overflow-hidden rounded-lg border border-neutral-100 bg-white shadow-md"
+            className={styles.panel}
           >
-            <div className="flex items-center justify-between bg-primary px-4 py-3 text-white">
-              <p className="font-heading font-semibold">Trợ lý ảo MobiFone</p>
-              <button type="button" onClick={() => setIsOpen(false)} aria-label="Đóng chat">
-                <X className="h-5 w-5" />
+            <div className={styles.panelHeader}>
+              <p className={styles.panelTitle}>Trợ lý ảo MobiFone</p>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                aria-label="Đóng chat"
+                className={styles.panelClose}
+              >
+                <X className={styles.launcherIcon} />
               </button>
             </div>
 
-            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-3">
+            <div ref={scrollRef} className={styles.panelBody}>
               {messages.map((m) => (
-                <div key={m.id} className={cn('flex items-start gap-2', m.role === 'user' && 'flex-row-reverse')}>
-                  <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', m.role === 'user' ? 'bg-primary text-white' : 'bg-neutral-100 text-neutral-900')}>
-                    {m.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                <div
+                  key={m.id}
+                  className={cn(styles.messageRow, m.role === 'user' && styles.messageRowUser)}
+                >
+                  <div
+                    className={cn(
+                      styles.avatar,
+                      m.role === 'user' ? styles.avatarUser : styles.avatarAssistant,
+                    )}
+                  >
+                    {m.role === 'user' ? (
+                      <User className={styles.avatarIcon} />
+                    ) : (
+                      <Bot className={styles.avatarIcon} />
+                    )}
                   </div>
-                  <div className={cn('max-w-[80%] rounded-lg px-3 py-2 text-sm', m.role === 'user' ? 'bg-primary text-white' : 'bg-neutral-100 text-neutral-900')}>
+                  <div
+                    className={cn(
+                      styles.bubble,
+                      m.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant,
+                    )}
+                  >
                     {m.text}
                   </div>
                 </div>
               ))}
               {sendMessage.isPending && (
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-900">
-                    <Bot className="h-4 w-4" />
+                <div className={styles.messageRow}>
+                  <div className={cn(styles.avatar, styles.avatarAssistant)}>
+                    <Bot className={styles.avatarIcon} />
                   </div>
-                  <div className="rounded-lg bg-neutral-100 px-3 py-2 text-sm text-neutral-500">Đang trả lời...</div>
+                  <div className={styles.typing}>Đang trả lời...</div>
                 </div>
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-neutral-100 p-3">
+            <form onSubmit={handleSubmit} className={styles.form}>
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Nhập câu hỏi của bạn..."
-                className="h-10 flex-1 rounded-lg border border-neutral-100 px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className={styles.input}
               />
               <button
                 type="submit"
                 disabled={sendMessage.isPending}
                 aria-label="Gửi"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white transition-colors duration-150 hover:bg-primary-dark disabled:opacity-60"
+                className={styles.sendButton}
               >
-                <Send className="h-4 w-4" />
+                <Send className={styles.sendIcon} />
               </button>
             </form>
           </motion.div>
@@ -129,7 +162,7 @@ export function ChatWidget() {
         type="button"
         onClick={() => setIsOpen((o) => !o)}
         aria-label={isOpen ? 'Đóng khung chat' : 'Mở khung chat tư vấn'}
-        className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-md transition-colors duration-150 hover:bg-primary-dark before:absolute before:-inset-2 before:content-['']"
+        className={styles.launcher}
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
@@ -139,7 +172,11 @@ export function ChatWidget() {
             exit={{ rotate: 90, opacity: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
           >
-            {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+            {isOpen ? (
+              <X className={styles.launcherIcon} />
+            ) : (
+              <MessageCircle className={styles.launcherIcon} />
+            )}
           </motion.span>
         </AnimatePresence>
       </button>

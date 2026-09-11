@@ -9,12 +9,14 @@ import { SliderZone } from '@/components/shared/SliderZone';
 
 export const revalidate = 60;
 
+import styles from './page.module.scss';
+
 function SectionHeader({ title, href }: { title: string; href: string }) {
   return (
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="font-heading text-xl font-bold text-neutral-900 sm:text-2xl">{title}</h2>
-      <Link href={href} className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-        Xem tất cả <ArrowRight className="h-4 w-4" />
+    <div className={styles.sectionHeader}>
+      <h2 className={styles.sectionTitle}>{title}</h2>
+      <Link href={href} className={styles.viewAll}>
+        Xem tất cả <ArrowRight className={styles.viewAllIcon} />
       </Link>
     </div>
   );
@@ -29,55 +31,55 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="space-y-12 py-6 sm:space-y-16 sm:py-10">
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
-        <SliderZone zoneCode="hero_banner" aspectClassName="aspect-[16/9] sm:aspect-[21/9]" />
+    <div className={styles.page}>
+      <section className={styles.heroSection}>
+        <SliderZone zoneCode="hero_banner" aspect="hero" className={styles.heroSlider} />
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
+      <section className={styles.section}>
         <SectionHeader title="Gói cước nổi bật" href="/goi-cuoc" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={styles.grid4}>
           {hotPackages.slice(0, 4).map((pkg) => (
             <PackageCard key={pkg.id} pkg={pkg} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
+      <section className={styles.section}>
         <SectionHeader title="Sim số đẹp nổi bật" href="/sim-so-dep" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={styles.grid4}>
           {hotSims.slice(0, 4).map((sim) => (
             <SimCard key={sim.id} sim={sim} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
+      <section className={styles.section}>
         <SectionHeader title="Giải pháp số cho Doanh nghiệp / UBND" href="/giai-phap-so" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={styles.grid3}>
           {solutions.slice(0, 3).map((solution) => (
             <SolutionCard key={solution.id} solution={solution} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
+      <section className={styles.section}>
         <SectionHeader title="Tin tức & Khuyến mãi" href="/tin-tuc" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={styles.grid3}>
           {newsResult.items.map((news) => (
             <NewsCard key={news.id} news={news} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-4 text-center font-heading text-xl font-bold text-neutral-900">Đối tác & Thương hiệu</h2>
-        <SliderZone zoneCode="partners" aspectClassName="aspect-[4/1]" />
+      <section className={styles.section}>
+        <h2 className={styles.centerTitle}>Đối tác & Thương hiệu</h2>
+        <SliderZone zoneCode="partners" aspect="partners" />
       </section>
 
-      <section className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-4 text-center font-heading text-xl font-bold text-neutral-900">Khách hàng nói gì về chúng tôi</h2>
-        <SliderZone zoneCode="testimonials" aspectClassName="aspect-[16/9] sm:aspect-[21/9]" />
+      <section className={styles.section}>
+        <h2 className={styles.centerTitle}>Khách hàng nói gì về chúng tôi</h2>
+        <SliderZone zoneCode="testimonials" aspect="hero" />
       </section>
     </div>
   );

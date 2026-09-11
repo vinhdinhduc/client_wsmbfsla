@@ -12,6 +12,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { SelectField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatPrice } from '@/lib/format';
+import styles from './page.module.scss';
 
 const STATUS_OPTIONS: Array<{ value: RegistrationStatus; label: string }> = [
   { value: 'moi', label: 'Mới' },
@@ -25,7 +26,11 @@ const STATUS_TONE: Record<RegistrationStatus, 'primary' | 'warning' | 'success' 
   hoan_thanh: 'success',
   huy: 'danger',
 };
-const TYPE_LABEL: Record<string, string> = { sim: 'Sim số', goi_cuoc: 'Gói cước', giai_phap: 'Giải pháp' };
+const TYPE_LABEL: Record<string, string> = {
+  sim: 'Sim số',
+  goi_cuoc: 'Gói cước',
+  giai_phap: 'Giải pháp',
+};
 const PAGE_SIZE = 10;
 
 export default function AdminRegistrationsPage() {
@@ -37,11 +42,17 @@ export default function AdminRegistrationsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-registrations', page, statusFilter],
-    queryFn: () => ordersApi.list({ status: statusFilter === 'all' ? undefined : statusFilter, page, page_size: PAGE_SIZE }),
+    queryFn: () =>
+      ordersApi.list({
+        status: statusFilter === 'all' ? undefined : statusFilter,
+        page,
+        page_size: PAGE_SIZE,
+      }),
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: RegistrationStatus }) => ordersApi.updateStatus(id, { status }),
+    mutationFn: ({ id, status }: { id: number; status: RegistrationStatus }) =>
+      ordersApi.updateStatus(id, { status }),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ['admin-registrations'] });
       showToast('Đã cập nhật trạng thái');
@@ -51,82 +62,119 @@ export default function AdminRegistrationsPage() {
   });
 
   const columns: TableColumn<RegistrationGroup>[] = [
-    { key: 'customer_name', header: 'Khách hàng', render: (g) => g.customer_name, sortAccessor: (g) => g.customer_name },
+    {
+      key: 'customer_name',
+      header: 'Khách hàng',
+      render: (g) => g.customer_name,
+      sortAccessor: (g) => g.customer_name,
+    },
     { key: 'phone', header: 'SĐT', render: (g) => g.phone },
     { key: 'items', header: 'Số sản phẩm', render: (g) => g.items.length },
-    { key: 'created_at', header: 'Ngày tạo', render: (g) => formatDateTime(g.created_at), sortAccessor: (g) => g.created_at },
-    { key: 'status', header: 'Trạng thái', render: (g) => <Badge tone={STATUS_TONE[g.status]}>{STATUS_OPTIONS.find((s) => s.value === g.status)?.label}</Badge> },
     {
-      key: 'actions', header: '', className: 'text-right',
+      key: 'created_at',
+      header: 'Ngày tạo',
+      render: (g) => formatDateTime(g.created_at),
+      sortAccessor: (g) => g.created_at,
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
       render: (g) => (
-        <button type="button" onClick={() => setDetailTarget(g)} aria-label="Xem chi tiết" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-primary before:absolute before:-inset-1 before:content-['']">
-          <Eye className="h-4 w-4" />
+        <Badge tone={STATUS_TONE[g.status]}>
+          {STATUS_OPTIONS.find((s) => s.value === g.status)?.label}
+        </Badge>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      className: 'text-right',
+      render: (g) => (
+        <button
+          type="button"
+          onClick={() => setDetailTarget(g)}
+          aria-label="Xem chi tiết"
+          className={styles.iconButton}
+        >
+          <Eye className={styles.icon} />
         </button>
       ),
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900">Danh sách đăng ký</h1>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Danh sách đăng ký</h1>
         <select
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value as typeof statusFilter);
             setPage(1);
           }}
-          className="h-10 rounded-lg border border-neutral-100 px-3 text-sm"
+          className={styles.filter}
         >
           <option value="all">Tất cả trạng thái</option>
           {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
           ))}
         </select>
       </div>
 
-      <Table columns={columns} data={data?.items ?? []} rowKey={(g) => g.id} isLoading={isLoading} />
+      <Table
+        columns={columns}
+        data={data?.items ?? []}
+        rowKey={(g) => g.id}
+        isLoading={isLoading}
+      />
 
       {data && (
-        <div className="flex justify-center pt-2">
+        <div className={styles.paginationWrap}>
           <Pagination page={page} pageSize={PAGE_SIZE} total={data.total} onPageChange={setPage} />
         </div>
       )}
 
-      <Modal isOpen={detailTarget !== null} onClose={() => setDetailTarget(null)} title="Chi tiết đăng ký" maxWidthClassName="max-w-xl">
+      <Modal
+        isOpen={detailTarget !== null}
+        onClose={() => setDetailTarget(null)}
+        title="Chi tiết đăng ký"
+        maxWidth="xl"
+      >
         {detailTarget && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className={styles.detailPanel}>
+            <div className={styles.detailGrid}>
               <div>
-                <p className="text-neutral-500">Khách hàng</p>
-                <p className="font-medium text-neutral-900">{detailTarget.customer_name}</p>
+                <p className={styles.label}>Khách hàng</p>
+                <p className={styles.value}>{detailTarget.customer_name}</p>
               </div>
               <div>
-                <p className="text-neutral-500">Số điện thoại</p>
-                <p className="font-medium text-neutral-900">{detailTarget.phone}</p>
+                <p className={styles.label}>Số điện thoại</p>
+                <p className={styles.value}>{detailTarget.phone}</p>
               </div>
               <div>
-                <p className="text-neutral-500">Ngày tạo</p>
-                <p className="font-medium text-neutral-900">{formatDateTime(detailTarget.created_at)}</p>
+                <p className={styles.label}>Ngày tạo</p>
+                <p className={styles.value}>{formatDateTime(detailTarget.created_at)}</p>
               </div>
             </div>
             {detailTarget.note && (
               <div>
-                <p className="text-sm text-neutral-500">Ghi chú</p>
-                <p className="text-sm text-neutral-900">{detailTarget.note}</p>
+                <p className={styles.label}>Ghi chú</p>
+                <p className={styles.note}>{detailTarget.note}</p>
               </div>
             )}
 
             <div>
-              <p className="mb-2 text-sm font-semibold text-neutral-900">Sản phẩm đã đăng ký</p>
-              <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-100">
+              <p className={styles.value}>Sản phẩm đã đăng ký</p>
+              <div className={styles.itemsList}>
                 {detailTarget.items.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between px-3 py-2 text-sm">
+                  <div key={item.id} className={styles.itemRow}>
                     <div>
-                      <p className="text-xs text-neutral-500">{TYPE_LABEL[item.type]}</p>
-                      <p className="text-neutral-900">{item.reference_label}</p>
+                      <p className={styles.itemType}>{TYPE_LABEL[item.type]}</p>
+                      <p className={styles.itemName}>{item.reference_label}</p>
                     </div>
-                    <p className="font-semibold text-accent">{formatPrice(item.price_snapshot)}</p>
+                    <p className={styles.itemPrice}>{formatPrice(item.price_snapshot)}</p>
                   </div>
                 ))}
               </div>
@@ -136,7 +184,12 @@ export default function AdminRegistrationsPage() {
               label="Cập nhật trạng thái"
               options={STATUS_OPTIONS}
               value={detailTarget.status}
-              onChange={(e) => updateStatusMutation.mutate({ id: detailTarget.id, status: e.target.value as RegistrationStatus })}
+              onChange={(e) =>
+                updateStatusMutation.mutate({
+                  id: detailTarget.id,
+                  status: e.target.value as RegistrationStatus,
+                })
+              }
             />
           </div>
         )}

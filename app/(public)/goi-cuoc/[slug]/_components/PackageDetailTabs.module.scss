@@ -1,0 +1,78 @@
+@use '../../../../../styles/variables' as *;
+
+.container {
+  margin-top: 1.5rem;
+}
+
+.tabsContent {
+  padding-top: 1.5rem;
+}
+
+.content {
+  color: var(--color-neutral-900);
+
+  :global(p) {
+    margin: 0 0 0.75rem;
+    color: var(--color-neutral-500);
+    line-height: 1.75;
+  }
+
+  :global(ul),
+  :global(ol) {
+    margin: 0 0 1rem;
+    color: var(--color-neutral-500);
+    line-height: 1.8;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--color-primary);
+}
+
+.label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-neutral-900);
+}
+
+.value {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-neutral-500);
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-neutral-900);
+  line-height: 1.8;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-neutral-500);
+}

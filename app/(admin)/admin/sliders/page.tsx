@@ -15,6 +15,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { TextField, SelectField, CheckboxField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
+import styles from '../admin-shared.module.scss';
 
 const ANIMATION_OPTIONS = [
   { value: 'fade', label: 'Fade' },
@@ -53,11 +54,17 @@ export default function AdminSlidersPage() {
   const { showToast } = useToast();
   const [activeZoneId, setActiveZoneId] = useState<number | null>(null);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [itemModal, setItemModal] = useState<{ mode: 'create' | 'edit'; item?: SliderItem } | null>(null);
+  const [itemModal, setItemModal] = useState<{ mode: 'create' | 'edit'; item?: SliderItem } | null>(
+    null,
+  );
   const [deleteTarget, setDeleteTarget] = useState<SliderItem | null>(null);
 
-  const { data: zones } = useQuery({ queryKey: ['admin-slider-zones'], queryFn: () => slidersApi.listZones() });
-  const activeZone: SliderZone | undefined = zones?.find((z) => z.id === activeZoneId) ?? zones?.[0];
+  const { data: zones } = useQuery({
+    queryKey: ['admin-slider-zones'],
+    queryFn: () => slidersApi.listZones(),
+  });
+  const activeZone: SliderZone | undefined =
+    zones?.find((z) => z.id === activeZoneId) ?? zones?.[0];
   const resolvedZoneId = activeZoneId ?? zones?.[0]?.id;
 
   const { data: items, isLoading } = useQuery({
@@ -90,14 +97,29 @@ export default function AdminSlidersPage() {
   });
 
   function openCreateItem() {
-    itemForm.reset({ image_url: '', link_url: '', title: '', caption: '', display_order: 0, status: 'active', start_date: '', end_date: '' });
+    itemForm.reset({
+      image_url: '',
+      link_url: '',
+      title: '',
+      caption: '',
+      display_order: 0,
+      status: 'active',
+      start_date: '',
+      end_date: '',
+    });
     setItemModal({ mode: 'create' });
   }
 
   function openEditItem(item: SliderItem) {
     itemForm.reset({
-      image_url: item.image_url, link_url: item.link_url ?? '', title: item.title ?? '', caption: item.caption ?? '',
-      display_order: item.display_order, status: item.status, start_date: item.start_date ?? '', end_date: item.end_date ?? '',
+      image_url: item.image_url,
+      link_url: item.link_url ?? '',
+      title: item.title ?? '',
+      caption: item.caption ?? '',
+      display_order: item.display_order,
+      status: item.status,
+      start_date: item.start_date ?? '',
+      end_date: item.end_date ?? '',
     });
     setItemModal({ mode: 'edit', item });
   }
@@ -140,19 +162,55 @@ export default function AdminSlidersPage() {
 
   const columns: TableColumn<SliderItem>[] = [
     { key: 'title', header: 'Tiêu đề', render: (i) => i.title ?? '(không có)' },
-    { key: 'image_url', header: 'Ảnh', render: (i) => <span className="line-clamp-1 max-w-[220px] text-xs text-neutral-500">{i.image_url}</span> },
-    { key: 'display_order', header: 'Thứ tự', render: (i) => i.display_order, sortAccessor: (i) => i.display_order },
-    { key: 'status', header: 'Trạng thái', render: (i) => <Badge tone={i.status === 'active' ? 'success' : 'neutral'}>{STATUS_OPTIONS.find((s) => s.value === i.status)?.label}</Badge> },
-    { key: 'start_date', header: 'Hiệu lực', render: (i) => (i.start_date || i.end_date ? `${formatDate(i.start_date)} - ${formatDate(i.end_date)}` : 'Không giới hạn') },
     {
-      key: 'actions', header: '', className: 'text-right',
+      key: 'image_url',
+      header: 'Ảnh',
+      render: (i) => <span className={styles.imageUrl}>{i.image_url}</span>,
+    },
+    {
+      key: 'display_order',
+      header: 'Thứ tự',
+      render: (i) => i.display_order,
+      sortAccessor: (i) => i.display_order,
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
       render: (i) => (
-        <div className="flex justify-end gap-1">
-          <button type="button" onClick={() => openEditItem(i)} aria-label="Sửa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-primary before:absolute before:-inset-1 before:content-['']">
-            <Pencil className="h-4 w-4" />
+        <Badge tone={i.status === 'active' ? 'success' : 'neutral'}>
+          {STATUS_OPTIONS.find((s) => s.value === i.status)?.label}
+        </Badge>
+      ),
+    },
+    {
+      key: 'start_date',
+      header: 'Hiệu lực',
+      render: (i) =>
+        i.start_date || i.end_date
+          ? `${formatDate(i.start_date)} - ${formatDate(i.end_date)}`
+          : 'Không giới hạn',
+    },
+    {
+      key: 'actions',
+      header: '',
+      className: 'text-right',
+      render: (i) => (
+        <div className={styles.iconActions}>
+          <button
+            type="button"
+            onClick={() => openEditItem(i)}
+            aria-label="Sửa"
+            className={styles.iconButton}
+          >
+            <Pencil className={styles.icon} />
           </button>
-          <button type="button" onClick={() => setDeleteTarget(i)} aria-label="Xóa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-danger before:absolute before:-inset-1 before:content-['']">
-            <Trash2 className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setDeleteTarget(i)}
+            aria-label="Xóa"
+            className={styles.iconButton}
+          >
+            <Trash2 className={styles.icon} />
           </button>
         </div>
       ),
@@ -160,8 +218,8 @@ export default function AdminSlidersPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <h1 className="font-heading text-2xl font-bold text-neutral-900">Quản lý Slider</h1>
+    <div className={styles.page}>
+      <h1 className={styles.title}>Quản lý Slider</h1>
 
       {zones && zones.length > 0 && (
         <Tabs
@@ -171,60 +229,143 @@ export default function AdminSlidersPage() {
         />
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-neutral-500">
-          Chỉ có 3 zone mặc định cố định - không thể tạo/xóa zone (chỉ sửa cấu hình animation/autoplay và CRUD từng slide bên trong).
+      <div className={styles.toolbar}>
+        <p className={styles.muted}>
+          Chỉ có 3 zone mặc định cố định - không thể tạo/xóa zone (chỉ sửa cấu hình
+          animation/autoplay và CRUD từng slide bên trong).
         </p>
-        <div className="flex gap-2">
+        <div className={styles.buttonGroup}>
           <Button variant="outline" size="sm" onClick={openConfig}>
-            <Settings2 className="h-4 w-4" /> Cấu hình zone
+            <Settings2 className={styles.icon} /> Cấu hình zone
           </Button>
           <Button size="sm" onClick={openCreateItem}>
-            <Plus className="h-4 w-4" /> Thêm slide
+            <Plus className={styles.icon} /> Thêm slide
           </Button>
         </div>
       </div>
 
       <Table columns={columns} data={items ?? []} rowKey={(i) => i.id} isLoading={isLoading} />
 
-      <Modal isOpen={isConfigOpen} onClose={() => setIsConfigOpen(false)} title={`Cấu hình zone: ${activeZone?.name ?? ''}`}>
-        <form onSubmit={zoneForm.handleSubmit((v) => updateZoneMutation.mutate(v))} className="space-y-4">
-          <SelectField label="Hiệu ứng" options={ANIMATION_OPTIONS} error={zoneForm.formState.errors.animation_type?.message} {...zoneForm.register('animation_type')} />
-          <CheckboxField label="Bật tự động chuyển slide (autoplay)" {...zoneForm.register('autoplay_enabled')} />
-          <TextField type="number" label="Tốc độ autoplay (ms)" error={zoneForm.formState.errors.autoplay_speed_ms?.message} {...zoneForm.register('autoplay_speed_ms')} />
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setIsConfigOpen(false)}>Hủy</Button>
-            <Button type="submit" isLoading={updateZoneMutation.isPending}>Lưu</Button>
+      <Modal
+        isOpen={isConfigOpen}
+        onClose={() => setIsConfigOpen(false)}
+        title={`Cấu hình zone: ${activeZone?.name ?? ''}`}
+      >
+        <form
+          onSubmit={zoneForm.handleSubmit((v) => updateZoneMutation.mutate(v))}
+          className={styles.form}
+        >
+          <SelectField
+            label="Hiệu ứng"
+            options={ANIMATION_OPTIONS}
+            error={zoneForm.formState.errors.animation_type?.message}
+            {...zoneForm.register('animation_type')}
+          />
+          <CheckboxField
+            label="Bật tự động chuyển slide (autoplay)"
+            {...zoneForm.register('autoplay_enabled')}
+          />
+          <TextField
+            type="number"
+            label="Tốc độ autoplay (ms)"
+            error={zoneForm.formState.errors.autoplay_speed_ms?.message}
+            {...zoneForm.register('autoplay_speed_ms')}
+          />
+          <div className={styles.actions}>
+            <Button type="button" variant="outline" onClick={() => setIsConfigOpen(false)}>
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={updateZoneMutation.isPending}>
+              Lưu
+            </Button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={itemModal !== null} onClose={() => setItemModal(null)} title={itemModal?.mode === 'edit' ? 'Sửa slide' : 'Thêm slide'}>
-        <form onSubmit={itemForm.handleSubmit(onSubmitItem)} className="space-y-4">
-          <TextField label="URL hình ảnh" placeholder="https://..." error={itemForm.formState.errors.image_url?.message} {...itemForm.register('image_url')} />
-          <TextField label="Liên kết khi bấm vào (tùy chọn)" placeholder="https://..." error={itemForm.formState.errors.link_url?.message} {...itemForm.register('link_url')} />
-          <TextField label="Tiêu đề" error={itemForm.formState.errors.title?.message} {...itemForm.register('title')} />
-          <TextField label="Chú thích (caption)" error={itemForm.formState.errors.caption?.message} {...itemForm.register('caption')} />
-          <div className="grid grid-cols-2 gap-4">
-            <TextField type="number" label="Thứ tự hiển thị" error={itemForm.formState.errors.display_order?.message} {...itemForm.register('display_order')} />
-            <SelectField label="Trạng thái" options={STATUS_OPTIONS} error={itemForm.formState.errors.status?.message} {...itemForm.register('status')} />
+      <Modal
+        isOpen={itemModal !== null}
+        onClose={() => setItemModal(null)}
+        title={itemModal?.mode === 'edit' ? 'Sửa slide' : 'Thêm slide'}
+      >
+        <form onSubmit={itemForm.handleSubmit(onSubmitItem)} className={styles.form}>
+          <TextField
+            label="URL hình ảnh"
+            placeholder="https://..."
+            error={itemForm.formState.errors.image_url?.message}
+            {...itemForm.register('image_url')}
+          />
+          <TextField
+            label="Liên kết khi bấm vào (tùy chọn)"
+            placeholder="https://..."
+            error={itemForm.formState.errors.link_url?.message}
+            {...itemForm.register('link_url')}
+          />
+          <TextField
+            label="Tiêu đề"
+            error={itemForm.formState.errors.title?.message}
+            {...itemForm.register('title')}
+          />
+          <TextField
+            label="Chú thích (caption)"
+            error={itemForm.formState.errors.caption?.message}
+            {...itemForm.register('caption')}
+          />
+          <div className={styles.grid2}>
+            <TextField
+              type="number"
+              label="Thứ tự hiển thị"
+              error={itemForm.formState.errors.display_order?.message}
+              {...itemForm.register('display_order')}
+            />
+            <SelectField
+              label="Trạng thái"
+              options={STATUS_OPTIONS}
+              error={itemForm.formState.errors.status?.message}
+              {...itemForm.register('status')}
+            />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <TextField type="date" label="Ngày bắt đầu hiệu lực" error={itemForm.formState.errors.start_date?.message} {...itemForm.register('start_date')} />
-            <TextField type="date" label="Ngày kết thúc hiệu lực" error={itemForm.formState.errors.end_date?.message} {...itemForm.register('end_date')} />
+          <div className={styles.grid2}>
+            <TextField
+              type="date"
+              label="Ngày bắt đầu hiệu lực"
+              error={itemForm.formState.errors.start_date?.message}
+              {...itemForm.register('start_date')}
+            />
+            <TextField
+              type="date"
+              label="Ngày kết thúc hiệu lực"
+              error={itemForm.formState.errors.end_date?.message}
+              {...itemForm.register('end_date')}
+            />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setItemModal(null)}>Hủy</Button>
-            <Button type="submit" isLoading={saveItemMutation.isPending}>Lưu</Button>
+          <div className={styles.actions}>
+            <Button type="button" variant="outline" onClick={() => setItemModal(null)}>
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={saveItemMutation.isPending}>
+              Lưu
+            </Button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Xác nhận xóa">
-        <p className="text-neutral-900">Bạn có chắc muốn xóa slide này?</p>
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleteTarget(null)}>Hủy</Button>
-          <Button variant="danger" isLoading={deleteItemMutation.isPending} onClick={() => deleteTarget && deleteItemMutation.mutate(deleteTarget.id)}>Xóa</Button>
+      <Modal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Xác nhận xóa"
+      >
+        <p className={styles.confirm}>Bạn có chắc muốn xóa slide này?</p>
+        <div className={styles.confirmActions}>
+          <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+            Hủy
+          </Button>
+          <Button
+            variant="danger"
+            isLoading={deleteItemMutation.isPending}
+            onClick={() => deleteTarget && deleteItemMutation.mutate(deleteTarget.id)}
+          >
+            Xóa
+          </Button>
         </div>
       </Modal>
     </div>

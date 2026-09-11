@@ -5,6 +5,7 @@ import { SlidersHorizontal, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
 import { SimType } from '@/types/product';
+import styles from './FilterSidebar.module.scss';
 
 const PREFIXES = ['090', '093', '089', '070', '079', '077', '076', '078'];
 const SIM_TYPES: Array<{ value: SimType; label: string }> = [
@@ -35,14 +36,14 @@ interface FilterSidebarProps {
 
 function FilterBody({ value, onChange }: FilterSidebarProps) {
   return (
-    <div className="space-y-6">
-      <div>
-        <h4 className="mb-2 font-heading text-sm font-semibold text-neutral-900">Đầu số</h4>
-        <div className="flex flex-wrap gap-2">
+    <div className={styles.filterBody}>
+      <div className={styles.section}>
+        <h4 className={styles.sectionTitle}>Đầu số</h4>
+        <div className={styles.prefixList}>
           <button
             type="button"
             onClick={() => onChange({ ...value, prefix: '' })}
-            className={`rounded-full border px-3 py-1 text-sm ${value.prefix === '' ? 'border-primary bg-primary text-white' : 'border-neutral-100 text-neutral-900'}`}
+            className={`${styles.chip} ${value.prefix === '' ? styles.chipActive : ''}`}
           >
             Tất cả
           </button>
@@ -51,7 +52,7 @@ function FilterBody({ value, onChange }: FilterSidebarProps) {
               key={p}
               type="button"
               onClick={() => onChange({ ...value, prefix: p })}
-              className={`rounded-full border px-3 py-1 text-sm ${value.prefix === p ? 'border-primary bg-primary text-white' : 'border-neutral-100 text-neutral-900'}`}
+              className={`${styles.chip} ${value.prefix === p ? styles.chipActive : ''}`}
             >
               {p}
             </button>
@@ -59,27 +60,27 @@ function FilterBody({ value, onChange }: FilterSidebarProps) {
         </div>
       </div>
 
-      <div>
-        <h4 className="mb-2 font-heading text-sm font-semibold text-neutral-900">Loại sim</h4>
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-2 text-sm text-neutral-900">
+      <div className={styles.section}>
+        <h4 className={styles.sectionTitle}>Loại sim</h4>
+        <div className={styles.radioGroup}>
+          <label className={styles.radioLabel}>
             <input
               type="radio"
               name="sim_type"
               checked={value.sim_type === ''}
               onChange={() => onChange({ ...value, sim_type: '' })}
-              className="h-4 w-4 text-primary focus-visible:ring-primary"
+              className={styles.radioInput}
             />
             Tất cả
           </label>
           {SIM_TYPES.map((t) => (
-            <label key={t.value} className="flex items-center gap-2 text-sm text-neutral-900">
+            <label key={t.value} className={styles.radioLabel}>
               <input
                 type="radio"
                 name="sim_type"
                 checked={value.sim_type === t.value}
                 onChange={() => onChange({ ...value, sim_type: t.value })}
-                className="h-4 w-4 text-primary focus-visible:ring-primary"
+                className={styles.radioInput}
               />
               {t.label}
             </label>
@@ -87,17 +88,17 @@ function FilterBody({ value, onChange }: FilterSidebarProps) {
         </div>
       </div>
 
-      <div>
-        <h4 className="mb-2 font-heading text-sm font-semibold text-neutral-900">Mức giá</h4>
-        <div className="space-y-1.5">
+      <div className={styles.section}>
+        <h4 className={styles.sectionTitle}>Mức giá</h4>
+        <div className={styles.radioGroup}>
           {PRICE_RANGES.map((r) => (
-            <label key={r.value} className="flex items-center gap-2 text-sm text-neutral-900">
+            <label key={r.value} className={styles.radioLabel}>
               <input
                 type="radio"
                 name="price_range"
                 checked={value.price_range === r.value}
                 onChange={() => onChange({ ...value, price_range: r.value })}
-                className="h-4 w-4 text-primary focus-visible:ring-primary"
+                className={styles.radioInput}
               />
               {r.label}
             </label>
@@ -114,15 +115,13 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
 
   return (
     <>
-      {/* Desktop: cot trai co dinh */}
-      <aside className="hidden w-64 shrink-0 rounded-lg border border-neutral-100 bg-white p-4 lg:block">
+      <aside className={styles.desktopSidebar}>
         <FilterBody value={value} onChange={onChange} />
       </aside>
 
-      {/* Mobile: nut mo Modal/Drawer full-screen */}
-      <div className="mb-4 lg:hidden">
+      <div className={styles.mobileToggle}>
         <Button variant="outline" size="sm" onClick={() => setIsMobileOpen(true)}>
-          <SlidersHorizontal className="h-4 w-4" />
+          <SlidersHorizontal className={styles.icon} />
           Bộ lọc
         </Button>
       </div>
@@ -134,7 +133,7 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
-            className="fixed inset-0 z-50 bg-neutral-900/50 lg:hidden"
+            className={styles.mobileOverlay}
             onClick={() => setIsMobileOpen(false)}
           >
             <motion.div
@@ -142,17 +141,22 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-lg bg-white p-4"
+              className={styles.mobilePanel}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-heading text-lg font-semibold">Bộ lọc</h3>
-                <button type="button" onClick={() => setIsMobileOpen(false)} aria-label="Đóng">
-                  <X className="h-5 w-5" />
+              <div className={styles.mobileHeader}>
+                <h3 className={styles.mobileTitle}>Bộ lọc</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileOpen(false)}
+                  aria-label="Đóng"
+                  className={styles.closeButton}
+                >
+                  <X className={styles.closeIcon} />
                 </button>
               </div>
               <FilterBody value={value} onChange={onChange} />
-              <Button className="mt-4 w-full" onClick={() => setIsMobileOpen(false)}>
+              <Button className={styles.applyButton} onClick={() => setIsMobileOpen(false)}>
                 Áp dụng
               </Button>
             </motion.div>

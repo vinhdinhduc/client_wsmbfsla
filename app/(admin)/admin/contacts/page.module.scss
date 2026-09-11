@@ -1,0 +1,91 @@
+@use '../../../../styles/variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.filter {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+.detail p {
+  margin: 0;
+}
+.muted {
+  color: var(--color-neutral-500);
+}
+.value {
+  font-weight: 500;
+  color: var(--color-neutral-900);
+}
+.messageLabel {
+  margin: 0;
+  color: var(--color-neutral-500);
+}
+.message {
+  margin: 0.25rem 0 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+}
+.detailAction {
+  display: flex;
+  justify-content: flex-end;
+}
+.iconButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+  &:hover {
+    background: var(--color-neutral-100);
+    color: var(--color-primary);
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.25rem;
+  }
+}
+.icon {
+  width: 1rem;
+  height: 1rem;
+}

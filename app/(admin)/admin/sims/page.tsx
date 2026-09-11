@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/Badge';
 import { TextField, SelectField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatPrice } from '@/lib/format';
+import styles from '../admin-shared.module.scss';
 
 const CATALOG_OPTIONS = [
   { value: 'so_dep', label: 'Số đẹp' },
@@ -58,12 +59,18 @@ type SimSchemaValues = z.infer<typeof simSchema>;
 export default function AdminSimsPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [modalState, setModalState] = useState<{ mode: 'create' | 'edit'; item?: SimNumber } | null>(null);
+  const [modalState, setModalState] = useState<{
+    mode: 'create' | 'edit';
+    item?: SimNumber;
+  } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SimNumber | null>(null);
   const [importResult, setImportResult] = useState<SimImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: sims, isLoading } = useQuery({ queryKey: ['admin-sims'], queryFn: () => simsApi.listAdmin() });
+  const { data: sims, isLoading } = useQuery({
+    queryKey: ['admin-sims'],
+    queryFn: () => simsApi.listAdmin(),
+  });
 
   const {
     register,
@@ -73,14 +80,28 @@ export default function AdminSimsPage() {
   } = useForm<SimSchemaValues>({ resolver: zodResolver(simSchema) });
 
   function openCreate() {
-    reset({ phone_number: '', prefix: '', catalog: 'so_dep', sim_type: 'thuong', price: 0, bundle_note: '', commitment_months: 0, status: 'available' });
+    reset({
+      phone_number: '',
+      prefix: '',
+      catalog: 'so_dep',
+      sim_type: 'thuong',
+      price: 0,
+      bundle_note: '',
+      commitment_months: 0,
+      status: 'available',
+    });
     setModalState({ mode: 'create' });
   }
 
   function openEdit(item: SimNumber) {
     reset({
-      phone_number: item.phone_number, prefix: item.prefix, catalog: item.catalog, sim_type: item.sim_type,
-      price: item.price, bundle_note: item.bundle_note ?? '', commitment_months: item.commitment_months ?? 0,
+      phone_number: item.phone_number,
+      prefix: item.prefix,
+      catalog: item.catalog,
+      sim_type: item.sim_type,
+      price: item.price,
+      bundle_note: item.bundle_note ?? '',
+      commitment_months: item.commitment_months ?? 0,
       status: item.status,
     });
     setModalState({ mode: 'edit', item });
@@ -88,7 +109,9 @@ export default function AdminSimsPage() {
 
   const saveMutation = useMutation({
     mutationFn: (values: SimFormValues) =>
-      modalState?.mode === 'edit' && modalState.item ? simsApi.update(modalState.item.id, values) : simsApi.create(values),
+      modalState?.mode === 'edit' && modalState.item
+        ? simsApi.update(modalState.item.id, values)
+        : simsApi.create(values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
       showToast('Đã lưu số sim thành công');
@@ -118,7 +141,11 @@ export default function AdminSimsPage() {
   });
 
   function onSubmit(values: SimSchemaValues) {
-    saveMutation.mutate({ ...values, bundle_note: values.bundle_note || null, commitment_months: values.commitment_months ?? null });
+    saveMutation.mutate({
+      ...values,
+      bundle_note: values.bundle_note || null,
+      commitment_months: values.commitment_months ?? null,
+    });
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -128,19 +155,53 @@ export default function AdminSimsPage() {
   }
 
   const columns: TableColumn<SimNumber>[] = [
-    { key: 'phone_number', header: 'Số điện thoại', render: (s) => <span className="font-semibold">{s.phone_number}</span>, sortAccessor: (s) => s.phone_number },
-    { key: 'sim_type', header: 'Loại sim', render: (s) => SIM_TYPE_OPTIONS.find((t) => t.value === s.sim_type)?.label },
-    { key: 'price', header: 'Giá', render: (s) => formatPrice(s.price), sortAccessor: (s) => s.price },
-    { key: 'status', header: 'Trạng thái', render: (s) => <Badge tone={STATUS_TONE[s.status]}>{STATUS_OPTIONS.find((o) => o.value === s.status)?.label}</Badge> },
     {
-      key: 'actions', header: '', className: 'text-right',
+      key: 'phone_number',
+      header: 'Số điện thoại',
+      render: (s) => <span className={styles.strong}>{s.phone_number}</span>,
+      sortAccessor: (s) => s.phone_number,
+    },
+    {
+      key: 'sim_type',
+      header: 'Loại sim',
+      render: (s) => SIM_TYPE_OPTIONS.find((t) => t.value === s.sim_type)?.label,
+    },
+    {
+      key: 'price',
+      header: 'Giá',
+      render: (s) => formatPrice(s.price),
+      sortAccessor: (s) => s.price,
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
       render: (s) => (
-        <div className="flex justify-end gap-1">
-          <button type="button" onClick={() => openEdit(s)} aria-label="Sửa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-primary before:absolute before:-inset-1 before:content-['']">
-            <Pencil className="h-4 w-4" />
+        <Badge tone={STATUS_TONE[s.status]}>
+          {STATUS_OPTIONS.find((o) => o.value === s.status)?.label}
+        </Badge>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      className: 'text-right',
+      render: (s) => (
+        <div className={styles.iconActions}>
+          <button
+            type="button"
+            onClick={() => openEdit(s)}
+            aria-label="Sửa"
+            className={styles.iconButton}
+          >
+            <Pencil className={styles.icon} />
           </button>
-          <button type="button" onClick={() => setDeleteTarget(s)} aria-label="Xóa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-danger before:absolute before:-inset-1 before:content-['']">
-            <Trash2 className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setDeleteTarget(s)}
+            aria-label="Xóa"
+            className={styles.iconButton}
+          >
+            <Trash2 className={styles.icon} />
           </button>
         </div>
       ),
@@ -148,59 +209,136 @@ export default function AdminSimsPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900">Quản lý Kho sim số</h1>
-        <div className="flex gap-2">
-          <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleFileChange} />
-          <Button variant="outline" isLoading={importMutation.isPending} onClick={() => fileInputRef.current?.click()}>
-            <Upload className="h-4 w-4" /> Import Excel
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Quản lý Kho sim số</h1>
+        <div className={styles.buttonGroup}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            className={styles.hidden}
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="outline"
+            isLoading={importMutation.isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className={styles.icon} /> Import Excel
           </Button>
-          <Button onClick={openCreate}><Plus className="h-4 w-4" /> Thêm số sim</Button>
+          <Button onClick={openCreate}>
+            <Plus className={styles.icon} /> Thêm số sim
+          </Button>
         </div>
       </div>
 
       <Table columns={columns} data={sims ?? []} rowKey={(s) => s.id} isLoading={isLoading} />
 
-      <Modal isOpen={modalState !== null} onClose={() => setModalState(null)} title={modalState?.mode === 'edit' ? 'Sửa số sim' : 'Thêm số sim'}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <TextField label="Số điện thoại" error={errors.phone_number?.message} {...register('phone_number')} />
-          <TextField label="Đầu số" placeholder="090, 093..." error={errors.prefix?.message} {...register('prefix')} />
-          <div className="grid grid-cols-2 gap-4">
-            <SelectField label="Danh mục" options={CATALOG_OPTIONS} error={errors.catalog?.message} {...register('catalog')} />
-            <SelectField label="Loại sim" options={SIM_TYPE_OPTIONS} error={errors.sim_type?.message} {...register('sim_type')} />
+      <Modal
+        isOpen={modalState !== null}
+        onClose={() => setModalState(null)}
+        title={modalState?.mode === 'edit' ? 'Sửa số sim' : 'Thêm số sim'}
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <TextField
+            label="Số điện thoại"
+            error={errors.phone_number?.message}
+            {...register('phone_number')}
+          />
+          <TextField
+            label="Đầu số"
+            placeholder="090, 093..."
+            error={errors.prefix?.message}
+            {...register('prefix')}
+          />
+          <div className={styles.grid2}>
+            <SelectField
+              label="Danh mục"
+              options={CATALOG_OPTIONS}
+              error={errors.catalog?.message}
+              {...register('catalog')}
+            />
+            <SelectField
+              label="Loại sim"
+              options={SIM_TYPE_OPTIONS}
+              error={errors.sim_type?.message}
+              {...register('sim_type')}
+            />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <TextField type="number" label="Giá (đ)" error={errors.price?.message} {...register('price')} />
-            <TextField type="number" label="Cam kết (tháng)" error={errors.commitment_months?.message} {...register('commitment_months')} />
+          <div className={styles.grid2}>
+            <TextField
+              type="number"
+              label="Giá (đ)"
+              error={errors.price?.message}
+              {...register('price')}
+            />
+            <TextField
+              type="number"
+              label="Cam kết (tháng)"
+              error={errors.commitment_months?.message}
+              {...register('commitment_months')}
+            />
           </div>
-          <TextField label="Ghi chú gói cước kèm theo" error={errors.bundle_note?.message} {...register('bundle_note')} />
-          <SelectField label="Trạng thái" options={STATUS_OPTIONS} error={errors.status?.message} {...register('status')} />
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setModalState(null)}>Hủy</Button>
-            <Button type="submit" isLoading={saveMutation.isPending}>Lưu</Button>
+          <TextField
+            label="Ghi chú gói cước kèm theo"
+            error={errors.bundle_note?.message}
+            {...register('bundle_note')}
+          />
+          <SelectField
+            label="Trạng thái"
+            options={STATUS_OPTIONS}
+            error={errors.status?.message}
+            {...register('status')}
+          />
+          <div className={styles.actions}>
+            <Button type="button" variant="outline" onClick={() => setModalState(null)}>
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={saveMutation.isPending}>
+              Lưu
+            </Button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Xác nhận xóa">
-        <p className="text-neutral-900">Bạn có chắc muốn xóa số <strong>{deleteTarget?.phone_number}</strong>?</p>
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleteTarget(null)}>Hủy</Button>
-          <Button variant="danger" isLoading={deleteMutation.isPending} onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>Xóa</Button>
+      <Modal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Xác nhận xóa"
+      >
+        <p className={styles.confirm}>
+          Bạn có chắc muốn xóa số <strong>{deleteTarget?.phone_number}</strong>?
+        </p>
+        <div className={styles.confirmActions}>
+          <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+            Hủy
+          </Button>
+          <Button
+            variant="danger"
+            isLoading={deleteMutation.isPending}
+            onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+          >
+            Xóa
+          </Button>
         </div>
       </Modal>
 
-      <Modal isOpen={importResult !== null} onClose={() => setImportResult(null)} title="Kết quả Import Excel">
+      <Modal
+        isOpen={importResult !== null}
+        onClose={() => setImportResult(null)}
+        title="Kết quả Import Excel"
+      >
         {importResult && (
-          <div className="space-y-3">
-            <p className="text-sm text-neutral-900">
-              Đã nhập thành công <strong>{importResult.inserted}</strong> số, bỏ qua <strong>{importResult.skipped}</strong> dòng.
+          <div className={styles.form}>
+            <p className={styles.confirm}>
+              Đã nhập thành công <strong>{importResult.inserted}</strong> số, bỏ qua{' '}
+              <strong>{importResult.skipped}</strong> dòng.
             </p>
             {importResult.errors.length > 0 && (
-              <div className="max-h-60 overflow-y-auto rounded-lg border border-danger/30 bg-danger/5 p-3">
-                <p className="mb-2 text-sm font-semibold text-danger">Các dòng lỗi:</p>
-                <ul className="space-y-1 text-sm text-neutral-900">
+              <div className={styles.errorBox}>
+                <p className={styles.errorTitle}>Các dòng lỗi:</p>
+                <ul className={styles.errorList}>
                   {importResult.errors.map((e, idx) => (
                     <li key={idx}>
                       Dòng {e.row}: {e.message}
@@ -209,7 +347,7 @@ export default function AdminSimsPage() {
                 </ul>
               </div>
             )}
-            <div className="flex justify-end">
+            <div className={styles.actions}>
               <Button onClick={() => setImportResult(null)}>Đóng</Button>
             </div>
           </div>

@@ -1,0 +1,43 @@
+@use '../../styles/variables' as *;
+.loading {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+.loader {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-primary);
+  animation: spin 1s linear infinite;
+}
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-main);
+  transition: background-color 200ms ease;
+}
+.content {
+  display: flex;
+  min-height: 100vh;
+  flex: 1;
+  flex-direction: column;
+}
+.main {
+  flex: 1;
+  overflow-x: hidden;
+  padding: 1.25rem;
+  padding-bottom: 5rem;
+  @media (min-width: $breakpoint-sm) {
+    padding: 2rem 2.25rem;
+  }
+  @media (min-width: $breakpoint-xl) {
+    padding-right: 4rem;
+    padding-left: 4rem;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

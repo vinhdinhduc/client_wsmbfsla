@@ -5,6 +5,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { buildMetadata } from '@/lib/metadata';
 import { SolutionContent } from './_components/SolutionContent';
+import styles from './page.module.scss';
 
 export const revalidate = 60;
 
@@ -24,7 +25,11 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   try {
     const solution = await solutionsApi.getPublicBySlug(params.slug);
     return buildMetadata({
@@ -47,16 +52,18 @@ export default async function SolutionDetailPage({ params }: { params: { slug: s
   }
 
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
-      <Breadcrumb items={[{ label: 'Giải pháp số', href: '/giai-phap-so' }, { label: solution.name }]} />
-      <div className="mx-auto mt-4 max-w-3xl">
-        <div className="flex items-center gap-2">
+    <div className={styles.page}>
+      <Breadcrumb
+        items={[{ label: 'Giải pháp số', href: '/giai-phap-so' }, { label: solution.name }]}
+      />
+      <div className={styles.content}>
+        <div className={styles.headerRow}>
           {solution.is_hot && <Badge tone="accent">HOT</Badge>}
           <Badge tone="primary">{CATEGORY_LABEL[solution.category] ?? solution.category}</Badge>
         </div>
-        <h1 className="mt-3 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">{solution.name}</h1>
-        {solution.summary && <p className="mt-2 text-neutral-500">{solution.summary}</p>}
-        <div className="mt-6">
+        <h1 className={styles.title}>{solution.name}</h1>
+        {solution.summary && <p className={styles.summary}>{solution.summary}</p>}
+        <div className={styles.solutionBody}>
           <SolutionContent solution={solution} />
         </div>
       </div>

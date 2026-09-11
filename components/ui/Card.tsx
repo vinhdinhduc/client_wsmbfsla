@@ -10,6 +10,7 @@ import { Badge } from './Badge';
 import { Button } from './Button';
 import { useCart } from '@/hooks/useCart';
 import type { News, Package, SimNumber, Solution } from '@/types/product';
+import styles from './Card.module.scss';
 
 const CATEGORY_LABEL: Record<string, string> = {
   khuyen_mai: 'Khuyến mãi',
@@ -34,20 +35,10 @@ export function Card({
   className?: string;
   children: ReactNode;
 }) {
-  const content = (
-    <div
-      className={cn(
-        'group relative overflow-hidden rounded-lg border border-neutral-100 bg-white shadow-sm transition-shadow duration-150 ease hover:shadow-md',
-        "before:pointer-events-none before:absolute before:inset-0 before:rounded-lg before:border-2 before:border-transparent before:content-[''] before:transition-colors group-hover:before:border-primary/30",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
+  const content = <div className={cn(styles.card, className)}>{children}</div>;
   if (href) {
     return (
-      <Link href={href} className="block">
+      <Link href={href} className={styles.blockLink}>
         {content}
       </Link>
     );
@@ -57,18 +48,18 @@ export function Card({
 
 function CardThumbnail({ src, alt }: { src: string | null; alt: string }) {
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">
+    <div className={styles.thumbnail}>
       {src ? (
         <Image
           src={src}
           alt={alt}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className={styles.thumbnailImage}
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-neutral-500">
-          <Smartphone className="h-10 w-10" />
+        <div className={styles.thumbnailEmpty}>
+          <Smartphone className={styles.thumbnailIcon} />
         </div>
       )}
     </div>
@@ -82,35 +73,42 @@ export function PackageCard({ pkg }: { pkg: Package }) {
 
   return (
     <Card>
-      <Link href={`/goi-cuoc/${pkg.slug}`} className="block">
+      <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.blockLink}>
         <CardThumbnail src={null} alt={pkg.name} />
-        <div className="space-y-2 p-4">
-          <div className="flex items-center gap-2">
+        <div className={styles.content}>
+          <div className={styles.badges}>
             {pkg.group_type === 'hot' && <Badge tone="accent">HOT</Badge>}
             <Badge tone="primary">{CATEGORY_LABEL[pkg.group_type] ?? pkg.group_type}</Badge>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-neutral-900">{pkg.name}</h3>
-          {pkg.headline_desc && <p className="text-sm text-neutral-500">{pkg.headline_desc}</p>}
-          <p className="font-body text-xl font-bold text-accent">
+          <h3 className={styles.cardTitle}>{pkg.name}</h3>
+          {pkg.headline_desc && <p className={styles.muted}>{pkg.headline_desc}</p>}
+          <p className={styles.price}>
             {formatPrice(pkg.price)}
-            <span className="text-sm font-normal text-neutral-500">
+            <span className={styles.priceUnit}>
               /{pkg.duration_value} {pkg.duration_unit}
             </span>
           </p>
         </div>
       </Link>
-      <div className="px-4 pb-4">
+      <div className={styles.action}>
         <Button
           size="sm"
           variant={inCart ? 'outline' : 'primary'}
-          className="w-full"
+          className={styles.fullWidth}
           disabled={inCart}
           onClick={(e) => {
             e.preventDefault();
-            addItem({ key, type: 'goi_cuoc', reference_id: pkg.id, name: pkg.name, price: pkg.price, image: null });
+            addItem({
+              key,
+              type: 'goi_cuoc',
+              reference_id: pkg.id,
+              name: pkg.name,
+              price: pkg.price,
+              image: null,
+            });
           }}
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart className={styles.actionIcon} />
           {inCart ? 'Đã có trong giỏ' : 'Thêm vào giỏ'}
         </Button>
       </div>
@@ -134,29 +132,34 @@ export function SimCard({ sim }: { sim: SimNumber }) {
 
   return (
     <Card>
-      <Link href={`/sim-so-dep/${sim.id}`} className="block p-4">
-        <div className="flex items-center justify-between">
+      <Link href={`/sim-so-dep/${sim.id}`} className={styles.content}>
+        <div className={styles.spaceBetween}>
           <Badge tone="primary">{SIM_TYPE_LABEL[sim.sim_type] ?? sim.sim_type}</Badge>
           <Badge tone={soldOut ? 'danger' : 'success'}>{soldOut ? 'Hết hàng' : 'Còn hàng'}</Badge>
         </div>
-        <p className="mt-3 font-heading text-2xl font-bold tracking-wide text-neutral-900">
-          {sim.phone_number}
-        </p>
-        {sim.bundle_note && <p className="mt-1 text-sm text-neutral-500">{sim.bundle_note}</p>}
-        <p className="mt-2 font-body text-xl font-bold text-accent">{formatPrice(sim.price)}</p>
+        <p className={styles.phoneNumber}>{sim.phone_number}</p>
+        {sim.bundle_note && <p className={styles.muted}>{sim.bundle_note}</p>}
+        <p className={styles.price}>{formatPrice(sim.price)}</p>
       </Link>
-      <div className="px-4 pb-4">
+      <div className={styles.action}>
         <Button
           size="sm"
           variant={inCart ? 'outline' : 'primary'}
-          className="w-full"
+          className={styles.fullWidth}
           disabled={inCart || soldOut}
           onClick={(e) => {
             e.preventDefault();
-            addItem({ key, type: 'sim', reference_id: sim.id, name: sim.phone_number, price: sim.price, image: null });
+            addItem({
+              key,
+              type: 'sim',
+              reference_id: sim.id,
+              name: sim.phone_number,
+              price: sim.price,
+              image: null,
+            });
           }}
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart className={styles.actionIcon} />
           {soldOut ? 'Hết hàng' : inCart ? 'Đã có trong giỏ' : 'Thêm vào giỏ'}
         </Button>
       </div>
@@ -168,13 +171,11 @@ export function NewsCard({ news }: { news: News }) {
   return (
     <Card href={`/tin-tuc/${news.slug}`}>
       <CardThumbnail src={news.thumbnail} alt={news.title} />
-      <div className="space-y-2 p-4">
+      <div className={styles.content}>
         <Badge tone="accent">{CATEGORY_LABEL[news.category] ?? news.category}</Badge>
-        <h3 className="line-clamp-2 font-heading text-lg font-semibold text-neutral-900">
-          {news.title}
-        </h3>
-        {news.summary && <p className="line-clamp-2 text-sm text-neutral-500">{news.summary}</p>}
-        {news.published_at && <p className="text-sm text-neutral-500">{formatDate(news.published_at)}</p>}
+        <h3 className={styles.cardTitleClamp}>{news.title}</h3>
+        {news.summary && <p className={styles.mutedClamp}>{news.summary}</p>}
+        {news.published_at && <p className={styles.muted}>{formatDate(news.published_at)}</p>}
       </div>
     </Card>
   );
@@ -184,30 +185,38 @@ export function SolutionCard({ solution }: { solution: Solution }) {
   return (
     <Card href={`/giai-phap-so/${solution.slug}`}>
       <CardThumbnail src={solution.thumbnail} alt={solution.name} />
-      <div className="space-y-2 p-4">
-        <div className="flex items-center gap-2">
+      <div className={styles.content}>
+        <div className={styles.badges}>
           {solution.is_hot && <Badge tone="accent">HOT</Badge>}
           <Badge tone="primary">{CATEGORY_LABEL[solution.category] ?? solution.category}</Badge>
         </div>
-        <h3 className="line-clamp-2 font-heading text-lg font-semibold text-neutral-900">
-          {solution.name}
-        </h3>
-        {solution.summary && <p className="line-clamp-2 text-sm text-neutral-500">{solution.summary}</p>}
+        <h3 className={styles.cardTitleClamp}>{solution.name}</h3>
+        {solution.summary && <p className={styles.mutedClamp}>{solution.summary}</p>}
       </div>
     </Card>
   );
 }
 
-export function StoreCard({ store }: { store: { name: string; address: string; district: string; phone: string; opening_hours: string | null } }) {
+export function StoreCard({
+  store,
+}: {
+  store: {
+    name: string;
+    address: string;
+    district: string;
+    phone: string;
+    opening_hours: string | null;
+  };
+}) {
   return (
-    <div className="rounded-lg border border-neutral-100 bg-white p-4 shadow-sm">
-      <h3 className="font-heading text-lg font-semibold text-neutral-900">{store.name}</h3>
-      <p className="mt-1 flex items-start gap-1.5 text-sm text-neutral-500">
-        <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+    <div className={styles.storeCard}>
+      <h3 className={styles.cardTitle}>{store.name}</h3>
+      <p className={styles.storeAddress}>
+        <MapPin className={styles.storeIcon} />
         {store.address}, {store.district}
       </p>
-      <p className="mt-1 text-sm text-neutral-500">Hotline: {store.phone}</p>
-      {store.opening_hours && <p className="mt-1 text-sm text-neutral-500">Giờ mở cửa: {store.opening_hours}</p>}
+      <p className={styles.muted}>Hotline: {store.phone}</p>
+      {store.opening_hours && <p className={styles.muted}>Giờ mở cửa: {store.opening_hours}</p>}
     </div>
   );
 }

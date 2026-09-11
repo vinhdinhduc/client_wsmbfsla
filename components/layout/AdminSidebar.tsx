@@ -1,66 +1,124 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import {
+  ChevronDown,
+  Gauge as RateLimitIcon,
+  Home as HomeIcon,
+  KeyRound,
+  Mail,
+  Settings as SettingsIcon,
+  X,
+} from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { menuForRole } from '@/lib/rbac';
 import { cn } from '@/lib/cn';
+import styles from './AdminSidebar.module.scss';
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  isMobileMenuOpen,
+  onClose,
+}: {
+  isMobileMenuOpen: boolean;
+  onClose: () => void;
+}) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const menu = user ? menuForRole(user.role) : [];
+  const isSettingsRoute = pathname.startsWith('/admin/settings');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsRoute);
+
+  const settingsItems = [
+    { href: '/admin/settings?section=api-key', label: 'Cấu hình API Key', icon: KeyRound },
+    { href: '/admin/settings?section=email', label: 'Cấu hình Email', icon: Mail },
+    {
+      href: '/admin/settings?section=rate-limit',
+      label: 'Cấu hình Rate Limit',
+      icon: RateLimitIcon,
+    },
+  ];
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-100 bg-white sm:flex">
-      <div className="flex h-16 items-center gap-2 border-b border-neutral-100 px-5">
-        <span className="font-heading text-lg font-bold text-primary">MobiFone Admin</span>
+    <aside className={cn(styles.sidebar, isMobileMenuOpen && styles.mobileOpen)}>
+      <div className={styles.brand}>
+        <span className={styles.brandMark}>M</span>
+        <span className={styles.brandText}>MobiFone Admin</span>
+        <button
+          type="button"
+          className={styles.closeButton}
+          onClick={onClose}
+          aria-label="Đóng menu"
+        >
+          <X />
+        </button>
       </div>
-      <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
-        {menu.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150',
-                isActive ? 'bg-primary text-white' : 'text-neutral-900 hover:bg-neutral-100',
-              )}
+      <nav className={styles.nav}>
+        {menu
+          .filter((item) => item.href !== '/admin/settings')
+          .map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(styles.link, isActive ? styles.active : styles.inactive)}
+                onClick={onClose}
+              >
+                <Icon className={styles.icon} />
+                {item.label}
+              </Link>
+            );
+          })}
+        {user?.role === 'admin' && (
+          <div className={styles.settingsGroup}>
+            <button
+              type="button"
+              className={cn(styles.link, styles.settingsButton, isSettingsRoute && styles.active)}
+              onClick={() => setIsSettingsOpen((isOpen) => !isOpen)}
+              aria-expanded={isSettingsOpen}
             >
-              <Icon className="h-4 w-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
+              <SettingsIcon className={styles.icon} />
+              <span>Cài đặt</span>
+              <ChevronDown className={cn(styles.chevron, isSettingsOpen && styles.chevronOpen)} />
+            </button>
+            {isSettingsOpen && (
+              <div className={styles.subnav}>
+                {settingsItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive =
+                    pathname === '/admin/settings' &&
+                    searchParams.get('section') === item.href.split('=')[1];
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        styles.subLink,
+                        isActive ? styles.subActive : styles.subInactive,
+                      )}
+                      onClick={onClose}
+                    >
+                      <Icon className={styles.subIcon} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </nav>
+      <div className={styles.sidebarFooter}>
+        <Link href="/" target="_blank" className={styles.homeLink} onClick={onClose}>
+          <HomeIcon className={styles.icon} />
+          Xem trang chủ
+        </Link>
+        <span>Hệ thống quản trị nội bộ</span>
+      </div>
     </aside>
-  );
-}
-
-/** Thanh icon thu gon cho man hinh nho (< sm) - cung du lieu menu, chi hien icon. */
-export function AdminSidebarMobile() {
-  const pathname = usePathname();
-  const { user } = useAuth();
-  const menu = user ? menuForRole(user.role) : [];
-
-  return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-neutral-100 bg-white py-1.5 sm:hidden">
-      {menu.slice(0, 5).map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-label={item.label}
-            className={cn('flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5', isActive ? 'text-primary' : 'text-neutral-500')}
-          >
-            <Icon className="h-5 w-5" />
-          </Link>
-        );
-      })}
-    </nav>
   );
 }

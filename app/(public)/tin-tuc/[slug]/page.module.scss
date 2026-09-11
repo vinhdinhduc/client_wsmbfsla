@@ -1,0 +1,33 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.page {
+  width: min(100%, var(--container-width));
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  @include breakpoint(sm) {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  @include breakpoint(lg) {
+    padding-right: 2rem;
+    padding-left: 2rem;
+  }
+}
+
+.content {
+  max-width: 48rem;
+  margin: 1rem auto 0;
+}
+
+.title {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 2vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+
+.body {
+  margin-top: 1.5rem;
+}

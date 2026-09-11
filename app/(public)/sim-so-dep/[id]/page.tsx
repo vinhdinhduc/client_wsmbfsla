@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { AddToCartButton } from '@/components/shared/AddToCartButton';
 import { formatPrice } from '@/lib/format';
 import { buildMetadata } from '@/lib/metadata';
+import styles from './page.module.scss';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,29 +37,38 @@ export default async function SimDetailPage({ params }: { params: { id: string }
   const soldOut = sim.status !== 'available';
 
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
-      <Breadcrumb items={[{ label: 'Sim số đẹp', href: '/sim-so-dep' }, { label: sim.phone_number }]} />
+    <div className={styles.page}>
+      <Breadcrumb
+        items={[{ label: 'Sim số đẹp', href: '/sim-so-dep' }, { label: sim.phone_number }]}
+      />
 
-      <div className="mx-auto mt-6 max-w-xl rounded-lg border border-neutral-100 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-center gap-2">
+      <div className={styles.card}>
+        <div className={styles.badges}>
           <Badge tone="primary">{SIM_TYPE_LABEL[sim.sim_type] ?? sim.sim_type}</Badge>
           <Badge tone={soldOut ? 'danger' : 'success'}>{soldOut ? 'Hết hàng' : 'Còn hàng'}</Badge>
         </div>
-        <h1 className="mt-4 font-heading text-3xl font-bold tracking-wide text-neutral-900 sm:text-4xl">
-          {sim.phone_number}
-        </h1>
-        {sim.bundle_note && <p className="mt-3 text-neutral-500">{sim.bundle_note}</p>}
+        <h1 className={styles.title}>{sim.phone_number}</h1>
+        {sim.bundle_note && <p className={styles.note}>{sim.bundle_note}</p>}
         {sim.commitment_months && (
-          <p className="mt-1 text-sm text-neutral-500">Cam kết sử dụng: {sim.commitment_months} tháng</p>
+          <p className={styles.commitment}>Cam kết sử dụng: {sim.commitment_months} tháng</p>
         )}
-        <p className="mt-4 font-body text-3xl font-bold text-accent">{formatPrice(sim.price)}</p>
+        <p className={styles.price}>{formatPrice(sim.price)}</p>
 
         <AddToCartButton
-          className="mt-6 w-full"
+          className={styles.addButton}
           disabled={soldOut}
-          item={{ key: `sim-${sim.id}`, type: 'sim', reference_id: sim.id, name: sim.phone_number, price: sim.price, image: null }}
+          item={{
+            key: `sim-${sim.id}`,
+            type: 'sim',
+            reference_id: sim.id,
+            name: sim.phone_number,
+            price: sim.price,
+            image: null,
+          }}
         />
-        {soldOut && <p className="mt-2 text-center text-sm text-danger">Số này hiện đã hết hàng, vui lòng chọn số khác.</p>}
+        {soldOut && (
+          <p className={styles.outOfStock}>Số này hiện đã hết hàng, vui lòng chọn số khác.</p>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,38 @@
+@use '../../styles/variables' as *;
+
+.breadcrumb,
+.item,
+.homeLink {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb {
+  flex-wrap: wrap;
+  gap: $space-2 - $space-1 / 2;
+  color: var(--color-neutral-500);
+  font-size: $font-size-sm;
+}
+.item {
+  gap: $space-2 - $space-1 / 2;
+}
+.homeLink {
+  gap: $space-1;
+  &:hover,
+  &:focus-visible {
+    color: var(--color-primary);
+  }
+}
+.link {
+  &:hover,
+  &:focus-visible {
+    color: var(--color-primary);
+  }
+}
+.current {
+  color: var(--color-neutral-900);
+}
+.icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}

@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+@mixin breakpoint($name) {
+  @if $name == sm {
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $name == md {
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $name == lg {
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $name == xl {
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
+  } @else if $name == 2xl {
+    @media (min-width: $breakpoint-2xl) {
+      @content;
+    }
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@mixin container {
+  width: min(100% - 2rem, var(--container-width));
+  margin-inline: auto;
+
+  @media (min-width: 640px) {
+    width: min(100% - 3rem, var(--container-width));
+  }
+  @media (min-width: 1024px) {
+    width: min(100% - 4rem, var(--container-width));
+  }
+}

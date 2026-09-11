@@ -1,12 +1,13 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { AdminSidebar, AdminSidebarMobile } from '@/components/layout/AdminSidebar';
+import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminHeader } from '@/components/layout/AdminHeader';
 import { isRouteAllowedForRole } from '@/lib/rbac';
+import styles from './AdminLayoutClient.module.scss';
 
 const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/403'];
 
@@ -19,6 +20,7 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading, isAuthenticated } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isPublicPath = PUBLIC_ADMIN_PATHS.includes(pathname);
 
@@ -37,20 +39,22 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className={styles.loading}>
+        <Loader2 className={styles.loader} />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-100/40">
-      <AdminSidebar />
-      <div className="flex min-h-screen flex-1 flex-col">
-        <AdminHeader />
-        <main className="flex-1 overflow-x-hidden p-4 pb-20 sm:p-6 sm:pb-6">{children}</main>
+    <div className={styles.layout}>
+      <AdminSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
+      <div className={styles.content}>
+        <AdminHeader onMenuToggle={() => setIsMobileMenuOpen((isOpen) => !isOpen)} />
+        <main className={styles.main}>{children}</main>
       </div>
-      <AdminSidebarMobile />
     </div>
   );
 }

@@ -9,22 +9,8 @@ import { simsApi } from '@/lib/api/sims';
 import { contactsApi } from '@/lib/api/contacts';
 import { shiftsApi } from '@/lib/api/shifts';
 import { formatDate } from '@/lib/format';
-
-function StatCard({ icon: Icon, label, value }: { icon: typeof ClipboardList; label: string; value: number | string }) {
-  return (
-    <div className="rounded-lg border border-neutral-100 bg-white p-5">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-neutral-900">{value}</p>
-          <p className="text-sm text-neutral-500">{label}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { StatCard } from '@/components/ui/StatCard';
+import styles from './page.module.scss';
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -58,30 +44,48 @@ export default function AdminDashboardPage() {
   const availableSims = sims?.filter((s) => s.status === 'available').length ?? 0;
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-heading text-2xl font-bold text-neutral-900">Tổng quan</h1>
+    <div className={styles.page}>
+      <div className={styles.intro}>
+        <div>
+          <p className={styles.kicker}>Bảng điều khiển</p>
+          <h1 className={styles.title}>Xin chào, {user?.full_name || 'quản trị viên'}.</h1>
+          <p className={styles.description}>Đây là những gì đang diễn ra trên hệ thống hôm nay.</p>
+        </div>
+        <div className={styles.status}>
+          <span /> Hệ thống đang hoạt động
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={ClipboardList} label="Đăng ký mới" value={newRegistrations?.total ?? '—'} />
-        <StatCard icon={Mail} label="Liên hệ mới" value={newContacts?.total ?? '—'} />
-        {isContentRole && <StatCard icon={Newspaper} label="Tin đã đăng" value={publishedNews} />}
-        {isContentRole && <StatCard icon={Smartphone} label="Sim còn lại" value={availableSims} />}
+      <div className={styles.grid}>
+        <StatCard
+          icon={ClipboardList}
+          label="Đăng ký mới"
+          value={newRegistrations?.total ?? '—'}
+          tone="blue"
+        />
+        <StatCard icon={Mail} label="Liên hệ mới" value={newContacts?.total ?? '—'} tone="orange" />
+        {isContentRole && (
+          <StatCard icon={Newspaper} label="Tin đã đăng" value={publishedNews} tone="green" />
+        )}
+        {isContentRole && (
+          <StatCard icon={Smartphone} label="Sim còn lại" value={availableSims} tone="purple" />
+        )}
       </div>
 
       {mySchedule && (
-        <div className="rounded-lg border border-neutral-100 bg-white p-5">
-          <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <CalendarClock className="h-5 w-5" />
+        <div className={styles.scheduleCard}>
+          <h2 className={styles.scheduleHeader}>
+            <CalendarClock className={styles.scheduleIcon} />
             Lịch trực của tôi
           </h2>
           {mySchedule.length === 0 ? (
-            <p className="mt-3 text-sm text-neutral-500">Bạn chưa có lịch trực nào được xếp.</p>
+            <p className={styles.emptyText}>Bạn chưa có lịch trực nào được xếp.</p>
           ) : (
-            <ul className="mt-3 divide-y divide-neutral-100">
+            <ul className={styles.scheduleList}>
               {mySchedule.map((s) => (
-                <li key={s.id} className="flex items-center justify-between py-2 text-sm">
-                  <span className="text-neutral-900">{formatDate(s.shift_date)}</span>
-                  <span className="text-neutral-500">
+                <li key={s.id} className={styles.scheduleItem}>
+                  <span className={styles.scheduleDate}>{formatDate(s.shift_date)}</span>
+                  <span className={styles.scheduleTime}>
                     {s.start_time} - {s.end_time}
                   </span>
                 </li>

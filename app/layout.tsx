@@ -3,7 +3,7 @@ import { Be_Vietnam_Pro, Inter } from 'next/font/google';
 import { Providers } from '@/contexts/providers';
 import { AnalyticsScripts } from '@/components/shared/AnalyticsScripts';
 import { env } from '@/lib/env';
-import './globals.css';
+import './globals.scss';
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${inter.variable}`}>
-      <body className="font-body">
+      <body>
         <Providers>
           {children}
           <AnalyticsScripts />

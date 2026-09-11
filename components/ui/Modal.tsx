@@ -4,19 +4,19 @@ import { ReactNode, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import styles from './Modal.module.scss';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
-  /** vd: max-w-lg, max-w-2xl - mac dinh max-w-lg */
-  maxWidthClassName?: string;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 const CLOSE_ANIMATION_MS = 150;
 
-export function Modal({ isOpen, onClose, title, children, maxWidthClassName = 'max-w-lg' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : undefined;
@@ -46,11 +46,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidthClassName = 'm
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}
-      className={cn(
-        'm-auto w-full rounded-lg p-0 backdrop:bg-transparent',
-        "[&::backdrop]:bg-neutral-900/50",
-        maxWidthClassName,
-      )}
+      className={cn(styles.dialog, styles[`maxWidth${maxWidth.toUpperCase()}`])}
     >
       <AnimatePresence>
         {isOpen && (
@@ -59,20 +55,15 @@ export function Modal({ isOpen, onClose, title, children, maxWidthClassName = 'm
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: duration ?? 0.2, ease: 'easeOut' }}
-            className="w-full rounded-lg bg-white shadow-md"
+            className={styles.panel}
           >
-            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
-              <h2 className="font-heading text-lg font-semibold text-neutral-900">{title}</h2>
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Đóng"
-                className="relative text-neutral-500 hover:text-neutral-900 before:absolute before:content-[''] before:-inset-2"
-              >
-                <X className="h-5 w-5" />
+            <div className={styles.header}>
+              <h2 className={styles.title}>{title}</h2>
+              <button type="button" onClick={onClose} aria-label="Đóng" className={styles.close}>
+                <X className={styles.closeIcon} />
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto p-5">{children}</div>
+            <div className={styles.body}>{children}</div>
           </motion.div>
         )}
       </AnimatePresence>

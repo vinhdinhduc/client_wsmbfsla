@@ -1,0 +1,35 @@
+@use '../../styles/variables' as *;
+.tabs {
+  display: flex;
+  gap: $space-1;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-neutral-100);
+}
+.tab {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0.625rem $space-4;
+  border: 0;
+  background: transparent;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+.active {
+  color: var(--color-primary);
+}
+.inactive {
+  color: var(--color-neutral-500);
+  &:hover {
+    color: var(--color-neutral-900);
+  }
+}
+.underline {
+  position: absolute;
+  right: 0.5rem;
+  bottom: -1px;
+  left: 0.5rem;
+  height: 0.125rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+}

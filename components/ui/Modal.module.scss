@@ -1,0 +1,72 @@
+@use '../../styles/variables' as *;
+.dialog {
+  width: 100%;
+  max-width: 32rem;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  &::backdrop {
+    background: rgb(26 26 26 / 50%);
+  }
+}
+.maxWidthSM {
+  max-width: 24rem;
+}
+.maxWidthMD {
+  max-width: 28rem;
+}
+.maxWidthLG {
+  max-width: 32rem;
+}
+.maxWidthXL {
+  max-width: 36rem;
+}
+.maxWidth2XL {
+  max-width: 42rem;
+}
+.panel {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-neutral-100);
+  padding: $space-4 $space-5;
+}
+.title {
+  margin: 0;
+  color: var(--color-neutral-900);
+  font-family: var(--font-heading);
+  font-size: $font-size-lg;
+  font-weight: 600;
+}
+.close {
+  position: relative;
+  border: 0;
+  padding: 0;
+  color: var(--color-neutral-500);
+  background: transparent;
+  &:hover {
+    color: var(--color-neutral-900);
+  }
+  &::before {
+    position: absolute;
+    inset: -0.5rem;
+    content: '';
+  }
+}
+.closeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.body {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: $space-5;
+}

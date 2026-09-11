@@ -12,9 +12,10 @@ export interface Setting {
 }
 
 /**
- * GET /api/public/settings - CHI tra ve dung 6 khoa cong khai co dinh o backend
+ * GET /api/public/settings - CHI tra ve cac khoa cong khai co dinh o backend
  * (PUBLIC_SETTING_KEYS): site_name, site_logo, hotline, theme_primary_color,
- * home_banner, ai_chatbot_enabled. Cac khoa khac (vd ga4_id, fb_pixel_id) du co
+ * home_banner, ai_chatbot_enabled, footer_branch_name, footer_address,
+ * footer_email, footer_description, footer_facebook_url. Cac khoa khac (vd ga4_id, fb_pixel_id) du co
  * duoc luu qua PUT /admin/settings cung KHONG duoc endpoint nay tra ve.
  */
 export interface PublicSettings {
@@ -24,6 +25,11 @@ export interface PublicSettings {
   theme_primary_color?: string;
   home_banner?: string;
   ai_chatbot_enabled?: string;
+  footer_branch_name?: string;
+  footer_address?: string;
+  footer_email?: string;
+  footer_description?: string;
+  footer_facebook_url?: string;
 }
 
 export const settingsApi = {

@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './AuthContext';
 import { CartProvider } from './CartContext';
+import { ThemeProvider } from './ThemeContext';
 import { ToastProvider } from '@/components/ui/Toast';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -22,11 +23,13 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

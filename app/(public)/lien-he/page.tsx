@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ContactForm } from './_components/ContactForm';
+import styles from './page.module.scss';
 
 export const metadata: Metadata = {
   title: 'Liên hệ',
@@ -9,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Liên hệ' }]} />
-      <h1 className="mb-6 mt-3 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">Liên hệ với chúng tôi</h1>
-      <div className="mx-auto max-w-xl rounded-lg border border-neutral-100 bg-white p-6 shadow-sm sm:p-8">
+      <h1 className={styles.title}>Liên hệ với chúng tôi</h1>
+      <div className={styles.card}>
         <ContactForm />
       </div>
     </div>

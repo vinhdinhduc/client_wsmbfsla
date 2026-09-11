@@ -6,10 +6,10 @@ import { ThemeColorInjector } from '@/components/shared/ThemeColorInjector';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
       <ThemeColorInjector />
       <Header />
-      <main className="flex-1">{children}</main>
+      <main style={{ flex: 1 }}>{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />

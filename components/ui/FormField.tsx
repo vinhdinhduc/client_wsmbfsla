@@ -1,13 +1,30 @@
-import { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes, forwardRef } from 'react';
+import {
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+  forwardRef,
+} from 'react';
 import { cn } from '@/lib/cn';
+import styles from './FormField.module.scss';
 
-function FieldWrapper({ label, error, children, hint }: { label: string; error?: string; children: ReactNode; hint?: string }) {
+function FieldWrapper({
+  label,
+  error,
+  children,
+  hint,
+}: {
+  label: string;
+  error?: string;
+  children: ReactNode;
+  hint?: string;
+}) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-neutral-900">{label}</label>
+    <div className={styles.field}>
+      <label className={styles.label}>{label}</label>
       {children}
-      {hint && !error && <p className="text-sm text-neutral-500">{hint}</p>}
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {hint && !error && <p className={styles.hint}>{hint}</p>}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 }
@@ -23,12 +40,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     <FieldWrapper label={label} error={error} hint={hint}>
       <input
         ref={ref}
-        className={cn(
-          'h-10 w-full rounded-lg border px-3 text-sm text-neutral-900 placeholder:text-neutral-500',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-          error ? 'border-danger' : 'border-neutral-100',
-          className,
-        )}
+        className={cn(styles.control, error ? styles.invalid : styles.valid, className)}
         {...props}
       />
     </FieldWrapper>
@@ -48,12 +60,7 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
       <textarea
         ref={ref}
         rows={rows}
-        className={cn(
-          'w-full rounded-lg border px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-500',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-          error ? 'border-danger' : 'border-neutral-100',
-          className,
-        )}
+        className={cn(styles.textarea, error ? styles.invalid : styles.valid, className)}
         {...props}
       />
     </FieldWrapper>
@@ -74,9 +81,9 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
       <select
         ref={ref}
         className={cn(
-          'h-10 w-full rounded-lg border bg-white px-3 text-sm text-neutral-900',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-          error ? 'border-danger' : 'border-neutral-100',
+          styles.control,
+          styles.select,
+          error ? styles.invalid : styles.valid,
           className,
         )}
         {...props}
@@ -97,8 +104,8 @@ export function CheckboxField({
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <label className="flex items-center gap-2 text-sm font-medium text-neutral-900">
-      <input type="checkbox" className="h-4 w-4 rounded border-neutral-100 text-primary focus-visible:ring-primary" {...props} />
+    <label className={styles.checkboxLabel}>
+      <input type="checkbox" className={styles.checkbox} {...props} />
       {label}
     </label>
   );

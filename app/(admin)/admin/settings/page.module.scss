@@ -1,0 +1,29 @@
+@use '../../../../styles/variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.panel {
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}

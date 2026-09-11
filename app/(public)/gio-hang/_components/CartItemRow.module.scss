@@ -1,0 +1,70 @@
+@use '../../../../styles/variables' as *;
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-neutral-100);
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.type {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-neutral-500);
+}
+
+.name {
+  margin: 0;
+  font-weight: 500;
+  color: var(--color-neutral-900);
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.price {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.removeButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-500);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  &:hover {
+    color: var(--color-danger);
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.5rem;
+  }
+}
+
+.removeIcon {
+  width: 1rem;
+  height: 1rem;
+}

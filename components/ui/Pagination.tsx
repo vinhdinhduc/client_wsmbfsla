@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import styles from './Pagination.module.scss';
 
 interface PaginationProps {
   page: number;
@@ -17,20 +18,20 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
   const pages = buildPageList(page, totalPages);
 
   return (
-    <nav className="flex items-center justify-center gap-1" aria-label="Điều hướng phân trang">
+    <nav className={styles.pagination} aria-label="Điều hướng phân trang">
       <button
         type="button"
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-500 hover:bg-neutral-100 disabled:opacity-40"
+        className={styles.button}
         aria-label="Trang trước"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className={styles.icon} />
       </button>
 
       {pages.map((p, idx) =>
         p === 'ellipsis' ? (
-          <span key={`e-${idx}`} className="px-2 text-neutral-500">
+          <span key={`e-${idx}`} className={styles.ellipsis}>
             …
           </span>
         ) : (
@@ -39,10 +40,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
             type="button"
             onClick={() => onPageChange(p)}
             aria-current={p === page ? 'page' : undefined}
-            className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150',
-              p === page ? 'bg-primary text-white' : 'text-neutral-900 hover:bg-neutral-100',
-            )}
+            className={cn(styles.button, p === page && styles.active)}
           >
             {p}
           </button>
@@ -53,10 +51,10 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         type="button"
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-500 hover:bg-neutral-100 disabled:opacity-40"
+        className={styles.button}
         aria-label="Trang sau"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className={styles.icon} />
       </button>
     </nav>
   );

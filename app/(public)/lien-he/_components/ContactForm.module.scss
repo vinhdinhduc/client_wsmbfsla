@@ -1,0 +1,33 @@
+@use '../../../../styles/variables' as *;
+
+.successState {
+  padding: 1.5rem;
+  border: 1px solid rgb(16 185 129 / 30%);
+  border-radius: var(--radius-md);
+  background: rgb(16 185 129 / 5%);
+  text-align: center;
+}
+
+.successMessage {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notice {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-neutral-500);
+}
+
+.submitButton {
+  width: 100%;
+}

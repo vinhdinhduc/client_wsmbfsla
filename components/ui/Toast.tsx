@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { CheckCircle2, XCircle, X } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import styles from './Toast.module.scss';
 
 type ToastTone = 'success' | 'error';
 
@@ -44,7 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed bottom-4 right-4 z-[100] flex flex-col gap-2 sm:bottom-6 sm:right-6">
+      <div className={styles.container}>
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => (
             <motion.div
@@ -54,25 +54,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.95 }}
               transition={{ duration, ease: 'easeOut' }}
-              className={cn(
-                'pointer-events-auto flex w-80 items-start gap-2 rounded-lg border bg-white p-3 shadow-md',
-                toast.tone === 'success' ? 'border-success/30' : 'border-danger/30',
-              )}
+              className={`${styles.toast} ${toast.tone === 'success' ? styles.success : styles.error}`}
               role="status"
             >
               {toast.tone === 'success' ? (
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+                <CheckCircle2 className={`${styles.icon} ${styles.successIcon}`} />
               ) : (
-                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
+                <XCircle className={`${styles.icon} ${styles.errorIcon}`} />
               )}
-              <p className="flex-1 text-sm text-neutral-900">{toast.message}</p>
+              <p className={styles.message}>{toast.message}</p>
               <button
                 type="button"
                 onClick={() => removeToast(toast.id)}
-                className="text-neutral-500 hover:text-neutral-900"
+                className={styles.close}
                 aria-label="Đóng thông báo"
               >
-                <X className="h-4 w-4" />
+                <X className={styles.closeIcon} />
               </button>
             </motion.div>
           ))}

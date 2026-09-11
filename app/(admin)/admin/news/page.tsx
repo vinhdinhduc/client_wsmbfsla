@@ -16,6 +16,7 @@ import { TextField, SelectField } from '@/components/ui/FormField';
 import { RichTextEditor } from '@/components/shared/RichTextEditor';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
+import styles from '../admin-shared.module.scss';
 
 const CATEGORY_OPTIONS = [
   { value: 'khuyen_mai', label: 'Khuyến mãi' },
@@ -26,7 +27,10 @@ const STATUS_OPTIONS = [
   { value: 'draft', label: 'Bản nháp' },
   { value: 'published', label: 'Đã đăng' },
 ];
-const STATUS_TONE: Record<string, 'success' | 'warning'> = { published: 'success', draft: 'warning' };
+const STATUS_TONE: Record<string, 'success' | 'warning'> = {
+  published: 'success',
+  draft: 'warning',
+};
 
 const newsSchema = z.object({
   title: z.string().min(1, 'Vui lòng nhập tiêu đề').max(255),
@@ -55,10 +59,15 @@ function slugify(input: string): string {
 export default function AdminNewsPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [modalState, setModalState] = useState<{ mode: 'create' | 'edit'; item?: News } | null>(null);
+  const [modalState, setModalState] = useState<{ mode: 'create' | 'edit'; item?: News } | null>(
+    null,
+  );
   const [deleteTarget, setDeleteTarget] = useState<News | null>(null);
 
-  const { data: news, isLoading } = useQuery({ queryKey: ['admin-news'], queryFn: () => newsApi.listAdmin() });
+  const { data: news, isLoading } = useQuery({
+    queryKey: ['admin-news'],
+    queryFn: () => newsApi.listAdmin(),
+  });
 
   const {
     register,
@@ -72,7 +81,15 @@ export default function AdminNewsPage() {
   const content = watch('content');
 
   function openCreate() {
-    reset({ title: '', slug: '', category: 'thong_bao', thumbnail: '', summary: '', content: '', status: 'draft' });
+    reset({
+      title: '',
+      slug: '',
+      category: 'thong_bao',
+      thumbnail: '',
+      summary: '',
+      content: '',
+      status: 'draft',
+    });
     setModalState({ mode: 'create' });
   }
 
@@ -122,19 +139,46 @@ export default function AdminNewsPage() {
 
   const columns: TableColumn<News>[] = [
     { key: 'title', header: 'Tiêu đề', render: (n) => n.title, sortAccessor: (n) => n.title },
-    { key: 'category', header: 'Danh mục', render: (n) => CATEGORY_OPTIONS.find((c) => c.value === n.category)?.label ?? n.category },
-    { key: 'status', header: 'Trạng thái', render: (n) => <Badge tone={STATUS_TONE[n.status]}>{STATUS_OPTIONS.find((s) => s.value === n.status)?.label}</Badge> },
-    { key: 'published_at', header: 'Ngày đăng', render: (n) => formatDate(n.published_at), sortAccessor: (n) => n.published_at ?? '' },
+    {
+      key: 'category',
+      header: 'Danh mục',
+      render: (n) => CATEGORY_OPTIONS.find((c) => c.value === n.category)?.label ?? n.category,
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (n) => (
+        <Badge tone={STATUS_TONE[n.status]}>
+          {STATUS_OPTIONS.find((s) => s.value === n.status)?.label}
+        </Badge>
+      ),
+    },
+    {
+      key: 'published_at',
+      header: 'Ngày đăng',
+      render: (n) => formatDate(n.published_at),
+      sortAccessor: (n) => n.published_at ?? '',
+    },
     {
       key: 'actions',
       header: '',
       render: (n) => (
-        <div className="flex justify-end gap-1">
-          <button type="button" onClick={() => openEdit(n)} aria-label="Sửa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-primary before:absolute before:-inset-1 before:content-['']">
-            <Pencil className="h-4 w-4" />
+        <div className={styles.iconActions}>
+          <button
+            type="button"
+            onClick={() => openEdit(n)}
+            aria-label="Sửa"
+            className={styles.iconButton}
+          >
+            <Pencil className={styles.icon} />
           </button>
-          <button type="button" onClick={() => setDeleteTarget(n)} aria-label="Xóa" className="relative rounded p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-danger before:absolute before:-inset-1 before:content-['']">
-            <Trash2 className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setDeleteTarget(n)}
+            aria-label="Xóa"
+            className={styles.iconButton}
+          >
+            <Trash2 className={styles.icon} />
           </button>
         </div>
       ),
@@ -143,11 +187,11 @@ export default function AdminNewsPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl font-bold text-neutral-900">Quản lý Tin tức</h1>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Quản lý Tin tức</h1>
         <Button onClick={openCreate}>
-          <Plus className="h-4 w-4" /> Thêm tin tức
+          <Plus className={styles.icon} /> Thêm tin tức
         </Button>
       </div>
 
@@ -157,9 +201,9 @@ export default function AdminNewsPage() {
         isOpen={modalState !== null}
         onClose={() => setModalState(null)}
         title={modalState?.mode === 'edit' ? 'Sửa tin tức' : 'Thêm tin tức'}
-        maxWidthClassName="max-w-2xl"
+        maxWidth="2xl"
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <TextField
             label="Tiêu đề"
             error={errors.title?.message}
@@ -170,27 +214,62 @@ export default function AdminNewsPage() {
             })}
           />
           <TextField label="Slug" error={errors.slug?.message} {...register('slug')} />
-          <div className="grid grid-cols-2 gap-4">
-            <SelectField label="Danh mục" options={CATEGORY_OPTIONS} error={errors.category?.message} {...register('category')} />
-            <SelectField label="Trạng thái" options={STATUS_OPTIONS} error={errors.status?.message} {...register('status')} />
+          <div className={styles.grid2}>
+            <SelectField
+              label="Danh mục"
+              options={CATEGORY_OPTIONS}
+              error={errors.category?.message}
+              {...register('category')}
+            />
+            <SelectField
+              label="Trạng thái"
+              options={STATUS_OPTIONS}
+              error={errors.status?.message}
+              {...register('status')}
+            />
           </div>
-          <TextField label="Ảnh đại diện (URL)" placeholder="https://..." error={errors.thumbnail?.message} {...register('thumbnail')} />
+          <TextField
+            label="Ảnh đại diện (URL)"
+            placeholder="https://..."
+            error={errors.thumbnail?.message}
+            {...register('thumbnail')}
+          />
           <TextField label="Tóm tắt" error={errors.summary?.message} {...register('summary')} />
-          <RichTextEditor label="Nội dung" value={content ?? ''} onChange={(html) => setValue('content', html, { shouldValidate: true })} error={errors.content?.message} />
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setModalState(null)}>Hủy</Button>
-            <Button type="submit" isLoading={saveMutation.isPending}>Lưu</Button>
+          <RichTextEditor
+            label="Nội dung"
+            value={content ?? ''}
+            onChange={(html) => setValue('content', html, { shouldValidate: true })}
+            error={errors.content?.message}
+          />
+          <div className={styles.actions}>
+            <Button type="button" variant="outline" onClick={() => setModalState(null)}>
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={saveMutation.isPending}>
+              Lưu
+            </Button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Xác nhận xóa">
-        <p className="text-neutral-900">
-          Bạn có chắc muốn xóa tin tức <strong>{deleteTarget?.title}</strong>? Hành động này không thể hoàn tác.
+      <Modal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Xác nhận xóa"
+      >
+        <p className={styles.confirm}>
+          Bạn có chắc muốn xóa tin tức <strong>{deleteTarget?.title}</strong>? Hành động này không
+          thể hoàn tác.
         </p>
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setDeleteTarget(null)}>Hủy</Button>
-          <Button variant="danger" isLoading={deleteMutation.isPending} onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>
+        <div className={styles.confirmActions}>
+          <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+            Hủy
+          </Button>
+          <Button
+            variant="danger"
+            isLoading={deleteMutation.isPending}
+            onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+          >
             Xóa
           </Button>
         </div>

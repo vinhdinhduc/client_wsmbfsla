@@ -1,0 +1,32 @@
+@use '../../../../styles/variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.control {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
