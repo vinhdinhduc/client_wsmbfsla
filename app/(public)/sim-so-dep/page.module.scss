@@ -1,5 +1,5 @@
-@use '../../../styles/variables' as *;
-@use '../../../styles/mixins' as *;
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
 
 .page {
   width: min(100%, var(--container-width));
@@ -15,44 +15,294 @@
   }
 }
 
-.title {
-  margin: 0.75rem 0 1.5rem;
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-neutral-900);
-  @include breakpoint(sm) {
-    font-size: 2.5rem;
-  }
-}
-
-.layout {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  @include breakpoint(lg) {
-    flex-direction: row;
-  }
-}
-
-.content {
-  flex: 1;
-}
-
-.emptyText {
-  padding: 4rem 1rem;
+.hero {
+  max-width: 56rem;
+  margin: 0 auto;
   text-align: center;
-  color: var(--color-neutral-500);
+}
+.title {
+  margin: 0;
+  color: #063a82;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.title::first-letter {
+  color: #063a82;
+}
+.subtitle {
+  margin: 0.35rem 0 1.5rem;
+  color: #39485c;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #718096;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.steps span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.steps b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid #d5dfeb;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0.75rem;
+}
+.stepActive {
+  color: #064fa8;
+  font-weight: 700;
+}
+.stepActive b {
+  color: #fff;
+  border-color: #064fa8;
+  background: #064fa8;
+}
+.stepSeparator {
+  color: #becbd9;
+  font-size: 1.5rem;
 }
 
-.grid {
+.controls {
+  width: min(100%, 50.5rem);
+  margin: 1.75rem auto 2rem;
+}
+.catalogTabs {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  @include breakpoint(sm) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border: 1px solid #dce5ef;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: #fff;
+  box-shadow: 0 4px 12px rgb(4 44 91 / 5%);
+}
+.catalogTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 3rem;
+  padding: 0.5rem;
+  color: #52657c;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
+}
+.catalogTab + .catalogTab {
+  border-left: 1px solid #edf1f5;
+}
+.catalogTabActive {
+  color: #0067bb;
+  border-bottom-color: #0067bb;
+}
+.controlIcon {
+  width: 1rem;
+  height: 1rem;
+}
+.searchRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.searchField,
+.prefixField {
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  border: 1px solid #cbd9e8;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+.searchField {
+  flex: 1;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+}
+.searchField input,
+.prefixField select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #34465c;
+  font: inherit;
+  font-size: 0.8125rem;
+}
+.searchIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  color: #94a8bd;
+}
+.prefixField {
+  width: 9.75rem;
+  gap: 0.4rem;
+  padding: 0 0.7rem;
+}
+.searchButton,
+.chooseButton {
+  border: 0;
+  border-radius: 0.5rem;
+  color: #fff;
+  background: #0966b5;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.searchButton {
+  width: 7.75rem;
+}
+.searchButton:hover,
+.chooseButton:hover:not(:disabled) {
+  background: #064c91;
+}
+.searchButton:active,
+.chooseButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.paymentChoice {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  color: #52657c;
+  font-size: 0.8125rem;
+}
+.paymentChoice label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.paymentChoice input {
+  accent-color: #0b76d1;
+}
+
+.tableWrap {
+  width: min(100%, 62rem);
+  margin: 0 auto;
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 3px 12px rgb(4 44 91 / 9%);
+}
+.resultsTable {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  color: #29384b;
+  font-size: 0.875rem;
+}
+.resultsTable th {
+  padding: 0.9rem 1.25rem;
+  color: #fff;
+  background: #0752aa;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+.resultsTable th:first-child {
+  border-radius: 0.75rem 0 0 0;
+}
+.resultsTable th:last-child {
+  border-radius: 0 0.75rem 0 0;
+  text-align: center;
+}
+.resultsTable td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #edf1f5;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.resultsTable td:first-child {
+  width: 5rem;
+  text-align: center;
+}
+.resultsTable td:last-child {
+  text-align: center;
+}
+.phoneLink {
+  color: #28394f;
+  font-size: 1.0625rem;
+  font-weight: 800;
+}
+.phoneLink:hover {
+  color: #0966b5;
+}
+.chooseButton {
+  min-width: 6.5rem;
+  padding: 0.65rem 1rem;
+  background: #ed1738;
+  box-shadow: 0 3px 8px rgb(237 23 56 / 18%);
+}
+.chooseButtonSelected {
+  background: #8290a0;
+  box-shadow: none;
+}
+.chooseButton:disabled {
+  cursor: not-allowed;
+}
+.emptyText {
+  width: min(100%, 50rem);
+  margin: 2rem auto;
+  padding: 3rem 1rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #718096;
+  text-align: center;
+}
+
+@media (max-width: 639px) {
+  .steps {
+    gap: 0.4rem;
+    font-size: 0.7rem;
   }
-  @include breakpoint(lg) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .steps b {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .catalogTabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .catalogTab:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #edf1f5;
+  }
+  .catalogTab:nth-child(4) {
+    border-top: 1px solid #edf1f5;
+  }
+  .searchRow {
+    flex-wrap: wrap;
+  }
+  .searchField {
+    flex-basis: 100%;
+  }
+  .prefixField,
+  .searchButton {
+    flex: 1;
+    width: auto;
   }
 }

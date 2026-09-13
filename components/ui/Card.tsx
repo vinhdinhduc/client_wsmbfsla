@@ -66,7 +66,7 @@ function CardThumbnail({ src, alt }: { src: string | null; alt: string }) {
   );
 }
 
-export function PackageCard({ pkg }: { pkg: Package }) {
+export function PackageCard({ pkg, onSelect }: { pkg: Package; onSelect?: () => void }) {
   const { addItem, isInCart } = useCart();
   const key = `goi_cuoc-${pkg.id}`;
   const inCart = isInCart(key);
@@ -98,6 +98,10 @@ export function PackageCard({ pkg }: { pkg: Package }) {
           disabled={inCart}
           onClick={(e) => {
             e.preventDefault();
+            if (onSelect) {
+              onSelect();
+              return;
+            }
             addItem({
               key,
               type: 'goi_cuoc',
@@ -109,7 +113,7 @@ export function PackageCard({ pkg }: { pkg: Package }) {
           }}
         >
           <ShoppingCart className={styles.actionIcon} />
-          {inCart ? 'Đã có trong giỏ' : 'Thêm vào giỏ'}
+          {onSelect ? 'Chọn gói cước' : inCart ? 'Đã có trong giỏ' : 'Thêm vào giỏ'}
         </Button>
       </div>
     </Card>

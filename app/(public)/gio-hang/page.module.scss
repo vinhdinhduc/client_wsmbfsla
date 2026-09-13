@@ -1,5 +1,5 @@
-@use '../../../styles/variables' as *;
-@use '../../../styles/mixins' as *;
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
 
 .page {
   width: min(100%, var(--container-width));
@@ -13,6 +13,42 @@
     padding-right: 2rem;
     padding-left: 2rem;
   }
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  max-width: 62rem;
+  margin: 0 auto 2rem;
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+.stepper span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.stepper b {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--color-primary);
+}
+.stepDone {
+  color: var(--color-success);
+}
+.stepDone b {
+  background: var(--color-success);
+}
+.stepCurrent {
+  color: var(--color-neutral-900);
 }
 
 .title {
@@ -73,6 +109,10 @@
     grid-template-columns: 3fr 2fr;
   }
 }
+.productStep {
+  width: min(100%, 44rem);
+  margin: 0 auto;
+}
 
 .cartBox,
 .formBox {
@@ -129,6 +169,43 @@
   margin-top: 1rem;
 }
 
+.addressFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.addressField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--color-neutral-700);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.addressField select {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-neutral-900);
+  font: inherit;
+}
+.addressField select:disabled {
+  color: var(--color-neutral-500);
+  background: var(--color-neutral-50);
+}
+.addressError {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.75rem;
+}
+
 .notice {
   margin: 0;
   font-size: 0.75rem;
@@ -137,4 +214,17 @@
 
 .submitWidth {
   width: 100%;
+}
+
+@media (max-width: 639px) {
+  .stepper {
+    font-size: 0.625rem;
+  }
+  .stepper b {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .addressGrid {
+    grid-template-columns: 1fr;
+  }
 }

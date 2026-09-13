@@ -17,6 +17,10 @@ const submitCartSchema = z.object({
     .max(20)
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
   note: z.string().optional().nullable(),
+  province: z.literal('Sơn La', { errorMap: () => ({ message: 'Chỉ hỗ trợ tỉnh Sơn La' }) }),
+  district: z.string().min(1, 'Vui lòng chọn huyện/thị xã Sơn La'),
+  ward: z.string().min(1, 'Vui lòng chọn xã/phường Sơn La'),
+  delivery_address: z.string().min(1, 'Vui lòng nhập địa chỉ nhận hàng').max(255),
   items: z.array(cartItemSchema).min(1, 'Giỏ hàng không được để trống'),
   recaptcha_token: z.string().min(1, 'Thiếu recaptcha token, vui lòng thử lại'),
 });
@@ -24,7 +28,7 @@ const submitCartSchema = z.object({
 export interface RegistrationActionState {
   status: 'idle' | 'success' | 'error';
   message?: string;
-  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'note' | 'items', string>>;
+  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'note' | 'items' | 'province' | 'district' | 'ward' | 'delivery_address', string>>;
   registrationId?: number;
 }
 
@@ -48,6 +52,10 @@ export async function submitRegistrationAction(
     customer_name: String(formData.get('customer_name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
     note: formData.get('note') ? String(formData.get('note')) : null,
+    province: String(formData.get('province') ?? ''),
+    district: String(formData.get('district') ?? ''),
+    ward: String(formData.get('ward') ?? ''),
+    delivery_address: String(formData.get('delivery_address') ?? ''),
     items: itemsRaw,
     recaptcha_token: String(formData.get('recaptcha_token') ?? ''),
   };

@@ -3,6 +3,8 @@
 import { Package } from '@/types/product';
 import { PackageCard } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/hooks/useCart';
 import { usePackageFilter } from '../_hooks/usePackageFilter';
 import styles from './PackageFilterBar.module.scss';
 
@@ -14,8 +16,24 @@ const GROUP_TABS = [
   { value: 'wifi_5g', label: 'Wifi 5G' },
 ];
 
-export function PackageFilterBar({ packages }: { packages: Package[] }) {
+export function PackageFilterBar({ packages, simId }: { packages: Package[]; simId?: string }) {
   const { group, setGroup, sort, setSort, filtered } = usePackageFilter(packages);
+  const router = useRouter();
+  const { addItem } = useCart();
+  const simReferenceId = Number(simId);
+
+  function selectPackage(pkg: Package) {
+    if (!Number.isInteger(simReferenceId) || simReferenceId <= 0) return;
+    addItem({
+      key: `goi_cuoc-${pkg.id}`,
+      type: 'goi_cuoc',
+      reference_id: pkg.id,
+      name: pkg.name,
+      price: pkg.price,
+      image: null,
+    });
+    router.push('/gio-hang?step=product');
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -36,7 +54,13 @@ export function PackageFilterBar({ packages }: { packages: Package[] }) {
         {filtered.length === 0 ? (
           <p className={styles.empty}>Không có gói cước phù hợp</p>
         ) : (
-          filtered.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} />)
+          filtered.map((pkg) => (
+            <PackageCard
+              key={pkg.id}
+              pkg={pkg}
+              onSelect={simId ? () => selectPackage(pkg) : undefined}
+            />
+          ))
         )}
       </div>
     </div>

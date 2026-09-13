@@ -26,6 +26,10 @@ export interface RegistrationGroup {
   id: number;
   customer_name: string;
   phone: string;
+  province: string;
+  district: string;
+  ward: string;
+  delivery_address: string;
   note: string | null;
   status: RegistrationStatus;
   assigned_to: number | null;

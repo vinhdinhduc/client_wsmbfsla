@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Check, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { TextField } from '@/components/ui/FormField';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +17,7 @@ import styles from './page.module.scss';
 const loginSchema = z.object({
   username: z.string().min(1, 'Vui lòng nhập tên đăng nhập'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
+  remember: z.boolean().default(false),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -38,7 +39,7 @@ function AdminLoginForm() {
   async function onSubmit(values: LoginFormValues) {
     setIsSubmitting(true);
     try {
-      await login(values.username, values.password);
+      await login(values.username, values.password, values.remember);
       const redirect = searchParams.get('redirect') || '/admin/dashboard';
       router.replace(redirect);
     } catch (err) {
@@ -52,9 +53,10 @@ function AdminLoginForm() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <Image src="/logo-mobifone.svg" alt="MobiFone Sơn La" width={48} height={48} />
+          <div className={styles.logoFrame}>
+            <Image src="/logo.png" alt="MobiFone" width={72} height={72} priority />
+          </div>
           <h1 className={styles.title}>Đăng nhập quản trị</h1>
-          <p className={styles.subtitle}>MobiFone Chi nhánh Sơn La</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -93,6 +95,13 @@ function AdminLoginForm() {
             </div>
             {errors.password?.message && <p className={styles.error}>{errors.password.message}</p>}
           </div>
+          <label className={styles.remember}>
+            <input type="checkbox" {...register('remember')} />
+            <span className={styles.checkboxIcon} aria-hidden="true">
+              <Check />
+            </span>
+            <span>Ghi nhớ đăng nhập</span>
+          </label>
           <div className={styles.formMeta}>
             <button
               type="button"

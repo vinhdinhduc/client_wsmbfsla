@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { authApi } from '@/lib/api/auth';
 import { AUTH_TOKEN_STORAGE_KEY } from '@/lib/api/client';
 import { AuthUser } from '@/types/user';
@@ -12,10 +20,11 @@ const AUTH_USER_STORAGE_KEY = 'mfsl_auth_user';
  * KHONG phai lop bao mat that su (backend van tu xac thuc JWT tren moi request).
  */
 const AUTH_COOKIE_NAME = 'mfsl_token';
-const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 ngay, khop mac dinh JWT_EXPIRES_IN cua backend
+const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
-function setAuthCookie(token: string) {
-  document.cookie = `${AUTH_COOKIE_NAME}=${token}; path=/; max-age=${AUTH_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+function setAuthCookie(token: string, remember: boolean) {
+  const maxAge = remember ? `; max-age=${AUTH_COOKIE_MAX_AGE_SECONDS}` : '';
+  document.cookie = `${AUTH_COOKIE_NAME}=${token}; path=/${maxAge}; SameSite=Lax`;
 }
 
 function clearAuthCookie() {
@@ -28,7 +37,7 @@ interface AuthContextValue {
   /** true trong khi dang khoi tao (doc localStorage + xac thuc lai token voi /auth/me) */
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<AuthUser>;
+  login: (username: string, password: string, remember: boolean) => Promise<AuthUser>;
   logout: () => Promise<void>;
 }
 
@@ -45,8 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function bootstrap() {
-      const storedToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-      const storedUserRaw = localStorage.getItem(AUTH_USER_STORAGE_KEY);
+      const storedToken =
+        localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ??
+        sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+      const storedUserRaw =
+        localStorage.getItem(AUTH_USER_STORAGE_KEY) ??
+        sessionStorage.getItem(AUTH_USER_STORAGE_KEY);
 
       if (!storedToken || !storedUserRaw) {
         setIsLoading(false);
@@ -56,13 +69,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const freshUser = await authApi.me();
         if (!cancelled) {
-          setAuthCookie(storedToken);
+          setAuthCookie(storedToken, Boolean(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)));
           setToken(storedToken);
           setUser(freshUser);
         }
       } catch {
         localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
         localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+        sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+        sessionStorage.removeItem(AUTH_USER_STORAGE_KEY);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -74,11 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (username: string, password: string, remember: boolean) => {
     const result = await authApi.login(username, password);
-    localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, result.token);
-    localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(result.user));
-    setAuthCookie(result.token);
+    const storage = remember ? localStorage : sessionStorage;
+    const otherStorage = remember ? sessionStorage : localStorage;
+    storage.setItem(AUTH_TOKEN_STORAGE_KEY, result.token);
+    storage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(result.user));
+    otherStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    otherStorage.removeItem(AUTH_USER_STORAGE_KEY);
+    setAuthCookie(result.token, remember);
     setToken(result.token);
     setUser(result.user);
     return result.user;
@@ -90,6 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
       localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+      sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+      sessionStorage.removeItem(AUTH_USER_STORAGE_KEY);
       clearAuthCookie();
       setToken(null);
       setUser(null);

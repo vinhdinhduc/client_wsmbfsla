@@ -19,12 +19,17 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    gap: 0.5rem;
+    width: 8.75rem;
+    min-height: 2.5rem;
     color: #fff;
   }
   &__logo {
-    width: 40px;
-    height: 40px;
+    display: block;
+    width: 8.75rem;
+    height: auto;
+    max-height: 2.5rem;
+    object-fit: contain;
+    object-position: left center;
   }
   &__brandName {
     display: none;
@@ -246,6 +251,11 @@
 }
 
 @media (min-width: 640px) {
+  .header__brand,
+  .header__logo {
+    width: 8.75rem;
+  }
+
   .header__brandName {
     display: inline;
   }
@@ -253,6 +263,12 @@
   .header__mobileNavInner {
     padding-right: 1.5rem;
     padding-left: 1.5rem;
+  }
+}
+@media (max-width: 639px) {
+  .header__brand,
+  .header__logo {
+    width: 6.75rem;
   }
 }
 @media (min-width: 768px) {

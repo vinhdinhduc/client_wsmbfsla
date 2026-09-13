@@ -44,17 +44,20 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
 
   const effect =
     data.animation_type === 'fade' ? 'fade' : data.animation_type === 'zoom' ? 'zoom' : 'slide';
+  const autoplayDelay = Math.max(data.autoplay_speed_ms || 5000, 1000);
 
   return (
     <Swiper
       modules={[Autoplay, EffectFade, Navigation, SwiperPagination]}
-      effect={effect === 'fade' ? 'fade' : undefined}
+      effect={effect === 'fade' ? 'fade' : 'slide'}
       fadeEffect={{ crossFade: true }}
+      slidesPerView={1}
+      speed={700}
       navigation={data.items.length > 1}
       pagination={data.items.length > 1 ? { clickable: true } : false}
       autoplay={
         data.autoplay_enabled
-          ? { delay: data.autoplay_speed_ms, disableOnInteraction: false }
+          ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true }
           : false
       }
       loop={data.items.length > 1}
@@ -70,6 +73,7 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
               alt={item.title ?? 'MobiFone Sơn La'}
               fill
               sizes="100vw"
+              quality={100}
               priority
               className={effect === 'zoom' ? styles.imageZoom : styles.image}
             />

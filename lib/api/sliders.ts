@@ -44,7 +44,8 @@ export interface SliderZoneUpdateValues {
 
 export interface SliderItemFormValues {
   zone_id: number;
-  image_url: string;
+  image_url?: string;
+  image?: File;
   link_url?: string | null;
   title?: string | null;
   caption?: string | null;
@@ -69,10 +70,29 @@ export const slidersApi = {
     apiFetch<SliderItem[]>('/admin/sliders/items', { params: { zone_id: zoneId } }),
 
   createItem: (dto: SliderItemFormValues) =>
-    apiFetch<SliderItem>('/admin/sliders/items', { method: 'POST', body: dto }),
+    apiFetch<SliderItem>('/admin/sliders/items', {
+      method: 'POST',
+      body: toFormData(dto),
+      isFormData: true,
+    }),
 
   updateItem: (id: number, dto: Partial<SliderItemFormValues>) =>
-    apiFetch<SliderItem>(`/admin/sliders/items/${id}`, { method: 'PUT', body: dto }),
+    apiFetch<SliderItem>(`/admin/sliders/items/${id}`, {
+      method: 'PUT',
+      body: toFormData(dto),
+      isFormData: true,
+    }),
 
   removeItem: (id: number) => apiFetch<null>(`/admin/sliders/items/${id}`, { method: 'DELETE' }),
 };
+
+function toFormData(values: Partial<SliderItemFormValues>) {
+  const formData = new FormData();
+  Object.entries(values).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && key !== 'image') {
+      formData.append(key, String(value));
+    }
+  });
+  if (values.image) formData.append('image', values.image);
+  return formData;
+}

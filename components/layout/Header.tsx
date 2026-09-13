@@ -17,6 +17,7 @@ const NAV_LINKS: Array<
       children: Array<{ href: string; label: string }>;
     }
 > = [
+  { href: '/', label: 'Trang chủ' },
   { href: '/sim-so-dep', label: 'Sim số đẹp' },
   { href: '/goi-cuoc', label: 'Gói cước' },
   { href: '/giai-phap-so', label: 'Giải pháp số' },
@@ -44,13 +45,13 @@ export function Header() {
         <Link href="/" className={styles.header__brand}>
           <Image
             className={styles.header__logo}
-            src="/logo-mobifone.svg"
+            src="/logo.png"
             alt="MobiFone Sơn La"
-            width={40}
-            height={40}
+            width={140}
+            height={32}
+            sizes="(max-width: 639px) 108px, 140px"
             priority
           />
-          <span className={styles.header__brandName}>MobiFone Sơn La</span>
         </Link>
 
         <nav className={styles.header__nav}>

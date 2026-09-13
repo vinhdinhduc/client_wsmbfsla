@@ -21,7 +21,7 @@ export interface SimImportResult {
 export const simsApi = {
   // ---- Public ----
   listPublic: (
-    params: { prefix?: string; sim_type?: SimType; price_range?: string } = {},
+    params: { q?: string; prefix?: string; catalog?: string; sim_type?: SimType; price_range?: string } = {},
     opts?: Pick<ApiFetchOptions, 'cache'>,
   ) => apiFetch<SimNumber[]>('/public/sims', { params, cache: 'no-store', ...opts }),
 

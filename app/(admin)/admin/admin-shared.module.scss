@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .page {
   display: flex;
@@ -85,7 +85,7 @@
     color: var(--color-danger);
   }
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -0.25rem;
   }
@@ -111,6 +111,34 @@
   font-size: 0.75rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.imagePreviewBox {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-100);
+}
+.imagePreview {
+  display: block;
+  width: 100%;
+  max-height: 13rem;
+  object-fit: contain;
+}
+.imagePreviewCaption {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+  text-align: center;
+}
+.imagePreviewError {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  color: var(--color-danger);
+  background: rgb(220 38 38 / 5%);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
 }
 .errorBox {
   max-height: 15rem;

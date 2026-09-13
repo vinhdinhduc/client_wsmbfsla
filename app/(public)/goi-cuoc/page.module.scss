@@ -1,5 +1,5 @@
-@use '../../../styles/variables' as *;
-@use '../../../styles/mixins' as *;
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
 
 .page {
   width: min(100%, var(--container-width));
@@ -24,4 +24,39 @@
   @include breakpoint(sm) {
     font-size: 2.5rem;
   }
+}
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  max-width: 62rem;
+  margin: 0 auto 2rem;
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+.stepper span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.stepper b {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--color-primary);
+}
+.stepDone {
+  color: var(--color-success);
+}
+.stepDone b {
+  background: var(--color-success);
+}
+.stepCurrent {
+  color: var(--color-neutral-900);
 }

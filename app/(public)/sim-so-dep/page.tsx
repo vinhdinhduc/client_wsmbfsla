@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 import { simsApi } from '@/lib/api/sims';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { SimCard } from '@/components/ui/Card';
-import { SimFilterPanel } from './_components/SimFilterPanel';
+import { SimCatalogControls } from './_components/SimCatalogControls';
+import { SimResultsTable } from './_components/SimResultsTable';
 import { SimFilterParams } from './_types/sim';
 import styles from './page.module.scss';
 
@@ -18,24 +17,31 @@ export default async function SimsPage({ searchParams }: { searchParams: SimFilt
 
   return (
     <div className={styles.page}>
-      <Breadcrumb items={[{ label: 'Sim số đẹp' }]} />
-      <h1 className={styles.title}>Kho sim số đẹp</h1>
-
-      <div className={styles.layout}>
-        <SimFilterPanel initial={searchParams} />
-
-        <div className={styles.content}>
-          {sims.length === 0 ? (
-            <p className={styles.emptyText}>Không tìm thấy số phù hợp với bộ lọc</p>
-          ) : (
-            <div className={styles.grid}>
-              {sims.map((sim) => (
-                <SimCard key={sim.id} sim={sim} />
-              ))}
-            </div>
-          )}
+      <header className={styles.hero}>
+        <h1 className={styles.title}>CHỌN SIM SỐ ĐẸP</h1>
+        <p className={styles.subtitle}>RƯỚC MAY MẮN - ĐÓN TÀI LỘC</p>
+        <div className={styles.steps} aria-label="Các bước chọn sim">
+          <span className={styles.stepActive}>
+            <b>1</b> Chọn sim
+          </span>
+          <span className={styles.stepSeparator}>›</span>
+          <span>
+            <b>2</b> Chọn gói cước
+          </span>
+          <span className={styles.stepSeparator}>›</span>
+          <span>
+            <b>3</b> Hoàn thành
+          </span>
         </div>
-      </div>
+      </header>
+
+      <SimCatalogControls initial={searchParams} />
+
+      {sims.length === 0 ? (
+        <p className={styles.emptyText}>Không tìm thấy số phù hợp với bộ lọc</p>
+      ) : (
+        <SimResultsTable sims={sims} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,6 +15,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { TextField, SelectField, CheckboxField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
+import { env } from '@/lib/env';
 import styles from '../admin-shared.module.scss';
 
 const ANIMATION_OPTIONS = [
@@ -34,11 +35,8 @@ const zoneConfigSchema = z.object({
 });
 type ZoneConfigValues = z.infer<typeof zoneConfigSchema>;
 
-// Nhac lai gia dinh da neu o dau: backend createSliderItemSchema chi doc image_url
-// (string) tu JSON body - KHONG doc req.file dau bai upload multipart. Vi vay o
-// day dung 1 truong URL anh thu cong thay vi input type="file".
 const itemSchema = z.object({
-  image_url: z.string().min(1, 'Vui lòng nhập URL hình ảnh').max(500),
+  image_url: z.string().optional(),
   link_url: z.string().max(500).optional().or(z.literal('')),
   title: z.string().max(150).optional().or(z.literal('')),
   caption: z.string().max(255).optional().or(z.literal('')),
@@ -49,6 +47,13 @@ const itemSchema = z.object({
 });
 type ItemSchemaValues = z.infer<typeof itemSchema>;
 
+function getImageUrl(imageUrl: string | null | undefined) {
+  if (!imageUrl) return null;
+  if (/^https?:\/\//i.test(imageUrl) || imageUrl.startsWith('blob:')) return imageUrl;
+  const apiBaseUrl = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '').replace(/\/api$/i, '');
+  return `${apiBaseUrl}/${imageUrl.replace(/^\/+/, '')}`;
+}
+
 export default function AdminSlidersPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -58,6 +63,18 @@ export default function AdminSlidersPage() {
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<SliderItem | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imagePreviewError, setImagePreviewError] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!selectedImage) return;
+    const objectUrl = URL.createObjectURL(selectedImage);
+    setImagePreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedImage]);
 
   const { data: zones } = useQuery({
     queryKey: ['admin-slider-zones'],
@@ -97,6 +114,11 @@ export default function AdminSlidersPage() {
   });
 
   function openCreateItem() {
+    setSelectedImage(null);
+    setExistingImageUrl(null);
+    setImagePreviewUrl(null);
+    setImagePreviewError(false);
+    if (imageInputRef.current) imageInputRef.current.value = '';
     itemForm.reset({
       image_url: '',
       link_url: '',
@@ -111,6 +133,12 @@ export default function AdminSlidersPage() {
   }
 
   function openEditItem(item: SliderItem) {
+    setSelectedImage(null);
+    const currentImageUrl = getImageUrl(item.image_url);
+    setExistingImageUrl(currentImageUrl);
+    setImagePreviewUrl(currentImageUrl);
+    setImagePreviewError(false);
+    if (imageInputRef.current) imageInputRef.current.value = '';
     itemForm.reset({
       image_url: item.image_url,
       link_url: item.link_url ?? '',
@@ -149,9 +177,14 @@ export default function AdminSlidersPage() {
 
   function onSubmitItem(values: ItemSchemaValues) {
     if (!resolvedZoneId) return;
+    if (itemModal?.mode === 'create' && !selectedImage) {
+      showToast('Vui lòng chọn ảnh cho slide', 'error');
+      return;
+    }
     saveItemMutation.mutate({
       ...values,
       zone_id: resolvedZoneId,
+      image: selectedImage ?? undefined,
       link_url: values.link_url || null,
       title: values.title || null,
       caption: values.caption || null,
@@ -288,12 +321,40 @@ export default function AdminSlidersPage() {
         title={itemModal?.mode === 'edit' ? 'Sửa slide' : 'Thêm slide'}
       >
         <form onSubmit={itemForm.handleSubmit(onSubmitItem)} className={styles.form}>
-          <TextField
-            label="URL hình ảnh"
-            placeholder="https://..."
-            error={itemForm.formState.errors.image_url?.message}
-            {...itemForm.register('image_url')}
-          />
+          <div className={styles.fileField}>
+            <label htmlFor="slider-image">Ảnh slide</label>
+            <input
+              ref={imageInputRef}
+              id="slider-image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(event) => {
+                setImagePreviewError(false);
+                setSelectedImage(event.target.files?.[0] ?? null);
+              }}
+            />
+            {imagePreviewUrl && !imagePreviewError && (
+              <div className={styles.imagePreviewBox}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imagePreviewUrl}
+                  alt={selectedImage ? 'Ảnh mới được chọn' : 'Ảnh hiện tại của slide'}
+                  onError={() => setImagePreviewError(true)}
+                  className={styles.imagePreview}
+                />
+                <p className={styles.imagePreviewCaption}>
+                  {selectedImage ? 'Ảnh mới sẽ được sử dụng' : 'Ảnh hiện tại đang được lưu'}
+                </p>
+              </div>
+            )}
+            {imagePreviewError && itemModal?.mode === 'edit' && existingImageUrl && (
+              <p className={styles.imagePreviewError}>
+                Không thể hiển thị ảnh hiện tại. Đường dẫn: {existingImageUrl}
+              </p>
+            )}
+            <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
+            {selectedImage && <p className={styles.imageUrl}>Đã chọn: {selectedImage.name}</p>}
+          </div>
           <TextField
             label="Liên kết khi bấm vào (tùy chọn)"
             placeholder="https://..."

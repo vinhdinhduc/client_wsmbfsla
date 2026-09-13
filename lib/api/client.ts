@@ -36,7 +36,11 @@ export type ApiFetchOptions = {
 function readTokenFromBrowser(): string | undefined {
   if (typeof window === 'undefined') return undefined;
   try {
-    return localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ?? undefined;
+    return (
+      localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ??
+      sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ??
+      undefined
+    );
   } catch {
     return undefined;
   }
