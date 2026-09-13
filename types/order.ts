@@ -30,6 +30,7 @@ export interface RegistrationGroup {
   district: string;
   ward: string;
   delivery_address: string;
+  delivery_store?: string | null;
   note: string | null;
   status: RegistrationStatus;
   assigned_to: number | null;

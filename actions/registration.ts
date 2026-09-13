@@ -16,19 +16,30 @@ const submitCartSchema = z.object({
     .min(9, 'Số điện thoại không hợp lệ')
     .max(20)
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
+  email: z.string().email('Email không hợp lệ').max(150),
   note: z.string().optional().nullable(),
+  delivery_method: z.enum(['address', 'store']),
+  sim_type: z.enum(['physical', 'esim']),
+  delivery_store: z.string().max(255).optional().nullable(),
   province: z.literal('Sơn La', { errorMap: () => ({ message: 'Chỉ hỗ trợ tỉnh Sơn La' }) }),
-  district: z.string().min(1, 'Vui lòng chọn huyện/thị xã Sơn La'),
   ward: z.string().min(1, 'Vui lòng chọn xã/phường Sơn La'),
-  delivery_address: z.string().min(1, 'Vui lòng nhập địa chỉ nhận hàng').max(255),
+  delivery_address: z.string().max(255).optional().nullable(),
   items: z.array(cartItemSchema).min(1, 'Giỏ hàng không được để trống'),
   recaptcha_token: z.string().min(1, 'Thiếu recaptcha token, vui lòng thử lại'),
+}).superRefine((value, context) => {
+  if (value.delivery_method === 'address') {
+    if (!value.ward) context.addIssue({ code: 'custom', path: ['ward'], message: 'Vui lòng chọn xã/phường Sơn La' });
+    if (!value.delivery_address) context.addIssue({ code: 'custom', path: ['delivery_address'], message: 'Vui lòng nhập địa chỉ nhận hàng' });
+  }
+  if (value.delivery_method === 'store' && !value.delivery_store) {
+    context.addIssue({ code: 'custom', path: ['delivery_store'], message: 'Vui lòng chọn cửa hàng nhận SIM' });
+  }
 });
 
 export interface RegistrationActionState {
   status: 'idle' | 'success' | 'error';
   message?: string;
-  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'note' | 'items' | 'province' | 'district' | 'ward' | 'delivery_address', string>>;
+  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'email' | 'note' | 'items' | 'province' | 'ward' | 'delivery_address' | 'delivery_store', string>>;
   registrationId?: number;
 }
 
@@ -51,9 +62,12 @@ export async function submitRegistrationAction(
   const raw = {
     customer_name: String(formData.get('customer_name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
+    email: String(formData.get('email') ?? ''),
     note: formData.get('note') ? String(formData.get('note')) : null,
+    delivery_method: String(formData.get('delivery_method') ?? ''),
+    sim_type: String(formData.get('sim_type') ?? ''),
+    delivery_store: formData.get('delivery_store') ? String(formData.get('delivery_store')) : null,
     province: String(formData.get('province') ?? ''),
-    district: String(formData.get('district') ?? ''),
     ward: String(formData.get('ward') ?? ''),
     delivery_address: String(formData.get('delivery_address') ?? ''),
     items: itemsRaw,

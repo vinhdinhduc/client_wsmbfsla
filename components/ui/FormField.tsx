@@ -13,15 +13,20 @@ function FieldWrapper({
   error,
   children,
   hint,
+  required,
 }: {
   label: string;
   error?: string;
   children: ReactNode;
   hint?: string;
+  required?: boolean;
 }) {
   return (
     <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
+      <label className={styles.label}>
+        {label}
+        {required && <span className={styles.requiredMark}> *</span>}
+      </label>
       {children}
       {hint && !error && <p className={styles.hint}>{hint}</p>}
       {error && <p className={styles.error}>{error}</p>}
@@ -36,11 +41,12 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
-  ({ label, error, hint, className, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint}>
+  ({ label, error, hint, className, required, ...props }, ref) => (
+    <FieldWrapper label={label} error={error} hint={hint} required={required}>
       <input
         ref={ref}
         className={cn(styles.control, error ? styles.invalid : styles.valid, className)}
+        required={required}
         {...props}
       />
     </FieldWrapper>
@@ -55,12 +61,13 @@ interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
 }
 
 export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  ({ label, error, hint, className, rows = 4, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint}>
+  ({ label, error, hint, className, rows = 4, required, ...props }, ref) => (
+    <FieldWrapper label={label} error={error} hint={hint} required={required}>
       <textarea
         ref={ref}
         rows={rows}
         className={cn(styles.textarea, error ? styles.invalid : styles.valid, className)}
+        required={required}
         {...props}
       />
     </FieldWrapper>
@@ -76,8 +83,8 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
-  ({ label, error, hint, options, className, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint}>
+  ({ label, error, hint, options, className, required, ...props }, ref) => (
+    <FieldWrapper label={label} error={error} hint={hint} required={required}>
       <select
         ref={ref}
         className={cn(
@@ -86,6 +93,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           error ? styles.invalid : styles.valid,
           className,
         )}
+        required={required}
         {...props}
       >
         {options.map((opt) => (

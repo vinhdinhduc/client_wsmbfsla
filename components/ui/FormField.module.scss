@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 .field {
   display: flex;
@@ -10,6 +10,10 @@
   color: var(--color-neutral-900);
   font-size: $font-size-sm;
   font-weight: 500;
+}
+.requiredMark {
+  color: var(--color-danger);
+  font-weight: 700;
 }
 .hint,
 .error {

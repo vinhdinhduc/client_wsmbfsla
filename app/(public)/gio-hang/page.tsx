@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +16,8 @@ import { submitRegistrationAction, RegistrationActionState } from '@/actions/reg
 import { serializeCartItemsForSubmit } from '@/actions/cart';
 import { CartItemRow } from './_components/CartItemRow';
 import { SonLaAddressFields } from './_components/SonLaAddressFields';
+import { storesApi } from '@/lib/api/stores';
+import { useQuery } from '@tanstack/react-query';
 import styles from './page.module.scss';
 
 const INITIAL_STATE: RegistrationActionState = { status: 'idle' };
@@ -37,6 +39,13 @@ export default function CartPage() {
   const { showToast } = useToast();
   const [state, formAction] = useFormState(submitRegistrationAction, INITIAL_STATE);
   const tokenInputRef = useRef<HTMLInputElement>(null);
+  const [deliveryMethod, setDeliveryMethod] = useState<'address' | 'store'>('address');
+  const [simType, setSimType] = useState<'physical' | 'esim'>('physical');
+  const { data: stores = [], isLoading: storesLoading } = useQuery({
+    queryKey: ['public-stores-son-la'],
+    queryFn: () => storesApi.listPublic(),
+    enabled: deliveryMethod === 'store',
+  });
   const step = searchParams.get('step') === 'product' ? 'product' : 'customer';
 
   useEffect(() => {
@@ -123,6 +132,24 @@ export default function CartPage() {
             )}
           </div>
 
+          {step === 'product' && (
+            <aside className={styles.orderSummary}>
+              <h2 className={styles.sectionTitle}>ĐƠN HÀNG</h2>
+              <div className={styles.orderLine}>
+                <span>Tổng sản phẩm ({items.length})</span>
+                <strong>{formatPrice(totalPrice)}</strong>
+              </div>
+              <div className={styles.orderLine}>
+                <span>Phí vận chuyển</span>
+                <strong>0đ</strong>
+              </div>
+              <div className={styles.orderTotal}>
+                <span>TỔNG TIỀN</span>
+                <strong>{formatPrice(totalPrice)}</strong>
+              </div>
+            </aside>
+          )}
+
           {step === 'customer' && (
             <form action={handleAction} className={styles.formBox}>
               <h2 className={styles.sectionTitle}>Thông tin đăng ký</h2>
@@ -141,14 +168,88 @@ export default function CartPage() {
                   required
                   error={state.fieldErrors?.phone}
                 />
-                <SonLaAddressFields />
                 <TextField
-                  name="delivery_address"
-                  label="Địa chỉ nhận hàng"
-                  placeholder="Số nhà, đường, bản/tổ"
+                  name="email"
+                  type="email"
+                  label="Email"
+                  placeholder="email@example.com"
                   required
-                  error={state.fieldErrors?.delivery_address}
+                  error={state.fieldErrors?.email}
                 />
+                <fieldset className={styles.choiceGroup}>
+                  <legend>Hình thức nhận hàng</legend>
+                  <label>
+                    <input
+                      type="radio"
+                      name="delivery_method"
+                      value="address"
+                      checked={deliveryMethod === 'address'}
+                      onChange={() => setDeliveryMethod('address')}
+                    />
+                    Nhận tại địa chỉ yêu cầu
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="delivery_method"
+                      value="store"
+                      checked={deliveryMethod === 'store'}
+                      onChange={() => setDeliveryMethod('store')}
+                    />
+                    Nhận tại cửa hàng
+                  </label>
+                </fieldset>
+                {deliveryMethod === 'address' ? (
+                  <>
+                    <SonLaAddressFields />
+                    <TextField
+                      name="delivery_address"
+                      label="Địa chỉ nhận hàng"
+                      placeholder="Số nhà, đường, bản/tổ"
+                      required
+                      error={state.fieldErrors?.delivery_address}
+                    />
+                  </>
+                ) : (
+                  <label className={styles.addressField}>
+                    <span>
+                      Cửa hàng nhận SIM <b className={styles.requiredMark}>*</b>
+                    </span>
+                    <select name="delivery_store" required disabled={storesLoading}>
+                      <option value="">
+                        {storesLoading ? 'Đang tải cửa hàng...' : 'Chọn cửa hàng MobiFone Sơn La'}
+                      </option>
+                      {stores.map((store) => (
+                        <option key={store.id} value={store.name}>
+                          {store.name} - {store.address}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                <fieldset className={styles.choiceGroup}>
+                  <legend>Loại SIM</legend>
+                  <label>
+                    <input
+                      type="radio"
+                      name="sim_type"
+                      value="physical"
+                      checked={simType === 'physical'}
+                      onChange={() => setSimType('physical')}
+                    />
+                    SIM vật lý
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="sim_type"
+                      value="esim"
+                      checked={simType === 'esim'}
+                      onChange={() => setSimType('esim')}
+                    />
+                    eSIM
+                  </label>
+                </fieldset>
                 <TextareaField name="note" label="Ghi chú" placeholder="Ghi chú thêm (nếu có)" />
                 <input ref={tokenInputRef} type="hidden" name="recaptcha_token" />
                 <p className={styles.notice}>

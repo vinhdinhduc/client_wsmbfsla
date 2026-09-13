@@ -14,11 +14,10 @@ interface District {
   wards: Ward[];
 }
 
-const SON_LA_API = 'https://provinces.open-api.vn/api/p/14?depth=2';
+const SON_LA_API = 'https://provinces.open-api.vn/api/p/14?depth=3';
 
 export function SonLaAddressFields() {
   const [districts, setDistricts] = useState<District[]>([]);
-  const [districtName, setDistrictName] = useState('');
   const [wardName, setWardName] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -44,51 +43,35 @@ export function SonLaAddressFields() {
     };
   }, []);
 
-  const wards = districts.find((district) => district.name === districtName)?.wards ?? [];
+  const wards = districts.flatMap((district) => district.wards);
 
   return (
     <div className={styles.addressFields}>
       <div className={styles.addressGrid}>
         <input type="hidden" name="province" value="Sơn La" />
         <label className={styles.addressField}>
-          <span>Tỉnh/Thành phố</span>
-          <select name="province" value="Sơn La" disabled>
+          <span>
+            Tỉnh/Thành phố <b className={styles.requiredMark}>*</b>
+          </span>
+          <select value="Sơn La" disabled>
             <option value="Sơn La">Sơn La</option>
-          </select>
-        </label>
-        <label className={styles.addressField}>
-          <span>Quận/Huyện/Thị xã</span>
-          <select
-            name="district"
-            value={districtName}
-            required
-            disabled={loading || districts.length === 0}
-            onChange={(event) => {
-              setDistrictName(event.target.value);
-              setWardName('');
-            }}
-          >
-            <option value="">{loading ? 'Đang tải...' : 'Chọn huyện/thị xã'}</option>
-            {districts.map((district) => (
-              <option key={district.code} value={district.name}>
-                {district.name}
-              </option>
-            ))}
           </select>
         </label>
       </div>
       <label className={styles.addressField}>
-        <span>Xã/Phường/Thị trấn</span>
+        <span>
+          Xã/Phường <b className={styles.requiredMark}>*</b>
+        </span>
         <select
           name="ward"
           value={wardName}
           required
-          disabled={!districtName || wards.length === 0}
+          disabled={loading || wards.length === 0}
           onChange={(event) => setWardName(event.target.value)}
         >
-          <option value="">Chọn xã/phường</option>
-          {wards.map((ward) => (
-            <option key={ward.code} value={ward.name}>
+          <option value="">{loading ? 'Đang tải...' : 'Chọn xã/phường'}</option>
+          {wards.map((ward, index) => (
+            <option key={`${ward.code}-${index}`} value={ward.name}>
               {ward.name}
             </option>
           ))}
