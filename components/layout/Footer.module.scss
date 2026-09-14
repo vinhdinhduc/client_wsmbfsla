@@ -1,7 +1,8 @@
 .footer {
   margin-top: 3rem;
   color: rgb(255 255 255 / 88%);
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  transition: background 260ms ease;
 
   &__inner {
     display: grid;
@@ -10,9 +11,19 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 3rem 1rem;
+    animation: footer-rise 650ms ease both;
   }
   &__column {
     min-width: 0;
+  }
+  &__logo {
+    display: block;
+    width: min(13rem, 100%);
+    height: auto;
+    max-height: 3rem;
+    object-fit: contain;
+    object-position: left center;
+    margin-bottom: 0.75rem;
   }
   &__title {
     margin: 0;
@@ -106,7 +117,11 @@
     border-radius: 50%;
     &:hover {
       background: rgb(255 255 255 / 22%);
+      transform: translateY(-3px);
     }
+    transition:
+      transform 160ms ease,
+      background-color 160ms ease;
   }
   &__socialIcon {
     width: 1rem;
@@ -118,6 +133,17 @@
     border-top: 1px solid rgb(255 255 255 / 14%);
     text-align: center;
     font-size: 0.75rem;
+  }
+}
+
+@keyframes footer-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

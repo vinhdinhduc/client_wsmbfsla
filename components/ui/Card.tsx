@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { ShoppingCart, MapPin, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatDate, formatPrice } from '@/lib/format';
@@ -47,15 +47,18 @@ export function Card({
 }
 
 function CardThumbnail({ src, alt }: { src: string | null; alt: string }) {
+  const [hasImageError, setHasImageError] = useState(false);
+
   return (
     <div className={styles.thumbnail}>
-      {src ? (
+      {src && !hasImageError ? (
         <Image
           src={src}
           alt={alt}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
           className={styles.thumbnailImage}
+          onError={() => setHasImageError(true)}
         />
       ) : (
         <div className={styles.thumbnailEmpty}>
@@ -205,6 +208,7 @@ export function StoreCard({
   store,
 }: {
   store: {
+    id: number;
     name: string;
     address: string;
     district: string;
@@ -221,6 +225,9 @@ export function StoreCard({
       </p>
       <p className={styles.muted}>Hotline: {store.phone}</p>
       {store.opening_hours && <p className={styles.muted}>Giờ mở cửa: {store.opening_hours}</p>}
+      <Link href={`/dat-lich?storeId=${store.id}`} className={styles.storeAction}>
+        Đặt lịch đến cửa hàng
+      </Link>
     </div>
   );
 }

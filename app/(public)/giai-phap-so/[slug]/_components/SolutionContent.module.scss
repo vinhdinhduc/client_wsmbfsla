@@ -12,12 +12,13 @@
     margin-bottom: 0.75rem;
     font-family: var(--font-heading);
     color: var(--color-neutral-900);
+    line-height: 1.35;
   }
 
   :global(p),
   :global(li) {
     color: var(--color-neutral-500);
-    line-height: 1.8;
+    line-height: 1.75;
   }
 
   :global(p) {
@@ -29,6 +30,7 @@
     max-width: 100%;
     height: auto;
     margin: 1rem auto;
+    border: 1px solid var(--border);
     border-radius: var(--radius-md);
   }
 

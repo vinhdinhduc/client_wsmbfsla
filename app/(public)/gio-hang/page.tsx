@@ -47,6 +47,7 @@ export default function CartPage() {
     enabled: deliveryMethod === 'store',
   });
   const step = searchParams.get('step') === 'product' ? 'product' : 'customer';
+  const activeStep = step === 'product' ? 3 : 4;
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -72,17 +73,17 @@ export default function CartPage() {
   return (
     <div className={styles.page}>
       <div className={styles.stepper} aria-label="Tiến trình đăng ký">
-        <span className={styles.stepDone}>
-          <b>1</b> Chọn gói cước
+        <span className={activeStep >= 2 ? styles.stepDone : styles.stepCurrent}>
+          <b>1</b> Chọn SIM
         </span>
-        <span className={styles.stepDone}>
-          <b>2</b> Thông tin sản phẩm
+        <span className={activeStep >= 3 ? styles.stepDone : styles.stepCurrent}>
+          <b>2</b> Chọn gói cước
         </span>
-        <span className={styles.stepDone}>
+        <span className={step === 'customer' ? styles.stepCurrent : styles.stepDone}>
           <b>3</b> Thông tin khách hàng
         </span>
-        <span className={styles.stepCurrent}>
-          <b>4</b> Đặt hàng
+        <span className={activeStep === 4 ? styles.stepCurrent : styles.stepPending}>
+          <b>4</b> Xác nhận đặt hàng
         </span>
       </div>
       <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />

@@ -4,8 +4,9 @@ import { packagesApi } from '@/lib/api/packages';
 import { simsApi } from '@/lib/api/sims';
 import { solutionsApi } from '@/lib/api/solutions';
 import { newsApi } from '@/lib/api/news';
-import { PackageCard, SimCard, NewsCard, SolutionCard } from '@/components/ui/Card';
+import { NewsCard, SolutionCard } from '@/components/ui/Card';
 import { SliderZone } from '@/components/shared/SliderZone';
+import { HomeCatalogSections } from '@/components/home/HomeCatalogSections';
 
 export const revalidate = 60;
 
@@ -23,8 +24,8 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 }
 
 export default async function HomePage() {
-  const [hotPackages, hotSims, solutions, newsResult] = await Promise.all([
-    packagesApi.listPublic('hot', { next: { revalidate: 60 } }),
+  const [packages, hotSims, solutions, newsResult] = await Promise.all([
+    packagesApi.listPublic(undefined, { next: { revalidate: 60 } }),
     simsApi.listPublic({}, { cache: 'no-store' }),
     solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }),
     newsApi.listPublic({ page_size: 3 }, { next: { revalidate: 60 } }),
@@ -36,23 +37,7 @@ export default async function HomePage() {
         <SliderZone zoneCode="hero_banner" aspect="hero" className={styles.heroSlider} />
       </section>
 
-      <section className={styles.section}>
-        <SectionHeader title="Gói cước nổi bật" href="/goi-cuoc" />
-        <div className={styles.grid4}>
-          {hotPackages.slice(0, 4).map((pkg) => (
-            <PackageCard key={pkg.id} pkg={pkg} />
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <SectionHeader title="Sim số đẹp nổi bật" href="/sim-so-dep" />
-        <div className={styles.grid4}>
-          {hotSims.slice(0, 4).map((sim) => (
-            <SimCard key={sim.id} sim={sim} />
-          ))}
-        </div>
-      </section>
+      <HomeCatalogSections packages={packages} sims={hotSims} />
 
       <section className={styles.section}>
         <SectionHeader title="Giải pháp số cho Doanh nghiệp / UBND" href="/giai-phap-so" />

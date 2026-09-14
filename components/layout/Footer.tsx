@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { FormEvent, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Facebook, Phone, Mail, MapPin } from 'lucide-react';
+import { Facebook, Phone, Mail, MapPin, Clock3, MessageCircle, Youtube } from 'lucide-react';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { newsletterApi } from '@/lib/api/newsletter';
 import { settingsApi } from '@/lib/api/settings';
@@ -40,9 +41,20 @@ export function Footer() {
     <footer className={styles.footer}>
       <div className={styles.footer__inner}>
         <div className={styles.footer__column}>
-          <h3 className={styles.footer__title}>{settings?.site_name ?? 'MobiFone Sơn La'}</h3>
+          <Image
+            src="/logo.png"
+            alt="Logo MobiFone"
+            width={700}
+            height={120}
+            className={styles.footer__logo}
+          />
+          <h3 className={styles.footer__title}>
+            {settings?.footer_about_title ?? settings?.site_name ?? 'MobiFone Sơn La'}
+          </h3>
           <p className={styles.footer__description}>
-            {settings?.footer_description ?? 'Thông tin liên hệ chính thức của MobiFone Sơn La'}
+            {settings?.footer_about_content ??
+              settings?.footer_description ??
+              'Thông tin liên hệ chính thức của MobiFone Sơn La'}
           </p>
           <div className={styles.footer__details}>
             <p className={styles.footer__detail}>
@@ -57,6 +69,10 @@ export function Footer() {
               <Mail className={styles.footer__detailIcon} />
               {settings?.footer_email ?? 'sonla@mobifone.vn'}
             </p>
+            <p className={styles.footer__detail}>
+              <Clock3 className={styles.footer__detailIcon} />
+              {settings?.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
+            </p>
           </div>
         </div>
 
@@ -64,8 +80,10 @@ export function Footer() {
           <h3 className={styles.footer__title}>Liên hệ nhanh</h3>
           <p className={styles.footer__hotline}>
             <Phone className={styles.footer__hotlineIcon} />
-            <a href={`tel:${dutyStaff?.phone ?? settings?.hotline ?? ''}`}>
-              {dutyStaff?.phone ?? settings?.hotline ?? '1800 xxxx'}
+            <a
+              href={`tel:${dutyStaff?.phone ?? settings?.footer_phone ?? settings?.hotline ?? ''}`}
+            >
+              {dutyStaff?.phone ?? settings?.footer_phone ?? settings?.hotline ?? '1800 xxxx'}
             </a>
           </p>
           <p className={styles.footer__description}>
@@ -119,11 +137,34 @@ export function Footer() {
             >
               <Facebook className={styles.footer__socialIcon} />
             </a>
+            {settings?.footer_zalo_url && (
+              <a
+                href={settings.footer_zalo_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Zalo MobiFone Sơn La"
+                className={styles.footer__socialLink}
+              >
+                <MessageCircle className={styles.footer__socialIcon} />
+              </a>
+            )}
+            {settings?.footer_youtube_url && (
+              <a
+                href={settings.footer_youtube_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube MobiFone Sơn La"
+                className={styles.footer__socialLink}
+              >
+                <Youtube className={styles.footer__socialIcon} />
+              </a>
+            )}
           </div>
         </div>
       </div>
       <div className={styles.footer__copyright}>
-        © {new Date().getFullYear()} MobiFone Chi nhánh Sơn La. Bảo lưu mọi quyền.
+        {settings?.footer_copyright ??
+          `© ${new Date().getFullYear()} MobiFone Chi nhánh Sơn La. Bảo lưu mọi quyền.`}
       </div>
     </footer>
   );

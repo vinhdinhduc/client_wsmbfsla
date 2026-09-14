@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -33,6 +33,7 @@ const userSchema = z.object({
   full_name: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
   email: z.string().email('Email không hợp lệ').max(100),
   phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
+  avatar_url: z.string().url('URL avatar không hợp lệ').max(500).optional().or(z.literal('')),
   role: z.enum(['admin', 'chuyen_vien', 'giao_dich_vien', 'nhan_vien']),
   status: z.enum(['active', 'locked']),
 });
@@ -47,6 +48,15 @@ export default function AdminUsersPage() {
     item?: AdminUser;
   } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!avatarFile) return;
+    const url = URL.createObjectURL(avatarFile);
+    setAvatarPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [avatarFile]);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -63,12 +73,15 @@ export default function AdminUsersPage() {
   });
 
   function openCreate() {
+    setAvatarFile(null);
+    setAvatarPreview(null);
     reset({
       username: '',
       password: '',
       full_name: '',
       email: '',
       phone: '',
+      avatar_url: '',
       role: 'nhan_vien',
       status: 'active',
     });
@@ -76,12 +89,15 @@ export default function AdminUsersPage() {
   }
 
   function openEdit(item: AdminUser) {
+    setAvatarFile(null);
+    setAvatarPreview(item.avatar_url);
     reset({
       username: item.username,
       password: '',
       full_name: item.full_name,
       email: item.email,
       phone: item.phone,
+      avatar_url: item.avatar_url ?? '',
       role: item.role,
       status: item.status,
     });
@@ -112,9 +128,13 @@ export default function AdminUsersPage() {
   });
 
   function onSubmit(values: UserSchemaValues) {
-    const payload: UserFormValues = { ...values };
+    const payload: UserFormValues = { ...values, avatar: avatarFile ?? undefined };
     if (!payload.password) delete payload.password;
     saveMutation.mutate(payload);
+  }
+
+  function handleAvatarChange(event: ChangeEvent<HTMLInputElement>) {
+    setAvatarFile(event.target.files?.[0] ?? null);
   }
 
   const columns: TableColumn<AdminUser>[] = [
@@ -206,6 +226,16 @@ export default function AdminUsersPage() {
               {...register('email')}
             />
             <TextField label="Số điện thoại" error={errors.phone?.message} {...register('phone')} />
+          </div>
+          <div className={styles.fileField}>
+            <label htmlFor="user-avatar">Ảnh đại diện</label>
+            <input id="user-avatar" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleAvatarChange} />
+            {avatarPreview && <div className={styles.avatarPreviewBox}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={avatarPreview} alt={avatarFile ? 'Ảnh avatar mới chọn' : 'Ảnh avatar hiện tại'} className={styles.avatarPreview} />
+              <p className={styles.imagePreviewCaption}>{avatarFile ? 'Ảnh mới sẽ được sử dụng khi lưu' : 'Ảnh avatar hiện tại'}</p>
+            </div>}
+            <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
           </div>
           <div className={styles.grid2}>
             <SelectField

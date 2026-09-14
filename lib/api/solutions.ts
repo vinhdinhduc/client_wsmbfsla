@@ -6,6 +6,7 @@ export interface SolutionFormValues {
   slug: string;
   category: SolutionCategory;
   thumbnail?: string | null;
+  image?: File;
   summary?: string | null;
   content: string;
   is_hot: boolean;
@@ -24,10 +25,20 @@ export const solutionsApi = {
   getById: (id: number) => apiFetch<Solution>(`/admin/solutions/${id}`),
 
   create: (dto: SolutionFormValues) =>
-    apiFetch<Solution>('/admin/solutions', { method: 'POST', body: dto }),
+    apiFetch<Solution>('/admin/solutions', solutionRequest('POST', dto)),
 
   update: (id: number, dto: Partial<SolutionFormValues>) =>
-    apiFetch<Solution>(`/admin/solutions/${id}`, { method: 'PUT', body: dto }),
+    apiFetch<Solution>(`/admin/solutions/${id}`, solutionRequest('PUT', dto)),
 
   remove: (id: number) => apiFetch<null>(`/admin/solutions/${id}`, { method: 'DELETE' }),
 };
+
+function solutionRequest(method: 'POST' | 'PUT', dto: Partial<SolutionFormValues>) {
+  if (!dto.image) return { method, body: dto };
+  const form = new FormData();
+  Object.entries(dto).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && key !== 'image') form.append(key, String(value));
+  });
+  form.append('image', dto.image);
+  return { method, body: form, isFormData: true };
+}

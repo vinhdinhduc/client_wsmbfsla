@@ -3,6 +3,7 @@ import { WorkShift } from '@/types/user';
 
 export interface ShiftFormValues {
   user_id: number;
+  store_id: number;
   shift_date: string;
   start_time: string;
   end_time: string;
@@ -12,6 +13,7 @@ export interface ShiftFormValues {
 export interface CurrentDutyStaff {
   name: string;
   phone: string;
+  avatar_url: string | null;
 }
 
 export const shiftsApi = {
@@ -22,7 +24,8 @@ export const shiftsApi = {
 
   mySchedule: () => apiFetch<WorkShift[]>('/admin/shifts/my-schedule'),
 
-  create: (dto: ShiftFormValues) => apiFetch<WorkShift>('/admin/shifts', { method: 'POST', body: dto }),
+  create: (dto: ShiftFormValues) =>
+    apiFetch<WorkShift>('/admin/shifts', { method: 'POST', body: dto }),
 
   update: (id: number, dto: Partial<ShiftFormValues>) =>
     apiFetch<WorkShift>(`/admin/shifts/${id}`, { method: 'PUT', body: dto }),

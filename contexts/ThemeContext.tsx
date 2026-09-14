@@ -16,6 +16,18 @@ function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
 }
 
+function changeTheme(theme: Theme) {
+  const update = () => applyTheme(theme);
+  const documentWithTransition = document as Document & {
+    startViewTransition?: (callback: () => void) => void;
+  };
+  if (documentWithTransition.startViewTransition) {
+    documentWithTransition.startViewTransition(update);
+  } else {
+    update();
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
 
@@ -30,7 +42,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setTheme((currentTheme) => {
       const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
       localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-      applyTheme(nextTheme);
+      changeTheme(nextTheme);
       return nextTheme;
     });
   }

@@ -3,11 +3,16 @@
 .card {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--color-neutral-100);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: #fff;
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-card);
+  box-shadow: 0 4px 14px rgb(15 23 42 / 6%);
   transition: box-shadow 150ms ease;
+  transition:
+    box-shadow 180ms ease,
+    background-color 260ms ease,
+    border-color 260ms ease,
+    transform 180ms ease;
   &::before {
     position: absolute;
     z-index: 1;
@@ -19,7 +24,8 @@
     transition: border-color 150ms ease;
   }
   &:hover {
-    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 26px rgb(0 74 133 / 13%);
     &::before {
       border-color: rgb(0 102 179 / 30%);
     }
@@ -33,7 +39,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--color-neutral-100);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--bg-card));
 }
 .thumbnailImage {
   object-fit: cover;
@@ -48,11 +54,15 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  color: var(--color-neutral-500);
+  color: var(--color-primary);
+  background:
+    linear-gradient(135deg, transparent 0 48%, rgb(255 255 255 / 46%) 48% 52%, transparent 52% 100%),
+    color-mix(in srgb, var(--color-primary) 8%, var(--bg-card));
 }
 .thumbnailIcon {
   width: 2.5rem;
   height: 2.5rem;
+  opacity: 0.72;
 }
 .content {
   display: flex;
@@ -127,7 +137,7 @@
   border: 1px solid var(--color-neutral-100);
   border-radius: var(--radius-md);
   padding: $space-4;
-  background: #fff;
+  background: var(--bg-card);
   box-shadow: var(--shadow-sm);
 }
 .storeAddress {
@@ -143,4 +153,11 @@
   width: 1rem;
   height: 1rem;
   margin-top: 0.125rem;
+}
+.storeAction {
+  margin-top: $space-2;
+  color: var(--color-primary);
+  font-size: $font-size-sm;
+  font-weight: 700;
+  text-decoration: none;
 }

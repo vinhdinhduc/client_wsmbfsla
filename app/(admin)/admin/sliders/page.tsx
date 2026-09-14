@@ -19,9 +19,9 @@ import { env } from '@/lib/env';
 import styles from '../admin-shared.module.scss';
 
 const ANIMATION_OPTIONS = [
-  { value: 'fade', label: 'Fade' },
-  { value: 'slide', label: 'Slide' },
-  { value: 'zoom', label: 'Zoom' },
+  { value: 'fade', label: 'Mờ dần' },
+  { value: 'slide', label: 'Trượt' },
+  { value: 'zoom', label: 'Phóng to' },
 ];
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Đang hiển thị' },
@@ -252,7 +252,7 @@ export default function AdminSlidersPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Quản lý Slider</h1>
+      <h1 className={styles.title}>Quản lý Banner</h1>
 
       {zones && zones.length > 0 && (
         <Tabs
@@ -264,15 +264,15 @@ export default function AdminSlidersPage() {
 
       <div className={styles.toolbar}>
         <p className={styles.muted}>
-          Chỉ có 3 zone mặc định cố định - không thể tạo/xóa zone (chỉ sửa cấu hình
-          animation/autoplay và CRUD từng slide bên trong).
+          Có 3 khu vực banner mặc định. Bạn có thể chỉnh hiệu ứng, tự động chuyển ảnh và thêm, sửa
+          hoặc xóa từng banner.
         </p>
         <div className={styles.buttonGroup}>
           <Button variant="outline" size="sm" onClick={openConfig}>
-            <Settings2 className={styles.icon} /> Cấu hình zone
+            <Settings2 className={styles.icon} /> Cấu hình khu vực
           </Button>
           <Button size="sm" onClick={openCreateItem}>
-            <Plus className={styles.icon} /> Thêm slide
+            <Plus className={styles.icon} /> Thêm banner
           </Button>
         </div>
       </div>
@@ -282,7 +282,7 @@ export default function AdminSlidersPage() {
       <Modal
         isOpen={isConfigOpen}
         onClose={() => setIsConfigOpen(false)}
-        title={`Cấu hình zone: ${activeZone?.name ?? ''}`}
+        title={`Cấu hình khu vực: ${activeZone?.name ?? ''}`}
       >
         <form
           onSubmit={zoneForm.handleSubmit((v) => updateZoneMutation.mutate(v))}
@@ -294,13 +294,10 @@ export default function AdminSlidersPage() {
             error={zoneForm.formState.errors.animation_type?.message}
             {...zoneForm.register('animation_type')}
           />
-          <CheckboxField
-            label="Bật tự động chuyển slide (autoplay)"
-            {...zoneForm.register('autoplay_enabled')}
-          />
+          <CheckboxField label="Tự động chuyển ảnh" {...zoneForm.register('autoplay_enabled')} />
           <TextField
             type="number"
-            label="Tốc độ autoplay (ms)"
+            label="Thời gian chuyển ảnh (mili giây)"
             error={zoneForm.formState.errors.autoplay_speed_ms?.message}
             {...zoneForm.register('autoplay_speed_ms')}
           />
@@ -318,7 +315,7 @@ export default function AdminSlidersPage() {
       <Modal
         isOpen={itemModal !== null}
         onClose={() => setItemModal(null)}
-        title={itemModal?.mode === 'edit' ? 'Sửa slide' : 'Thêm slide'}
+        title={itemModal?.mode === 'edit' ? 'Sửa banner' : 'Thêm banner'}
       >
         <form onSubmit={itemForm.handleSubmit(onSubmitItem)} className={styles.form}>
           <div className={styles.fileField}>

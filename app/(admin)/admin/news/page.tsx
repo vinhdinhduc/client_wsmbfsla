@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { TextField, SelectField } from '@/components/ui/FormField';
 import { RichTextEditor } from '@/components/shared/RichTextEditor';
+import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
 import styles from '../admin-shared.module.scss';
@@ -63,6 +64,7 @@ export default function AdminNewsPage() {
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<News | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   const { data: news, isLoading } = useQuery({
     queryKey: ['admin-news'],
@@ -81,6 +83,7 @@ export default function AdminNewsPage() {
   const content = watch('content');
 
   function openCreate() {
+    setThumbnailFile(null);
     reset({
       title: '',
       slug: '',
@@ -94,6 +97,7 @@ export default function AdminNewsPage() {
   }
 
   function openEdit(item: News) {
+    setThumbnailFile(null);
     reset({
       title: item.title,
       slug: item.slug,
@@ -132,6 +136,7 @@ export default function AdminNewsPage() {
   function onSubmit(values: NewsSchemaValues) {
     saveMutation.mutate({
       ...values,
+      image: thumbnailFile ?? undefined,
       thumbnail: values.thumbnail || null,
       summary: values.summary || null,
     });
@@ -228,11 +233,11 @@ export default function AdminNewsPage() {
               {...register('status')}
             />
           </div>
-          <TextField
-            label="Ảnh đại diện (URL)"
-            placeholder="https://..."
-            error={errors.thumbnail?.message}
-            {...register('thumbnail')}
+          <ImageUploadField
+            id="news-thumbnail"
+            label="Ảnh đại diện"
+            value={watch('thumbnail')}
+            onChange={setThumbnailFile}
           />
           <TextField label="Tóm tắt" error={errors.summary?.message} {...register('summary')} />
           <RichTextEditor

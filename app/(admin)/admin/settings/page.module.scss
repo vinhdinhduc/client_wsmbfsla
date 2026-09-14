@@ -12,6 +12,11 @@
   font-weight: 700;
   color: var(--color-neutral-900);
 }
+.description {
+  margin: 0.35rem 0 0;
+  color: var(--color-neutral-500);
+  font-size: 0.875rem;
+}
 .panel {
   max-width: 36rem;
   display: flex;

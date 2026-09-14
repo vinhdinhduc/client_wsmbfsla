@@ -25,6 +25,9 @@
   --text-secondary: #6b7280;
   --border: #e5e7eb;
   --shadow-card: 0 8px 24px rgb(15 23 42 / 6%);
+  --public-glow: rgb(0 102 179 / 12%);
+  --public-section: #f4f7fa;
+  --public-muted-surface: #eef4f8;
 }
 
 [data-theme='dark'] {
@@ -41,6 +44,9 @@
   --text-secondary: #9ca3af;
   --border: #2a2e3a;
   --shadow-card: 0 10px 28px rgb(0 0 0 / 22%);
+  --public-glow: rgb(74 158 255 / 18%);
+  --public-section: #171d29;
+  --public-muted-surface: #202837;
 }
 
 * {
@@ -49,6 +55,9 @@
 html,
 body {
   min-height: 100%;
+}
+html {
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -69,6 +78,20 @@ select,
 textarea {
   font: inherit;
 }
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+}
+::view-transition-old(root) {
+  animation-name: theme-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: theme-fade-in;
+}
 dialog {
   max-height: 90vh;
   border: 0;
@@ -79,4 +102,24 @@ dialog {
 }
 .prose img {
   border-radius: var(--radius-md);
+}
+@keyframes theme-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

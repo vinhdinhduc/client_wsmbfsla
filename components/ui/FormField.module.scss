@@ -32,6 +32,7 @@
   border: 1px solid;
   border-radius: var(--radius-md);
   color: var(--color-neutral-900);
+  background: var(--color-surface);
   font-size: $font-size-sm;
   &::placeholder {
     color: var(--color-neutral-500);
@@ -50,10 +51,14 @@
   resize: vertical;
 }
 .select {
-  background: #fff;
+  background: var(--color-surface);
+  option {
+    color: var(--color-neutral-900);
+    background: var(--color-surface);
+  }
 }
 .valid {
-  border-color: var(--color-neutral-100);
+  border-color: var(--border);
 }
 .invalid {
   border-color: var(--color-danger);

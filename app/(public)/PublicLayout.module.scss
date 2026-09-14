@@ -1,0 +1,13 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-main);
+  transition:
+    background-color 260ms ease,
+    color 260ms ease;
+}
+.main {
+  flex: 1;
+}

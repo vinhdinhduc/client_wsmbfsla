@@ -119,6 +119,29 @@
   border-radius: var(--radius-md);
   background: var(--color-neutral-100);
 }
+.fileField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--color-neutral-900);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.avatarPreviewBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-100);
+}
+.avatarPreview {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border-radius: 50%;
+}
 .imagePreview {
   display: block;
   width: 100%;

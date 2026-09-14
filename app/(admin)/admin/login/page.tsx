@@ -54,7 +54,7 @@ function AdminLoginForm() {
       <div className={styles.card}>
         <div className={styles.brand}>
           <div className={styles.logoFrame}>
-            <Image src="/logo.png" alt="MobiFone" width={72} height={72} priority />
+            <Image src="/logo_ngan_cropped.png" alt="MobiFone" width={112} height={112} priority />
           </div>
           <h1 className={styles.title}>Đăng nhập quản trị</h1>
         </div>

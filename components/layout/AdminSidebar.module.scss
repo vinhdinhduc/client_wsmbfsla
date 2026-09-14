@@ -29,22 +29,31 @@
   gap: $space-2;
   border-bottom: 1px solid var(--border);
   padding: 0 $space-5;
+  background: color-mix(in srgb, var(--color-primary) 4%, var(--bg-sidebar));
 }
 .brandMark {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  overflow: hidden;
   place-items: center;
+  border: 1px solid rgb(0 102 179 / 14%);
   border-radius: 0.625rem;
-  color: #fff;
-  background: var(--color-primary);
-  font-weight: 700;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(0 74 133 / 10%);
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 .brandText {
   color: var(--color-primary);
   font-family: var(--font-heading);
   font-size: $font-size-lg;
   font-weight: 700;
+  letter-spacing: 0;
 }
 .closeButton {
   display: grid;
@@ -169,6 +178,7 @@
 .homeLink {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.625rem;
   margin-bottom: 0.9rem;
   border: 1px solid var(--border);

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { TextField, SelectField, CheckboxField } from '@/components/ui/FormField';
 import { RichTextEditor } from '@/components/shared/RichTextEditor';
+import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { useToast } from '@/components/ui/Toast';
 import styles from '../admin-shared.module.scss';
 
@@ -48,6 +49,7 @@ export default function AdminSolutionsPage() {
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<Solution | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   const { data: solutions, isLoading } = useQuery({
     queryKey: ['admin-solutions'],
@@ -67,6 +69,7 @@ export default function AdminSolutionsPage() {
   const content = watch('content');
 
   function openCreate() {
+    setThumbnailFile(null);
     reset({
       name: '',
       slug: '',
@@ -81,6 +84,7 @@ export default function AdminSolutionsPage() {
   }
 
   function openEdit(item: Solution) {
+    setThumbnailFile(null);
     reset({
       name: item.name,
       slug: item.slug,
@@ -120,6 +124,7 @@ export default function AdminSolutionsPage() {
   function onSubmit(values: SolutionSchemaValues) {
     saveMutation.mutate({
       ...values,
+      image: thumbnailFile ?? undefined,
       thumbnail: values.thumbnail || null,
       summary: values.summary || null,
     });
@@ -207,11 +212,11 @@ export default function AdminSolutionsPage() {
               {...register('status')}
             />
           </div>
-          <TextField
-            label="Ảnh đại diện (URL)"
-            placeholder="https://..."
-            error={errors.thumbnail?.message}
-            {...register('thumbnail')}
+          <ImageUploadField
+            id="solution-thumbnail"
+            label="Ảnh đại diện"
+            value={watch('thumbnail')}
+            onChange={setThumbnailFile}
           />
           <TextField label="Tóm tắt" error={errors.summary?.message} {...register('summary')} />
           <CheckboxField label="Đánh dấu là giải pháp nổi bật (HOT)" {...register('is_hot')} />

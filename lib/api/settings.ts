@@ -30,6 +30,17 @@ export interface PublicSettings {
   footer_email?: string;
   footer_description?: string;
   footer_facebook_url?: string;
+  footer_about_title?: string;
+  footer_about_content?: string;
+  footer_phone?: string;
+  footer_working_hours?: string;
+  footer_zalo_url?: string;
+  footer_youtube_url?: string;
+  footer_copyright?: string;
+  contact_widget_message?: string;
+  contact_widget_enabled?: string;
+  ga4_id?: string;
+  fb_pixel_id?: string;
 }
 
 export const settingsApi = {

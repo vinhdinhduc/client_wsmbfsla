@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 import { LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
@@ -51,6 +52,9 @@ export function AdminHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
         >
           <Menu />
         </button>
+        <span className={styles.brandLogo} aria-hidden="true">
+          <Image src="/logo_ngan_cropped.png" alt="" width={48} height={48} priority />
+        </span>
         <div>
           <p className={styles.eyebrow}>MobiFone Admin</p>
           <h1 className={styles.title}>{pageTitle}</h1>

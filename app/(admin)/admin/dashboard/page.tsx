@@ -8,6 +8,7 @@ import { newsApi } from '@/lib/api/news';
 import { simsApi } from '@/lib/api/sims';
 import { contactsApi } from '@/lib/api/contacts';
 import { shiftsApi } from '@/lib/api/shifts';
+import { appointmentsApi } from '@/lib/api/appointments';
 import { formatDate } from '@/lib/format';
 import { StatCard } from '@/components/ui/StatCard';
 import styles from './page.module.scss';
@@ -39,6 +40,12 @@ export default function AdminDashboardPage() {
     queryFn: () => shiftsApi.mySchedule(),
     enabled: user?.role === 'giao_dich_vien' || user?.role === 'nhan_vien',
   });
+  const { data: appointments } = useQuery({
+    queryKey: ['dashboard-appointments'],
+    queryFn: appointmentsApi.list,
+    enabled:
+      user?.role === 'admin' || user?.role === 'chuyen_vien' || user?.role === 'giao_dich_vien',
+  });
 
   const publishedNews = news?.filter((n) => n.status === 'published').length ?? 0;
   const availableSims = sims?.filter((s) => s.status === 'available').length ?? 0;
@@ -64,6 +71,16 @@ export default function AdminDashboardPage() {
           tone="blue"
         />
         <StatCard icon={Mail} label="Liên hệ mới" value={newContacts?.total ?? '—'} tone="orange" />
+        {(user?.role === 'admin' ||
+          user?.role === 'chuyen_vien' ||
+          user?.role === 'giao_dich_vien') && (
+          <StatCard
+            icon={CalendarClock}
+            label="Lịch hẹn"
+            value={appointments?.filter((a) => a.status === 'moi').length ?? '—'}
+            tone="green"
+          />
+        )}
         {isContentRole && (
           <StatCard icon={Newspaper} label="Tin đã đăng" value={publishedNews} tone="green" />
         )}

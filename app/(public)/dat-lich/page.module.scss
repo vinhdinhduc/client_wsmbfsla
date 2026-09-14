@@ -1,0 +1,27 @@
+@use '../../../styles/variables' as *;
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+.intro {
+  margin: 2rem 0 1.5rem;
+}
+.kicker {
+  margin: 0 0 0.5rem;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+.description {
+  max-width: 650px;
+  color: var(--color-neutral-600);
+  line-height: 1.6;
+}

@@ -7,6 +7,7 @@ export interface AdminUser {
   full_name: string;
   email: string;
   phone: string;
+  avatar_url: string | null;
   role: UserRole;
   status: UserStatus;
   created_at: string;
@@ -29,13 +30,15 @@ export interface LoginResult {
 export interface WorkShift {
   id: number;
   user_id: number;
+  store_id: number | null;
   shift_date: string;
   start_time: string;
   end_time: string;
   note: string | null;
   created_by: number;
   created_at: string;
-  staff?: { id: number; full_name: string; phone: string };
+  staff?: { id: number; full_name: string; phone: string; avatar_url: string | null };
+  store?: { id: number; name: string; address: string; district: string };
 }
 
 export interface AuditLog {

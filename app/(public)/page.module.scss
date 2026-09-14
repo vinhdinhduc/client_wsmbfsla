@@ -24,6 +24,7 @@
   width: min(100%, var(--container-width));
   margin-inline: auto;
   padding-inline: 1rem;
+  animation: content-reveal 600ms ease both;
   @include breakpoint(sm) {
     padding-inline: 1.5rem;
   }
@@ -95,4 +96,14 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-neutral-900);
+}
+@keyframes content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -43,14 +43,18 @@ export default async function AboutPage() {
   return (
     <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Giới thiệu' }]} />
-      <h1 className={styles.title}>Giới thiệu về {settings.site_name ?? 'MobiFone Sơn La'}</h1>
-      <p className={styles.intro}>
-        MobiFone Chi nhánh Sơn La là đơn vị trực thuộc Tổng công ty Viễn thông MobiFone, chịu trách
-        nhiệm cung cấp dịch vụ viễn thông - công nghệ số cho khách hàng cá nhân, doanh nghiệp và các
-        cơ quan nhà nước trên địa bàn tỉnh Sơn La. Với phương châm lấy khách hàng làm trung tâm,
-        chúng tôi không ngừng đầu tư hạ tầng mạng lưới, nâng cao chất lượng dịch vụ và mở rộng mạng
-        lưới điểm giao dịch để phục vụ tốt nhất nhu cầu của người dân và doanh nghiệp địa phương.
-      </p>
+      <div className={styles.hero}>
+        <p className={styles.eyebrow}>MobiFone Sơn La</p>
+        <h1 className={styles.title}>Kết nối gần hơn, phục vụ tốt hơn</h1>
+        <p className={styles.intro}>
+          MobiFone Chi nhánh Sơn La là đơn vị trực thuộc Tổng công ty Viễn thông MobiFone, chịu
+          trách nhiệm cung cấp dịch vụ viễn thông - công nghệ số cho khách hàng cá nhân, doanh
+          nghiệp và các cơ quan nhà nước trên địa bàn tỉnh Sơn La. Với phương châm lấy khách hàng
+          làm trung tâm, chúng tôi không ngừng đầu tư hạ tầng mạng lưới, nâng cao chất lượng dịch vụ
+          và mở rộng mạng lưới điểm giao dịch để phục vụ tốt nhất nhu cầu của người dân và doanh
+          nghiệp địa phương.
+        </p>
+      </div>
 
       <div className={styles.highlights}>
         {HIGHLIGHTS.map((h) => (
@@ -63,9 +67,13 @@ export default async function AboutPage() {
       </div>
 
       <div className={styles.contactBox}>
-        <h3 className={styles.contactTitle}>Thông tin liên hệ</h3>
+        <div>
+          <p className={styles.eyebrow}>Luôn sẵn sàng hỗ trợ</p>
+          <h3 className={styles.contactTitle}>Thông tin liên hệ</h3>
+        </div>
         <p className={styles.contactText}>
-          Địa chỉ: Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La
+          Địa chỉ:{' '}
+          {settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La'}
         </p>
         <p className={styles.contactText}>Hotline: {settings.hotline ?? '1800 xxxx'}</p>
       </div>

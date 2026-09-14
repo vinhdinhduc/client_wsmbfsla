@@ -1,4 +1,4 @@
-@use "../../styles/variables" as *;
+@use '../../styles/variables' as *;
 
 .wrapper {
   position: fixed;
@@ -169,6 +169,8 @@
   align-items: center;
   justify-content: center;
   width: 3.5rem;
+  margin-bottom: 0.75rem;
+
   height: 3.5rem;
   color: #fff;
   background: var(--color-primary);
@@ -176,13 +178,45 @@
   border-radius: 50%;
   box-shadow: var(--shadow-md);
   transition: background-color 150ms ease;
+  animation: launcher-pop 500ms ease both;
   &:hover {
     background: var(--color-primary-dark);
   }
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: -0.5rem;
+  }
+}
+
+.chatHint {
+  position: absolute;
+  right: 4.25rem;
+  bottom: 1rem;
+  width: max-content;
+  max-width: min(15rem, calc(100vw - 6rem));
+  padding: 0.6rem 0.75rem;
+  color: var(--color-neutral-900);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-neutral-100));
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-md);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -0.35rem;
+    width: 0.65rem;
+    height: 0.65rem;
+    background: var(--color-surface);
+    border-top: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-neutral-100));
+    border-right: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-neutral-100));
+    transform: translateY(-50%) rotate(45deg);
   }
 }
 
@@ -192,40 +226,97 @@
 }
 
 .contactActions {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-height: 7.625rem;
   margin-bottom: 0.75rem;
 }
 
-.contactHint {
+.contactButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.dutyStaff {
   position: absolute;
   right: 4.25rem;
-  bottom: 8.25rem;
-  width: max-content;
-  max-width: min(18rem, calc(100vw - 7rem));
-  padding: 0.625rem 0.875rem;
+  bottom: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  width: min(15.5rem, calc(100vw - 7.5rem));
+  padding: 0.625rem;
   color: var(--color-neutral-900);
-  background: var(--color-surface);
-  border: 1px solid var(--color-neutral-100);
-  border-radius: 0.625rem;
+  background: color-mix(in srgb, var(--color-surface) 94%, var(--color-primary));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--color-neutral-100));
+  border-radius: 0.875rem;
   box-shadow: var(--shadow-md);
+}
+
+.dutyAvatar,
+.dutyAvatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.dutyAvatar {
+  object-fit: cover;
+}
+.dutyAvatarFallback {
+  color: #fff;
+  background: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.dutyStaffContent {
+  min-width: 0;
+  padding-top: 0.05rem;
+}
+.dutyStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-success);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.statusDot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
+}
+.dutyStaffName {
+  display: block;
+  overflow: hidden;
+  margin-top: 0.15rem;
+  color: var(--color-neutral-900);
   font-size: 0.8125rem;
-  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.contactMessage {
+  display: -webkit-box;
+  margin: 0.18rem 0 0;
+  overflow: hidden;
+  color: var(--color-neutral-500);
+  font-size: 0.6875rem;
+  font-weight: 500;
   line-height: 1.35;
-  pointer-events: none;
-  &::after {
-    position: absolute;
-    right: -0.375rem;
-    bottom: 1rem;
-    width: 0.75rem;
-    height: 0.75rem;
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-neutral-100);
-    border-right: 1px solid var(--color-neutral-100);
-    content: "";
-    transform: rotate(45deg);
-  }
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .contactButton {
@@ -277,10 +368,59 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .launcher {
+    animation:
+      launcher-pop 500ms both,
+      launcher-pulse 3s 1s ease-in-out infinite;
+  }
+  .zaloButton {
+    animation:
+      contactRise 500ms 100ms both,
+      zaloPulse 3.2s 1.4s ease-in-out infinite;
+  }
   .phoneButton {
     animation:
       contactRise 500ms 200ms both,
       contactPulse 2.8s 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes launcher-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes launcher-pulse {
+  0%,
+  68%,
+  100% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 0 rgb(0 102 179 / 32%);
+  }
+  84% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 0.625rem rgb(0 102 179 / 0%);
+  }
+}
+@keyframes zaloPulse {
+  0%,
+  68%,
+  100% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 0 rgb(0 104 255 / 30%);
+  }
+  84% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 0.625rem rgb(0 104 255 / 0%);
   }
 }
 

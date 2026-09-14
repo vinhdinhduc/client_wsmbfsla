@@ -1,10 +1,11 @@
-@use "../../../styles/variables" as *;
-@use "../../../styles/mixins" as *;
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 .page {
   width: min(100%, var(--container-width));
   margin: 0 auto;
   padding: 2rem 1rem 3rem;
+  animation: cart-in 450ms ease both;
   @include breakpoint(sm) {
     padding-right: 1.5rem;
     padding-left: 1.5rem;
@@ -25,12 +26,26 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-align: center;
+  position: relative;
+}
+.stepper::before {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  right: 10%;
+  left: 10%;
+  height: 2px;
+  background: var(--color-neutral-100);
+  z-index: 0;
 }
 .stepper span {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+  background: var(--bg-main);
 }
 .stepper b {
   display: grid;
@@ -49,6 +64,16 @@
 }
 .stepCurrent {
   color: var(--color-neutral-900);
+}
+.stepCurrent b {
+  box-shadow: 0 0 0 4px rgb(0 102 179 / 14%);
+}
+.stepPending {
+  color: var(--color-neutral-500);
+}
+.stepPending b {
+  color: var(--color-neutral-500);
+  background: var(--color-neutral-100);
 }
 
 .title {
@@ -122,6 +147,7 @@
   border: 1px solid var(--color-neutral-100);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 .orderLine,
 .orderTotal {
@@ -154,6 +180,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-neutral-100);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .items {
@@ -225,7 +252,7 @@
   font-weight: 600;
 }
 .choiceGroup legend::after {
-  content: " *";
+  content: ' *';
   color: var(--color-danger);
   font-weight: 700;
 }
@@ -277,6 +304,17 @@
 
 .submitWidth {
   width: 100%;
+}
+
+@keyframes cart-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 639px) {

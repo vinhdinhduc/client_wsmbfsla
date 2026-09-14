@@ -1,14 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import {
   ChevronDown,
-  Gauge as RateLimitIcon,
+  BarChart3,
+  Bot,
+  CircleHelp,
+  LayoutTemplate,
+  PanelBottom,
   Home as HomeIcon,
-  KeyRound,
-  Mail,
+  Globe2,
   Settings as SettingsIcon,
   X,
 } from 'lucide-react';
@@ -32,19 +36,20 @@ export function AdminSidebar({
   const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsRoute);
 
   const settingsItems = [
-    { href: '/admin/settings?section=api-key', label: 'Cấu hình API Key', icon: KeyRound },
-    { href: '/admin/settings?section=email', label: 'Cấu hình Email', icon: Mail },
-    {
-      href: '/admin/settings?section=rate-limit',
-      label: 'Cấu hình Rate Limit',
-      icon: RateLimitIcon,
-    },
+    { href: '/admin/settings?section=site', label: 'Thông tin website', icon: Globe2 },
+    { href: '/admin/settings?section=footer', label: 'Giới thiệu & footer', icon: PanelBottom },
+    { href: '/admin/settings?section=social', label: 'Mạng xã hội & hỗ trợ', icon: CircleHelp },
+    { href: '/admin/settings?section=appearance', label: 'Giao diện', icon: LayoutTemplate },
+    { href: '/admin/settings?section=chatbot', label: 'AI Chatbot', icon: Bot },
+    { href: '/admin/settings?section=analytics', label: 'Đo lường', icon: BarChart3 },
   ];
 
   return (
     <aside className={cn(styles.sidebar, isMobileMenuOpen && styles.mobileOpen)}>
       <div className={styles.brand}>
-        <span className={styles.brandMark}>M</span>
+        <span className={styles.brandMark} aria-hidden="true">
+          <Image src="/logo_ngan_cropped.png" alt="" width={64} height={64} priority />
+        </span>
         <span className={styles.brandText}>MobiFone Admin</span>
         <button
           type="button"

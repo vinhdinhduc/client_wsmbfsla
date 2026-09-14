@@ -55,13 +55,9 @@ Husky + lint-staged đã được cấu hình để tự chạy ESLint + Prettie
 
 ## Ghi chú triển khai quan trọng (đọc trước khi bàn giao)
 
-1. **Slider admin không dùng upload file ảnh trực tiếp.** Route backend
-   `POST /api/admin/sliders/items` có gắn middleware Multer nhưng
-   validator/service chỉ đọc `image_url` dạng chuỗi từ JSON body và không đọc
-   `req.file`. Vì Multer chỉ can thiệp khi request thực sự là
-   `multipart/form-data`, form Admin Slider gửi JSON thuần với trường "URL hình
-   ảnh" thay vì file picker - đây là cách duy nhất hoạt động đúng với backend
-   hiện tại mà không sửa code backend.
+1. **Các form ảnh trong admin dùng upload từ thiết bị.** Users, News, Solutions
+   và Slider đều gửi `multipart/form-data` với file ảnh, hiển thị preview trước
+   khi lưu và backend lưu đường dẫn tương đối trong thư mục `uploads`.
 2. **`GET /api/public/settings` chỉ trả về 6 khóa cố định**: `site_name`,
    `site_logo`, `hotline`, `theme_primary_color`, `home_banner`,
    `ai_chatbot_enabled`. Các khóa khác (vd `ga4_id`, `fb_pixel_id`) tuy có thể

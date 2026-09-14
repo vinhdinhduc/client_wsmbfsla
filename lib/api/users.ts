@@ -7,6 +7,8 @@ export interface UserFormValues {
   full_name: string;
   email: string;
   phone: string;
+  avatar_url?: string | null;
+  avatar?: File;
   role: UserRole;
   status: UserStatus;
 }
@@ -16,10 +18,20 @@ export const usersApi = {
 
   getById: (id: number) => apiFetch<AdminUser>(`/admin/users/${id}`),
 
-  create: (dto: UserFormValues) => apiFetch<AdminUser>('/admin/users', { method: 'POST', body: dto }),
+  create: (dto: UserFormValues) => apiFetch<AdminUser>('/admin/users', userRequest('POST', dto)),
 
   update: (id: number, dto: Partial<UserFormValues>) =>
-    apiFetch<AdminUser>(`/admin/users/${id}`, { method: 'PUT', body: dto }),
+    apiFetch<AdminUser>(`/admin/users/${id}`, userRequest('PUT', dto)),
 
   remove: (id: number) => apiFetch<null>(`/admin/users/${id}`, { method: 'DELETE' }),
 };
+
+function userRequest(method: 'POST' | 'PUT', dto: Partial<UserFormValues>) {
+  if (!dto.avatar) return { method, body: dto };
+  const form = new FormData();
+  Object.entries(dto).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && key !== 'avatar') form.append(key, String(value));
+  });
+  form.append('avatar', dto.avatar);
+  return { method, body: form, isFormData: true };
+}

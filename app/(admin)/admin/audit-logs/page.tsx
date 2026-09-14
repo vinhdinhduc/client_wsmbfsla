@@ -25,7 +25,56 @@ const ACTION_TONE: Record<string, 'success' | 'warning' | 'danger' | 'primary' |
   login: 'primary',
   logout: 'neutral',
 };
+const ACTION_LABELS: Record<string, string> = {
+  create: 'Tạo mới',
+  update: 'Cập nhật',
+  delete: 'Xóa',
+  login: 'Đăng nhập',
+  logout: 'Đăng xuất',
+};
+const MODULE_LABELS: Record<string, string> = {
+  users: 'Tài khoản người dùng',
+  news: 'Tin tức',
+  packages: 'Gói cước',
+  sims: 'Sim số đẹp',
+  solutions: 'Giải pháp số',
+  stores: 'Cửa hàng',
+  sliders: 'Banner / Slider',
+  shifts: 'Lịch trực',
+  settings: 'Cài đặt hệ thống',
+  contacts: 'Liên hệ',
+  store_appointments: 'Lịch hẹn cửa hàng',
+  registration_groups: 'Đăng ký dịch vụ',
+};
+const CODE_LABELS: Record<string, string> = {
+  ...MODULE_LABELS,
+  general: 'Thông tin chung',
+  theme: 'Giao diện',
+  ai: 'Trợ lý AI',
+  analytics: 'Đo lường',
+};
 const PAGE_SIZE = 15;
+
+function getModuleLabel(module: string) {
+  return MODULE_LABELS[module] ?? module;
+}
+
+function getDescription(log: AuditLog) {
+  const description = log.description ?? '';
+  const defaultDescription = description.match(/^(create|update|delete|login|logout)\s+(.+)$/i);
+  if (defaultDescription) {
+    return `${ACTION_LABELS[defaultDescription[1].toLowerCase()] ?? defaultDescription[1]} ${getModuleLabel(defaultDescription[2])}`;
+  }
+  return description.replace(
+    /\b(store_appointments|registration_groups|users|news|packages|sims|solutions|stores|sliders|shifts|settings|contacts|general|theme|ai|analytics)\b/g,
+    (value) => CODE_LABELS[value] ?? value,
+  );
+}
+
+function getIpLabel(ip: string | null) {
+  if (!ip) return 'Không xác định';
+  return ip === '::1' || ip === '::ffff:127.0.0.1' ? `${ip} (máy local)` : ip;
+}
 
 export default function AdminAuditLogsPage() {
   const [page, setPage] = useState(1);
@@ -51,7 +100,7 @@ export default function AdminAuditLogsPage() {
       sortAccessor: (l) => l.created_at,
     },
     { key: 'user', header: 'Người thực hiện', render: (l) => l.user?.full_name ?? '(Hệ thống)' },
-    { key: 'module', header: 'Module', render: (l) => l.module },
+    { key: 'module', header: 'Module', render: (l) => getModuleLabel(l.module) },
     {
       key: 'action',
       header: 'Hành động',
@@ -61,8 +110,8 @@ export default function AdminAuditLogsPage() {
         </Badge>
       ),
     },
-    { key: 'description', header: 'Mô tả', render: (l) => l.description ?? '' },
-    { key: 'ip_address', header: 'IP', render: (l) => l.ip_address ?? '' },
+    { key: 'description', header: 'Mô tả', render: getDescription },
+    { key: 'ip_address', header: 'IP', render: (l) => getIpLabel(l.ip_address) },
   ];
 
   return (

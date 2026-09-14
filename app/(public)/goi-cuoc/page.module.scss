@@ -1,62 +1,48 @@
-@use "../../../styles/variables" as *;
-@use "../../../styles/mixins" as *;
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 .page {
-  width: min(100%, var(--container-width));
-  margin: 0 auto;
-  padding: 2rem 1rem 3rem;
-  @include breakpoint(sm) {
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
-  }
-  @include breakpoint(lg) {
-    padding-right: 2rem;
-    padding-left: 2rem;
-  }
+  min-height: 100%;
+  padding-bottom: 3rem;
+  background: var(--bg-main);
+  transition: background-color 260ms ease;
 }
 
+.hero {
+  display: flex;
+  min-height: 18rem;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 1rem 3.5rem;
+  background: radial-gradient(circle at 50% 110%, var(--public-glow), transparent 38%),
+    linear-gradient(135deg, #f5f8ff, #e7efff);
+  border-bottom: 2px solid var(--color-primary);
+  text-align: center;
+  transition: background 260ms ease;
+}
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
 .title {
-  margin: 0.75rem 0 0;
+  margin: 0;
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
   font-weight: 700;
   color: var(--color-neutral-900);
+  line-height: 1.2;
+  text-wrap: balance;
   @include breakpoint(sm) {
-    font-size: 2.5rem;
+    font-size: 2.65rem;
   }
 }
-.stepper {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-  max-width: 62rem;
-  margin: 0 auto 2rem;
+.subtitle {
+  margin: 0.75rem 0 0;
   color: var(--color-neutral-500);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-}
-.stepper span {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-}
-.stepper b {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: 50%;
-  color: #fff;
-  background: var(--color-primary);
-}
-.stepDone {
-  color: var(--color-success);
-}
-.stepDone b {
-  background: var(--color-success);
-}
-.stepCurrent {
-  color: var(--color-neutral-900);
+  font-size: 0.875rem;
 }

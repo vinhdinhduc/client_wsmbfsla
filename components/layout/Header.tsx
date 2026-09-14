@@ -4,9 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ShoppingCart, Phone, Menu, X, LogIn, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Phone, Menu, X, LogIn, ChevronDown, Moon, Sun } from 'lucide-react';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { useCart } from '@/hooks/useCart';
+import { useTheme } from '@/contexts/ThemeContext';
 import styles from './Header.module.scss';
 
 const NAV_LINKS: Array<
@@ -37,6 +38,7 @@ export function Header() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const { count, openDrawer } = useCart();
   const { data: dutyStaff } = useCurrentDutyStaff();
+  const { theme, toggleTheme } = useTheme();
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -96,6 +98,15 @@ export function Header() {
             <LogIn className={styles.header__adminLoginIcon} />
             <span>Đăng nhập quản trị</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+            className={styles.header__themeToggle}
+          >
+            {theme === 'light' ? <Moon /> : <Sun />}
+          </button>
 
           <button
             type="button"

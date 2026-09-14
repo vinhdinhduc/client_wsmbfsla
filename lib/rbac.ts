@@ -12,6 +12,7 @@ import {
   Send,
   Users,
   CalendarClock,
+  CalendarDays,
   Settings,
   ScrollText,
   type LucideIcon,
@@ -75,6 +76,12 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/newsletter', label: 'Newsletter', icon: Send, roles: ['admin', 'chuyen_vien'] },
   { href: '/admin/users', label: 'Tài khoản', icon: Users, roles: ['admin'] },
   { href: '/admin/shifts', label: 'Ca trực', icon: CalendarClock, roles: ['admin'] },
+  {
+    href: '/admin/appointments',
+    label: 'Lịch hẹn',
+    icon: CalendarDays,
+    roles: ['admin', 'chuyen_vien', 'giao_dich_vien'],
+  },
   { href: '/admin/settings', label: 'Cài đặt', icon: Settings, roles: ['admin'] },
   { href: '/admin/audit-logs', label: 'Nhật ký', icon: ScrollText, roles: ['admin'] },
 ];
@@ -83,6 +90,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
 export const ADMIN_ROUTE_ROLES: Array<{ prefix: string; roles: UserRole[] }> = [
   { prefix: '/admin/users', roles: ['admin'] },
   { prefix: '/admin/shifts', roles: ['admin'] },
+  { prefix: '/admin/appointments', roles: ['admin', 'chuyen_vien', 'giao_dich_vien'] },
   { prefix: '/admin/settings', roles: ['admin'] },
   { prefix: '/admin/audit-logs', roles: ['admin'] },
   { prefix: '/admin/news', roles: ['admin', 'chuyen_vien'] },

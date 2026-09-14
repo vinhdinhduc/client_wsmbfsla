@@ -36,7 +36,6 @@ export function ChatWidget() {
     staleTime: 300_000,
   });
   const [isOpen, setIsOpen] = useState(false);
-  const [showContactHint, setShowContactHint] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -50,26 +49,13 @@ export function ChatWidget() {
   const { data: dutyStaff } = useCurrentDutyStaff();
   const phone = dutyStaff?.phone ?? settings?.hotline ?? '';
   const isChatbotEnabled = settings?.ai_chatbot_enabled !== 'false';
+  const isContactWidgetEnabled = settings?.contact_widget_enabled !== 'false';
+  const contactMessage = settings?.contact_widget_message ?? 'Cần hỗ trợ? Nhắn Zalo hoặc gọi ngay';
+  const staffInitial = dutyStaff?.name?.trim().charAt(0).toUpperCase() ?? 'M';
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, isOpen]);
-
-  useEffect(() => {
-    if (!phone) return;
-
-    const showHint = () => {
-      setShowContactHint(true);
-      window.setTimeout(() => setShowContactHint(false), 4500);
-    };
-    const initialTimer = window.setTimeout(showHint, 3000);
-    const interval = window.setInterval(showHint, 9000);
-
-    return () => {
-      window.clearTimeout(initialTimer);
-      window.clearInterval(interval);
-    };
-  }, [phone]);
 
   const sendMessage = useMutation({
     mutationFn: (message: string) => chatbotApi.sendMessage(getOrCreateSessionId(), message),
@@ -179,6 +165,20 @@ export function ChatWidget() {
             )}
           </AnimatePresence>
 
+          {!isOpen && (
+            <motion.button
+              type="button"
+              onClick={() => setIsOpen(true)}
+              aria-label="Mở Chatbot MobiFone"
+              initial={{ opacity: 0, y: 8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+              className={styles.chatHint}
+            >
+              Chatbot MobiFone - Nhấn để được hỗ trợ
+            </motion.button>
+          )}
+
           <button
             type="button"
             onClick={() => setIsOpen((o) => !o)}
@@ -204,28 +204,45 @@ export function ChatWidget() {
         </>
       )}
 
-      {phone && (
-        <>
-          <AnimatePresence>
-            {showContactHint && !isOpen && (
-              <motion.div
-                initial={{ opacity: 0, x: 12, scale: 0.92 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 12, scale: 0.92 }}
-                transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
-                className={styles.contactHint}
-              >
-                Cần hỗ trợ? Nhắn Zalo hoặc gọi ngay
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className={styles.contactActions}>
+      {phone && isContactWidgetEnabled && (
+        <div className={styles.contactActions}>
+          {!isOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: 12, scale: 0.96 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+              className={styles.dutyStaff}
+            >
+              {dutyStaff?.avatar_url ? (
+                <img
+                  src={dutyStaff.avatar_url}
+                  alt={dutyStaff.name}
+                  className={styles.dutyAvatar}
+                />
+              ) : (
+                <span className={styles.dutyAvatarFallback} aria-hidden="true">
+                  {staffInitial}
+                </span>
+              )}
+              <div className={styles.dutyStaffContent}>
+                <span className={styles.dutyStatus}>
+                  <i className={styles.statusDot} />
+                  {dutyStaff ? 'Giao dịch viên đang trực' : 'Tổng đài hỗ trợ'}
+                </span>
+                <strong className={styles.dutyStaffName}>
+                  {dutyStaff?.name ?? 'MobiFone Sơn La'}
+                </strong>
+                <p className={styles.contactMessage}>{contactMessage}</p>
+              </div>
+            </motion.div>
+          )}
+          <div className={styles.contactButtons}>
             <a
               href={`https://zalo.me/${phone.replace(/\D/g, '')}`}
               target="_blank"
               rel="noreferrer"
               aria-label="Nhắn tin qua Zalo"
+              title="Nhắn tin qua Zalo"
               className={`${styles.contactButton} ${styles.zaloButton}`}
             >
               <span aria-hidden="true">Zalo</span>
@@ -233,12 +250,13 @@ export function ChatWidget() {
             <a
               href={`tel:${phone}`}
               aria-label={`Gọi điện ${phone}`}
+              title={`Gọi ${phone}`}
               className={`${styles.contactButton} ${styles.phoneButton}`}
             >
               <Phone className={styles.contactIcon} />
             </a>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

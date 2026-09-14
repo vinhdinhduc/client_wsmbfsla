@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { packagesApi } from '@/lib/api/packages';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { PackageFilterBar } from './_components/PackageFilterBar';
 import styles from './page.module.scss';
 
@@ -20,22 +19,15 @@ export default async function PackagesPage({
 
   return (
     <div className={styles.page}>
-      <Breadcrumb items={[{ label: 'Gói cước' }]} />
-      <div className={styles.stepper} aria-label="Tiến trình đăng ký">
-        <span className={styles.stepDone}>
-          <b>1</b> Chọn sim
-        </span>
-        <span className={styles.stepCurrent}>
-          <b>2</b> Chọn gói cước
-        </span>
-        <span>
-          <b>3</b> Thông tin sản phẩm
-        </span>
-        <span>
-          <b>4</b> Thông tin khách hàng
-        </span>
-      </div>
-      <h1 className={styles.title}>Gói cước</h1>
+      <section className={styles.hero}>
+        <p className={styles.eyebrow}>MobiFone Sơn La</p>
+        <h1 className={styles.title}>
+          KHÁM PHÁ VŨ TRỤ DATA
+          <br />
+          LƯỚT NET THẢ GA KHÔNG LO VỀ GIÁ
+        </h1>
+        <p className={styles.subtitle}>Chọn gói cước phù hợp cho nhu cầu kết nối mỗi ngày.</p>
+      </section>
       <PackageFilterBar packages={packages} simId={searchParams.sim_id} />
     </div>
   );

@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { shiftsApi, ShiftFormValues } from '@/lib/api/shifts';
 import { usersApi } from '@/lib/api/users';
+import { storesApi } from '@/lib/api/stores';
 import { WorkShift } from '@/types/user';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
@@ -35,6 +36,7 @@ function toDateStr(d: Date): string {
 
 const shiftSchema = z.object({
   user_id: z.coerce.number().int().positive('Vui lòng chọn giao dịch viên'),
+  store_id: z.coerce.number().int().positive('Vui lòng chọn cửa hàng'),
   shift_date: z.string().min(1, 'Vui lòng chọn ngày'),
   start_time: z.string().min(1, 'Vui lòng chọn giờ bắt đầu'),
   end_time: z.string().min(1, 'Vui lòng chọn giờ kết thúc'),
@@ -59,6 +61,10 @@ export default function AdminShiftsPage() {
     queryKey: ['admin-users-for-shift'],
     queryFn: () => usersApi.list(),
   });
+  const { data: stores } = useQuery({
+    queryKey: ['admin-stores-for-shift'],
+    queryFn: () => storesApi.listAdmin(),
+  });
   const staffOptions = (users ?? [])
     .filter((u) => u.role === 'giao_dich_vien')
     .map((u) => ({ value: String(u.id), label: u.full_name }));
@@ -75,6 +81,7 @@ export default function AdminShiftsPage() {
   function openCreate(date: string) {
     reset({
       user_id: staffOptions[0] ? Number(staffOptions[0].value) : 0,
+      store_id: stores?.[0]?.id ?? 0,
       shift_date: date,
       start_time: '08:00',
       end_time: '17:00',
@@ -181,7 +188,7 @@ export default function AdminShiftsPage() {
                           {s.staff?.full_name ?? `NV #${s.user_id}`}
                         </p>
                         <p className={styles.shiftHours}>
-                          {s.start_time} - {s.end_time}
+                          {s.start_time} - {s.end_time} · {s.store?.name ?? 'Chưa gắn cửa hàng'}
                         </p>
                       </div>
                       <button
@@ -208,6 +215,15 @@ export default function AdminShiftsPage() {
             options={staffOptions}
             error={errors.user_id?.message}
             {...register('user_id')}
+          />
+          <SelectField
+            label="Cửa hàng"
+            options={(stores ?? []).map((store) => ({
+              value: String(store.id),
+              label: store.name,
+            }))}
+            error={errors.store_id?.message}
+            {...register('store_id')}
           />
           <TextField
             type="date"

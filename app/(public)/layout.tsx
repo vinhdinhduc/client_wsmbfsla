@@ -3,13 +3,14 @@ import { Footer } from '@/components/layout/Footer';
 import { CartDrawer } from '@/components/shared/CartDrawer';
 import { ChatWidget } from '@/components/shared/ChatWidget';
 import { ThemeColorInjector } from '@/components/shared/ThemeColorInjector';
+import styles from './PublicLayout.module.scss';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
+    <div className={styles.shell}>
       <ThemeColorInjector />
       <Header />
-      <main style={{ flex: 1 }}>{children}</main>
+      <main className={styles.main}>{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />

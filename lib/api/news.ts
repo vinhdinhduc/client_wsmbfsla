@@ -6,6 +6,7 @@ export interface NewsFormValues {
   slug: string;
   category: NewsCategory;
   thumbnail?: string | null;
+  image?: File;
   summary?: string | null;
   content: string;
   status: 'draft' | 'published';
@@ -25,10 +26,20 @@ export const newsApi = {
 
   getById: (id: number) => apiFetch<News>(`/admin/news/${id}`),
 
-  create: (dto: NewsFormValues) => apiFetch<News>('/admin/news', { method: 'POST', body: dto }),
+  create: (dto: NewsFormValues) => apiFetch<News>('/admin/news', newsRequest('POST', dto)),
 
   update: (id: number, dto: Partial<NewsFormValues>) =>
-    apiFetch<News>(`/admin/news/${id}`, { method: 'PUT', body: dto }),
+    apiFetch<News>(`/admin/news/${id}`, newsRequest('PUT', dto)),
 
   remove: (id: number) => apiFetch<null>(`/admin/news/${id}`, { method: 'DELETE' }),
 };
+
+function newsRequest(method: 'POST' | 'PUT', dto: Partial<NewsFormValues>) {
+  if (!dto.image) return { method, body: dto };
+  const form = new FormData();
+  Object.entries(dto).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && key !== 'image') form.append(key, String(value));
+  });
+  form.append('image', dto.image);
+  return { method, body: form, isFormData: true };
+}

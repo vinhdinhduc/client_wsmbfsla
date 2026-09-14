@@ -1,7 +1,9 @@
 'use client';
 
 import Script from 'next/script';
+import { useQuery } from '@tanstack/react-query';
 import { env } from '@/lib/env';
+import { settingsApi } from '@/lib/api/settings';
 
 /**
  * Nhung GA4 (gtag.js) + Meta Pixel qua <script> dong. Muc 12.1 dau bai mo ta ID lay
@@ -13,8 +15,13 @@ import { env } from '@/lib/env';
  * duoc dinh nghia san trong .env.example).
  */
 export function AnalyticsScripts() {
-  const ga4Id = env.NEXT_PUBLIC_GA4_ID;
-  const fbPixelId = env.NEXT_PUBLIC_FB_PIXEL_ID;
+  const { data: settings } = useQuery({
+    queryKey: ['public-settings'],
+    queryFn: () => settingsApi.listPublic(),
+    staleTime: 300_000,
+  });
+  const ga4Id = settings?.ga4_id || env.NEXT_PUBLIC_GA4_ID;
+  const fbPixelId = settings?.fb_pixel_id || env.NEXT_PUBLIC_FB_PIXEL_ID;
 
   return (
     <>
