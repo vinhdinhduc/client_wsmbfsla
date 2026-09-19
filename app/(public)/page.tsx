@@ -9,6 +9,7 @@ import { SliderZone } from '@/components/shared/SliderZone';
 import { HomeCatalogSections } from '@/components/home/HomeCatalogSections';
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 import styles from './page.module.scss';
 

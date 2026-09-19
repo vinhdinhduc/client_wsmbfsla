@@ -11,6 +11,8 @@ import { cn } from '@/lib/cn';
 import styles from './ChatWidget.module.scss';
 
 const SESSION_STORAGE_KEY = 'mfsl_chat_session_id';
+const CHAT_INTRO_DISMISSED_KEY = 'mfsl_chat_intro_dismissed';
+const QUICK_REPLIES = ['Gói cước nào rẻ?', 'Cửa hàng gần tôi', 'Tư vấn giải pháp doanh nghiệp'];
 
 interface ChatMessage {
   id: string;
@@ -36,6 +38,7 @@ export function ChatWidget() {
     staleTime: 300_000,
   });
   const [isOpen, setIsOpen] = useState(false);
+  const [showChatIntro, setShowChatIntro] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -52,6 +55,21 @@ export function ChatWidget() {
   const isContactWidgetEnabled = settings?.contact_widget_enabled !== 'false';
   const contactMessage = settings?.contact_widget_message ?? 'Cần hỗ trợ? Nhắn Zalo hoặc gọi ngay';
   const staffInitial = dutyStaff?.name?.trim().charAt(0).toUpperCase() ?? 'M';
+
+  useEffect(() => {
+    if (sessionStorage.getItem(CHAT_INTRO_DISMISSED_KEY)) return;
+
+    const showTimer = window.setTimeout(() => setShowChatIntro(true), 1500);
+    const hideTimer = window.setTimeout(() => {
+      setShowChatIntro(false);
+      sessionStorage.setItem(CHAT_INTRO_DISMISSED_KEY, 'true');
+    }, 7500);
+
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -96,7 +114,23 @@ export function ChatWidget() {
                 className={styles.panel}
               >
                 <div className={styles.panelHeader}>
-                  <p className={styles.panelTitle}>Trợ lý ảo MobiFone</p>
+                  <p className={styles.panelTitle}>Trợ lý MobiFone Sơn La</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMessages([
+                        {
+                          id: 'welcome',
+                          role: 'assistant',
+                          text: 'Xin chào! Tôi có thể giúp gì cho bạn?',
+                        },
+                      ])
+                    }
+                    aria-label="Xóa hội thoại"
+                    className={styles.panelClose}
+                  >
+                    Mới
+                  </button>
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
@@ -108,6 +142,25 @@ export function ChatWidget() {
                 </div>
 
                 <div ref={scrollRef} className={styles.panelBody}>
+                  {messages.length === 1 && (
+                    <div className={styles.quickReplies}>
+                      {QUICK_REPLIES.map((question) => (
+                        <button
+                          type="button"
+                          key={question}
+                          onClick={() => {
+                            setMessages((prev) => [
+                              ...prev,
+                              { id: `u-${Date.now()}`, role: 'user', text: question },
+                            ]);
+                            sendMessage.mutate(question);
+                          }}
+                        >
+                          {question}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {messages.map((m) => (
                     <div
                       key={m.id}
@@ -165,42 +218,51 @@ export function ChatWidget() {
             )}
           </AnimatePresence>
 
-          {!isOpen && (
-            <motion.button
-              type="button"
-              onClick={() => setIsOpen(true)}
-              aria-label="Mở Chatbot MobiFone"
-              initial={{ opacity: 0, y: 8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
-              className={styles.chatHint}
-            >
-              Chatbot MobiFone - Nhấn để được hỗ trợ
-            </motion.button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setIsOpen((o) => !o)}
-            aria-label={isOpen ? 'Đóng khung chat' : 'Mở khung chat tư vấn'}
-            className={styles.launcher}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={isOpen ? 'close' : 'open'}
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
-              >
-                {isOpen ? (
-                  <X className={styles.launcherIcon} />
-                ) : (
-                  <MessageCircle className={styles.launcherIcon} />
+          <div className={styles.chatLauncherArea}>
+            <div className={styles.chatHintAnchor}>
+              <AnimatePresence>
+                {showChatIntro && !isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 10, y: 4 }}
+                    animate={{ opacity: 1, x: 0, y: 0 }}
+                    exit={{ opacity: 0, x: 10, y: 4 }}
+                    transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
+                    className={styles.chatHint}
+                    aria-hidden="true"
+                  >
+                    👋 Xin chào! Bạn cần hỗ trợ gì? Hãy chat với AI nhé!
+                  </motion.div>
                 )}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+              </AnimatePresence>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowChatIntro(false);
+                sessionStorage.setItem(CHAT_INTRO_DISMISSED_KEY, 'true');
+                setIsOpen((o) => !o);
+              }}
+              aria-label={isOpen ? 'Đóng khung chat' : 'Chat với AI'}
+              className={styles.launcher}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={isOpen ? 'close' : 'open'}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+                >
+                  {isOpen ? (
+                    <X className={styles.launcherIcon} />
+                  ) : (
+                    <MessageCircle className={styles.launcherIcon} />
+                  )}
+                </motion.span>
+              </AnimatePresence>
+            </button>
+          </div>
         </>
       )}
 

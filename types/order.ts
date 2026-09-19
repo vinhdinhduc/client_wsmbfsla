@@ -7,8 +7,9 @@ export interface CartItem {
   type: CartItemType;
   reference_id: number;
   name: string;
-  price: number | null;
+  price: number | string | null;
   image: string | null;
+  sim_reference_id?: number;
 }
 
 export type RegistrationStatus = 'moi' | 'dang_xu_ly' | 'hoan_thanh' | 'huy';

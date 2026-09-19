@@ -20,6 +20,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   ubnd: 'UBND',
   ho_kinh_doanh: 'Hộ kinh doanh',
   cuc_nganh: 'Cục / Ngành',
+  chuyen_doi_so: 'Chuyển đổi số',
   hot: 'Hot',
   tra_truoc: 'Trả trước',
   tra_sau: 'Trả sau',

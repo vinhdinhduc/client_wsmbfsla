@@ -41,6 +41,14 @@
   flex-direction: column;
   gap: 1rem;
 }
+.detailSection { display: flex; flex-direction: column; gap: .75rem; padding: 1rem; border: 1px solid var(--color-neutral-200); border-radius: var(--radius-md); background: var(--color-neutral-50); }
+.detailHeader { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.detailHeader h3 { margin: 0; font-size: .95rem; }
+.repeatRow { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding: .75rem 2.75rem .75rem .75rem; border: 1px solid var(--color-neutral-200); border-radius: var(--radius-sm); background: var(--bg-card); }
+.removeRow { position: absolute; top: .7rem; right: .7rem; display: inline-flex; padding: .3rem; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-neutral-500); cursor: pointer; }
+.removeRow:hover { color: var(--color-danger); background: rgb(220 38 38 / 8%); }
+.removeRow svg { width: 1rem; height: 1rem; }
+@media (max-width: 40rem) { .repeatRow { grid-template-columns: 1fr; } }
 .grid2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

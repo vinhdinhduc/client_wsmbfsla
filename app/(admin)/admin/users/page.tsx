@@ -33,7 +33,6 @@ const userSchema = z.object({
   full_name: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
   email: z.string().email('Email không hợp lệ').max(100),
   phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
-  avatar_url: z.string().url('URL avatar không hợp lệ').max(500).optional().or(z.literal('')),
   role: z.enum(['admin', 'chuyen_vien', 'giao_dich_vien', 'nhan_vien']),
   status: z.enum(['active', 'locked']),
 });
@@ -81,7 +80,6 @@ export default function AdminUsersPage() {
       full_name: '',
       email: '',
       phone: '',
-      avatar_url: '',
       role: 'nhan_vien',
       status: 'active',
     });
@@ -97,7 +95,6 @@ export default function AdminUsersPage() {
       full_name: item.full_name,
       email: item.email,
       phone: item.phone,
-      avatar_url: item.avatar_url ?? '',
       role: item.role,
       status: item.status,
     });
@@ -229,12 +226,25 @@ export default function AdminUsersPage() {
           </div>
           <div className={styles.fileField}>
             <label htmlFor="user-avatar">Ảnh đại diện</label>
-            <input id="user-avatar" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleAvatarChange} />
-            {avatarPreview && <div className={styles.avatarPreviewBox}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={avatarPreview} alt={avatarFile ? 'Ảnh avatar mới chọn' : 'Ảnh avatar hiện tại'} className={styles.avatarPreview} />
-              <p className={styles.imagePreviewCaption}>{avatarFile ? 'Ảnh mới sẽ được sử dụng khi lưu' : 'Ảnh avatar hiện tại'}</p>
-            </div>}
+            <input
+              id="user-avatar"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleAvatarChange}
+            />
+            {avatarPreview && (
+              <div className={styles.avatarPreviewBox}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={avatarPreview}
+                  alt={avatarFile ? 'Ảnh avatar mới chọn' : 'Ảnh avatar hiện tại'}
+                  className={styles.avatarPreview}
+                />
+                <p className={styles.imagePreviewCaption}>
+                  {avatarFile ? 'Ảnh mới sẽ được sử dụng khi lưu' : 'Ảnh avatar hiện tại'}
+                </p>
+              </div>
+            )}
             <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
           </div>
           <div className={styles.grid2}>

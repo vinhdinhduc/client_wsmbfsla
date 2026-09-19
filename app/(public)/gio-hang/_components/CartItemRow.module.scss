@@ -1,12 +1,17 @@
 @use '../../../../styles/variables' as *;
 
 .row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(13rem, 2.1fr) minmax(4.5rem, 0.7fr) minmax(5.8rem, 0.85fr) minmax(
+      5.8rem,
+      0.85fr
+    ) minmax(6.8rem, 1fr) 2rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
+  min-height: 5.5rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--color-neutral-100);
+  background: transparent;
   &:last-child {
     border-bottom: 0;
   }
@@ -24,24 +29,41 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-neutral-500);
+  font-weight: 700;
 }
 
 .name {
   margin: 0;
   font-weight: 500;
   color: var(--color-neutral-900);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.subscription,
+.setupFee,
+.packagePrice {
+  white-space: nowrap;
+  color: var(--color-neutral-800);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.packagePrice {
+  color: var(--color-primary);
 }
 
 .side {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: flex-end;
 }
 
 .price {
   margin: 0;
   font-weight: 600;
   color: var(--color-accent);
+  font-size: 1rem;
 }
 
 .removeButton {
@@ -52,10 +74,14 @@
   color: var(--color-neutral-500);
   background: transparent;
   border: 0;
-  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.4rem;
+  border-radius: 50%;
   cursor: pointer;
   &:hover {
     color: var(--color-danger);
+    background: rgb(220 38 38 / 8%);
   }
   &::before {
     content: '';
@@ -67,4 +93,23 @@
 .removeIcon {
   width: 1rem;
   height: 1rem;
+}
+
+@media (max-width: 800px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    min-height: 4.5rem;
+  }
+
+  .subscription,
+  .setupFee,
+  .packagePrice {
+    display: none;
+  }
+
+  .side {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }

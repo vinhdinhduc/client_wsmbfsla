@@ -14,6 +14,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   ubnd: 'UBND',
   ho_kinh_doanh: 'Hộ kinh doanh',
   cuc_nganh: 'Cục / Ngành',
+  chuyen_doi_so: 'Chuyển đổi số',
 };
 
 export async function generateStaticParams() {
@@ -50,6 +51,9 @@ export default async function SolutionDetailPage({ params }: { params: { slug: s
   } catch {
     notFound();
   }
+  const related = (await solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }))
+    .filter((item) => item.category === solution.category && item.id !== solution.id)
+    .slice(0, 3);
 
   return (
     <div className={styles.page}>
@@ -64,7 +68,7 @@ export default async function SolutionDetailPage({ params }: { params: { slug: s
         <h1 className={styles.title}>{solution.name}</h1>
         {solution.summary && <p className={styles.summary}>{solution.summary}</p>}
         <div className={styles.solutionBody}>
-          <SolutionContent solution={solution} />
+          <SolutionContent solution={solution} related={related} />
         </div>
       </div>
     </div>

@@ -9,8 +9,16 @@ export interface SolutionFormValues {
   image?: File;
   summary?: string | null;
   content: string;
+  target_customers?: string | null;
+  legal_basis?: string | null;
+  brochure_url?: string | null;
+  video_url?: string | null;
   is_hot: boolean;
   status: 'active' | 'inactive';
+  features?: Array<{ icon?: string | null; title: string; description?: string | null; sort_order?: number }>;
+  pricing?: Array<{ package_code: string; package_name: string; price: number; cycle_months?: number; condition_note?: string | null; sort_order?: number }>;
+  faqs?: Array<{ question: string; answer?: string | null; sort_order?: number }>;
+  gallery?: Array<{ image_url: string; caption?: string | null; sort_order?: number }>;
 }
 
 export const solutionsApi = {

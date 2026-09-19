@@ -1,0 +1,64 @@
+@use '../../../../styles/variables' as *;
+.page {
+  width: min(100%, 80rem);
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+.title {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-heading);
+  color: var(--color-neutral-900);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) 1.2fr;
+  gap: 1.25rem;
+}
+.panel {
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+.panel h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+.panel input,
+.panel textarea,
+.panel select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.7rem;
+  background: var(--bg-card);
+  color: inherit;
+  font: inherit;
+}
+.actions,
+.itemActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+.item p,
+.item small {
+  display: block;
+  margin: 0.3rem 0 0;
+  color: var(--color-neutral-500);
+}
+@media (max-width: 48rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

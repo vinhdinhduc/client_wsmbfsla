@@ -68,6 +68,14 @@
   color: var(--color-neutral-900);
 }
 
+.actionLabel {
+  margin: 0 0 -0.5rem;
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .itemsList {
   display: flex;
   flex-direction: column;

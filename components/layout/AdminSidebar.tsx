@@ -32,7 +32,8 @@ export function AdminSidebar({
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const menu = user ? menuForRole(user.role) : [];
-  const isSettingsRoute = pathname.startsWith('/admin/settings');
+  const isSettingsRoute =
+    pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/ai-');
   const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsRoute);
 
   const settingsItems = [
@@ -41,6 +42,9 @@ export function AdminSidebar({
     { href: '/admin/settings?section=social', label: 'Mạng xã hội & hỗ trợ', icon: CircleHelp },
     { href: '/admin/settings?section=appearance', label: 'Giao diện', icon: LayoutTemplate },
     { href: '/admin/settings?section=chatbot', label: 'AI Chatbot', icon: Bot },
+    { href: '/admin/ai-settings', label: 'Cấu hình nâng cao', icon: Bot },
+    { href: '/admin/ai-knowledge', label: 'Dữ liệu tri thức', icon: CircleHelp },
+    { href: '/admin/ai-chat-logs', label: 'Lịch sử hội thoại', icon: BarChart3 },
     { href: '/admin/settings?section=analytics', label: 'Đo lường', icon: BarChart3 },
   ];
 
@@ -94,9 +98,11 @@ export function AdminSidebar({
               <div className={styles.subnav}>
                 {settingsItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive =
-                    pathname === '/admin/settings' &&
-                    searchParams.get('section') === item.href.split('=')[1];
+                  const isSettingsItem = item.href.startsWith('/admin/settings');
+                  const isActive = isSettingsItem
+                    ? pathname === '/admin/settings' &&
+                      searchParams.get('section') === item.href.split('=')[1]
+                    : pathname === item.href;
                   return (
                     <Link
                       key={item.href}

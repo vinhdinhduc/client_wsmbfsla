@@ -48,14 +48,15 @@ export function PackageFilterBar({ packages, simId }: { packages: Package[]; sim
   function selectPackage(pkg: Package) {
     if (!Number.isInteger(simReferenceId) || simReferenceId <= 0) return;
     addItem({
-      key: `goi_cuoc-${pkg.id}`,
+      key: `goi_cuoc-${pkg.id}-sim-${simReferenceId}`,
       type: 'goi_cuoc',
       reference_id: pkg.id,
       name: pkg.name,
       price: pkg.price,
       image: null,
+      sim_reference_id: simReferenceId,
     });
-    router.push('/gio-hang?step=product');
+    router.push('/gio-hang?step=customer');
   }
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {

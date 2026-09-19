@@ -38,7 +38,7 @@ export interface SimNumber {
   created_at: string;
 }
 
-export type SolutionCategory = 'sme' | 'ubnd' | 'ho_kinh_doanh' | 'cuc_nganh';
+export type SolutionCategory = 'sme' | 'ubnd' | 'ho_kinh_doanh' | 'cuc_nganh' | 'chuyen_doi_so';
 export type SolutionStatus = 'active' | 'inactive';
 
 export interface Solution {
@@ -49,8 +49,48 @@ export interface Solution {
   thumbnail: string | null;
   summary: string | null;
   content: string;
+  target_customers: string | null;
+  legal_basis: string | null;
+  brochure_url: string | null;
+  video_url: string | null;
   is_hot: boolean;
   status: SolutionStatus;
+  features?: SolutionFeature[];
+  pricing?: SolutionPricing[];
+  faqs?: SolutionFaq[];
+  gallery?: SolutionGallery[];
+}
+
+export interface SolutionFeature {
+  id: number;
+  icon: string | null;
+  title: string;
+  description: string | null;
+  sort_order: number;
+}
+
+export interface SolutionPricing {
+  id: number;
+  package_code: string;
+  package_name: string;
+  price: number;
+  cycle_months: number;
+  condition_note: string | null;
+  sort_order: number;
+}
+
+export interface SolutionFaq {
+  id: number;
+  question: string;
+  answer: string | null;
+  sort_order: number;
+}
+
+export interface SolutionGallery {
+  id: number;
+  image_url: string;
+  caption: string | null;
+  sort_order: number;
 }
 
 export type NewsCategory = 'khuyen_mai' | 'su_kien' | 'thong_bao';

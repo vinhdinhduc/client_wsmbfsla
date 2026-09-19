@@ -12,6 +12,7 @@ const CATEGORY_TABS: Array<{ value: SolutionCategory | 'all'; label: string }> =
   { value: 'ubnd', label: 'UBND' },
   { value: 'ho_kinh_doanh', label: 'Hộ kinh doanh' },
   { value: 'cuc_nganh', label: 'Cục / Ngành' },
+  { value: 'chuyen_doi_so', label: 'Chuyển đổi số' },
 ];
 
 export function SolutionFilterBar({ solutions }: { solutions: Solution[] }) {

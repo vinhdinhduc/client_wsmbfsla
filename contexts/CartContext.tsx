@@ -1,7 +1,16 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { CartItem } from '@/types/order';
+import { toPriceNumber } from '@/lib/format';
 
 const CART_STORAGE_KEY = 'mfsl_cart_items';
 
@@ -28,7 +37,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(CART_STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) {
+        const storedItems = JSON.parse(raw) as CartItem[];
+        setItems(
+          storedItems.map((item) => ({
+            ...item,
+            price: item.price === null ? null : toPriceNumber(item.price),
+          })),
+        );
+      }
     } catch {
       // localStorage hong/khong hop le - bat dau tu gio hang rong
     } finally {
@@ -43,7 +60,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Muc 16: gio hang KHONG goi API khi them/xoa - chi cap nhat Context + localStorage.
   const addItem = useCallback((item: CartItem) => {
-    setItems((prev) => (prev.some((p) => p.key === item.key) ? prev : [...prev, item]));
+    const normalizedItem = {
+      ...item,
+      price: item.price === null ? null : toPriceNumber(item.price),
+    };
+    setItems((prev) =>
+      prev.some((p) => p.key === normalizedItem.key) ? prev : [...prev, normalizedItem],
+    );
     setIsDrawerOpen(true);
   }, []);
 
@@ -59,7 +82,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => ({
       items,
       count: items.length,
-      totalPrice: items.reduce((sum, item) => sum + (item.price ?? 0), 0),
+      totalPrice: items.reduce((sum, item) => sum + toPriceNumber(item.price), 0),
       isDrawerOpen,
       openDrawer: () => setIsDrawerOpen(true),
       closeDrawer: () => setIsDrawerOpen(false),

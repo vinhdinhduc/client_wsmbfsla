@@ -1,0 +1,130 @@
+'use client';
+
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { aiApi, AiKnowledgeEntry } from '@/lib/api/ai';
+import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
+import styles from './page.module.scss';
+
+const empty: { title: string; content: string; tags: string; status: 'active' | 'inactive' } = {
+  title: '',
+  content: '',
+  tags: '',
+  status: 'active',
+};
+export default function AiKnowledgePage() {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [editing, setEditing] = useState<AiKnowledgeEntry | null>(null);
+  const [form, setForm] = useState(empty);
+  const { data = [] } = useQuery({
+    queryKey: ['ai-knowledge'],
+    queryFn: () => aiApi.listKnowledge(),
+  });
+  const save = useMutation({
+    mutationFn: () =>
+      editing ? aiApi.updateKnowledge(editing.id, form) : aiApi.createKnowledge(form),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-knowledge'] });
+      setEditing(null);
+      setForm(empty);
+      showToast('Đã lưu tri thức');
+    },
+    onError: (error: Error) => showToast(error.message, 'error'),
+  });
+  const remove = useMutation({
+    mutationFn: (id: number) => aiApi.deleteKnowledge(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-knowledge'] });
+      showToast('Đã xóa tri thức');
+    },
+  });
+  function edit(item: AiKnowledgeEntry) {
+    setEditing(item);
+    setForm({
+      title: item.title,
+      content: item.content,
+      tags: item.tags ?? '',
+      status: item.status,
+    });
+  }
+  return (
+    <div className={styles.page}>
+      <h1 className={styles.title}>Dữ liệu tri thức AI</h1>
+      <div className={styles.layout}>
+        <form
+          className={styles.panel}
+          onSubmit={(event) => {
+            event.preventDefault();
+            save.mutate();
+          }}
+        >
+          <h2>{editing ? 'Sửa tri thức' : 'Thêm tri thức'}</h2>
+          <input
+            required
+            placeholder="Tiêu đề"
+            value={form.title}
+            onChange={(event) => setForm({ ...form, title: event.target.value })}
+          />
+          <textarea
+            required
+            rows={12}
+            placeholder="Nội dung trả lời đáng tin cậy..."
+            value={form.content}
+            onChange={(event) => setForm({ ...form, content: event.target.value })}
+          />
+          <input
+            placeholder="Tags, phân cách bằng dấu phẩy"
+            value={form.tags ?? ''}
+            onChange={(event) => setForm({ ...form, tags: event.target.value })}
+          />
+          <select
+            value={form.status}
+            onChange={(event) =>
+              setForm({ ...form, status: event.target.value as 'active' | 'inactive' })
+            }
+          >
+            <option value="active">Đang dùng</option>
+            <option value="inactive">Tạm tắt</option>
+          </select>
+          <div className={styles.actions}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setEditing(null);
+                setForm(empty);
+              }}
+            >
+              Xóa form
+            </Button>
+            <Button type="submit" isLoading={save.isPending}>
+              Lưu
+            </Button>
+          </div>
+        </form>
+        <section className={styles.panel}>
+          <h2>Danh sách ({data.length})</h2>
+          {data.map((item) => (
+            <article className={styles.item} key={item.id}>
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.tags}</p>
+                <small>{item.status === 'active' ? 'Đang dùng' : 'Tạm tắt'}</small>
+              </div>
+              <div className={styles.itemActions}>
+                <Button size="sm" variant="outline" onClick={() => edit(item)}>
+                  Sửa
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => remove.mutate(item.id)}>
+                  Xóa
+                </Button>
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
+    </div>
+  );
+}

@@ -168,7 +168,7 @@ export default function AdminRegistrationsPage() {
             <div>
               <p className={styles.value}>Sản phẩm đã đăng ký</p>
               <div className={styles.itemsList}>
-                {detailTarget.items.map((item) => (
+                {(detailTarget.items ?? []).map((item) => (
                   <div key={item.id} className={styles.itemRow}>
                     <div>
                       <p className={styles.itemType}>{TYPE_LABEL[item.type]}</p>
@@ -180,8 +180,9 @@ export default function AdminRegistrationsPage() {
               </div>
             </div>
 
+            <p className={styles.actionLabel}>Hành động</p>
             <SelectField
-              label="Cập nhật trạng thái"
+              label="Trạng thái mới"
               options={STATUS_OPTIONS}
               value={detailTarget.status}
               onChange={(e) =>

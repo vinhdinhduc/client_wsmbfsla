@@ -27,7 +27,13 @@ export const usersApi = {
 };
 
 function userRequest(method: 'POST' | 'PUT', dto: Partial<UserFormValues>) {
-  if (!dto.avatar) return { method, body: dto };
+  if (!dto.avatar) {
+    if (method === 'PUT' && 'avatar_url' in dto) {
+      const { avatar_url: _avatarUrl, ...updateDto } = dto;
+      return { method, body: updateDto };
+    }
+    return { method, body: dto };
+  }
   const form = new FormData();
   Object.entries(dto).forEach(([key, value]) => {
     if (value !== undefined && value !== null && key !== 'avatar') form.append(key, String(value));
