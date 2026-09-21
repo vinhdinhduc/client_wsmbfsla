@@ -59,7 +59,7 @@ export function Footer() {
           <div className={styles.footer__details}>
             <p className={styles.footer__detail}>
               <MapPin className={styles.footer__detailIcon} />
-              {settings?.footer_address ?? 'Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La'}
+              {settings?.contact_address ?? settings?.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
             </p>
             <p className={styles.footer__detail}>
               <MapPin className={styles.footer__detailIcon} />
@@ -67,11 +67,11 @@ export function Footer() {
             </p>
             <p className={styles.footer__detail}>
               <Mail className={styles.footer__detailIcon} />
-              {settings?.footer_email ?? 'sonla@mobifone.vn'}
+              {settings?.contact_email ?? settings?.footer_email ?? 'sonla@mobifone.vn'}
             </p>
             <p className={styles.footer__detail}>
               <Clock3 className={styles.footer__detailIcon} />
-              {settings?.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
+              {settings?.working_hours ?? settings?.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
             </p>
           </div>
         </div>
@@ -81,9 +81,9 @@ export function Footer() {
           <p className={styles.footer__hotline}>
             <Phone className={styles.footer__hotlineIcon} />
             <a
-              href={`tel:${dutyStaff?.phone ?? settings?.footer_phone ?? settings?.hotline ?? ''}`}
+              href={`tel:${settings?.hotline ?? settings?.footer_phone ?? dutyStaff?.phone ?? ''}`}
             >
-              {dutyStaff?.phone ?? settings?.footer_phone ?? settings?.hotline ?? '1800 xxxx'}
+              {settings?.hotline ?? settings?.footer_phone ?? dutyStaff?.phone ?? '18001090'}
             </a>
           </p>
           <p className={styles.footer__description}>
@@ -101,6 +101,9 @@ export function Footer() {
             </li>
             <li>
               <Link href="/dieu-khoan-su-dung">Điều khoản sử dụng</Link>
+            </li>
+            <li>
+              <Link href="/admin/login">Quản trị</Link>
             </li>
           </ul>
         </div>

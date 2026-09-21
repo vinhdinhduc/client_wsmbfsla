@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Clock3, Mail, MapPin, Phone } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ContactForm } from './_components/ContactForm';
+import { settingsApi, PublicSettings } from '@/lib/api/settings';
 import styles from './page.module.scss';
 
 export const metadata: Metadata = {
@@ -9,7 +10,12 @@ export const metadata: Metadata = {
   description: 'Liên hệ với MobiFone Chi nhánh Sơn La để được tư vấn và hỗ trợ.',
 };
 
-export default function ContactPage() {
+export const revalidate = 300;
+
+export default async function ContactPage() {
+  const settings = await settingsApi
+    .listPublic({ next: { revalidate: 300 } })
+    .catch(() => ({}) as PublicSettings);
   return (
     <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Liên hệ' }]} />
@@ -33,7 +39,7 @@ export default function ContactPage() {
               <span>
                 Hotline
                 <br />
-                <strong>1800 xxxx</strong>
+                <strong>{settings.hotline ?? '18001090'}</strong>
               </span>
             </p>
             <p>
@@ -41,7 +47,7 @@ export default function ContactPage() {
               <span>
                 Email
                 <br />
-                <strong>sonla@mobifone.vn</strong>
+                <strong>{settings.contact_email ?? settings.footer_email ?? 'sonla@mobifone.vn'}</strong>
               </span>
             </p>
             <p>
@@ -49,7 +55,7 @@ export default function ContactPage() {
               <span>
                 Địa chỉ
                 <br />
-                <strong>Phường Tô Hiệu, tỉnh Sơn La</strong>
+                <strong>{settings.contact_address ?? settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}</strong>
               </span>
             </p>
             <p>
@@ -57,7 +63,7 @@ export default function ContactPage() {
               <span>
                 Thời gian làm việc
                 <br />
-                <strong>Thứ Hai - Thứ Bảy: 07:30 - 17:30</strong>
+                <strong>{settings.working_hours ?? settings.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}</strong>
               </span>
             </p>
           </div>

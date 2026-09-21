@@ -6,4 +6,5 @@ export interface SimFilterParams {
   catalog?: string;
   sim_type?: SimType;
   price_range?: string;
+  type?: 'prepaid' | 'postpaid';
 }

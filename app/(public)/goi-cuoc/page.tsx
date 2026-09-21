@@ -15,7 +15,9 @@ export default async function PackagesPage({
 }: {
   searchParams: { sim_id?: string };
 }) {
-  const packages = await packagesApi.listPublic(undefined, { next: { revalidate: 60 } });
+  const packages = await packagesApi
+    .listPublic(undefined, { next: { revalidate: 60 } })
+    .catch(() => []);
 
   return (
     <div className={styles.page}>

@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/Badge';
 import { TextField, SelectField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import styles from '../admin-shared.module.scss';
+import { assetUrl } from '@/lib/assets';
 
 const ROLE_OPTIONS = [
   { value: 'admin', label: 'Quản trị viên' },
@@ -29,7 +30,7 @@ const STATUS_OPTIONS = [
 
 const userSchema = z.object({
   username: z.string().min(3, 'Tối thiểu 3 ký tự').max(50),
-  password: z.string().min(6, 'Tối thiểu 6 ký tự').max(100).optional().or(z.literal('')),
+  password: z.string().min(8, 'Tối thiểu 8 ký tự').max(100).optional().or(z.literal('')),
   full_name: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
   email: z.string().email('Email không hợp lệ').max(100),
   phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
@@ -88,7 +89,7 @@ export default function AdminUsersPage() {
 
   function openEdit(item: AdminUser) {
     setAvatarFile(null);
-    setAvatarPreview(item.avatar_url);
+    setAvatarPreview(assetUrl(item.avatar_url));
     reset({
       username: item.username,
       password: '',

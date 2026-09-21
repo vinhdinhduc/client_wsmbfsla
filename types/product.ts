@@ -23,15 +23,19 @@ export interface Package {
 
 export type SimCatalog = 'so_dep' | 'phong_thuy' | 'nam_sinh' | 'tra_truoc' | 'sim_data' | 'esim';
 export type SimType = 'tam_hoa' | 'tu_quy' | 'phat_loc' | 'than_tai' | 'thuong';
-export type SimStatus = 'available' | 'reserved' | 'sold';
+export type SimStatus = 'available' | 'reserved' | 'sold' | 'hidden';
+export type SubscriptionType = 'prepaid' | 'postpaid';
 
 export interface SimNumber {
   id: number;
   phone_number: string;
   prefix: string;
+  subscription_type: SubscriptionType;
   catalog: SimCatalog;
   sim_type: SimType;
-  price: number;
+  price: number | null;
+  activation_fee: number;
+  needs_review: boolean;
   bundle_note: string | null;
   commitment_months: number | null;
   status: SimStatus;

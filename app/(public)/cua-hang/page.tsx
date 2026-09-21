@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default async function StoresPage() {
-  const stores = await storesApi.listPublic(undefined, { next: { revalidate: 60 } });
+  const stores = await storesApi
+    .listPublic(undefined, { next: { revalidate: 60 } })
+    .catch(() => []);
 
   return (
     <div className={styles.page}>

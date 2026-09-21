@@ -52,7 +52,7 @@ export default async function SimDetailPage({ params }: { params: { id: string }
         {sim.commitment_months && (
           <p className={styles.commitment}>Cam kết sử dụng: {sim.commitment_months} tháng</p>
         )}
-        <p className={styles.price}>{formatPrice(sim.price)}</p>
+        <p className={styles.price}>{formatPrice(sim.activation_fee)}</p>
 
         <AddToCartButton
           className={styles.addButton}
@@ -62,7 +62,7 @@ export default async function SimDetailPage({ params }: { params: { id: string }
             type: 'sim',
             reference_id: sim.id,
             name: sim.phone_number,
-            price: sim.price,
+            price: sim.activation_fee,
             image: null,
           }}
         />

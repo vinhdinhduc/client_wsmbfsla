@@ -84,11 +84,23 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
 
       <div className={styles.paymentChoice} role="group" aria-label="Hình thức thanh toán">
         <label>
-          <input type="radio" checked readOnly />
+          <input
+            type="radio"
+            name="subscription-type"
+            value="postpaid"
+            checked={(initial.type ?? 'postpaid') === 'postpaid'}
+            onChange={() => navigate({ type: 'postpaid' })}
+          />
           Trả sau
         </label>
         <label>
-          <input type="radio" disabled />
+          <input
+            type="radio"
+            name="subscription-type"
+            value="prepaid"
+            checked={initial.type === 'prepaid'}
+            onChange={() => navigate({ type: 'prepaid' })}
+          />
           Trả trước
         </label>
       </div>

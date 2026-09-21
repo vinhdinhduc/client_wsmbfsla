@@ -23,9 +23,9 @@ const SECTIONS: Record<string, Section> = {
   ] },
   footer: { group: 'general', label: 'Giới thiệu & footer', description: 'Nội dung giới thiệu và thông tin liên hệ hiển thị cuối trang.', fields: [
     { key: 'footer_about_title', label: 'Tiêu đề giới thiệu', type: 'text' }, { key: 'footer_about_content', label: 'Nội dung giới thiệu', type: 'textarea' },
-    { key: 'footer_branch_name', label: 'Tên chi nhánh', type: 'text' }, { key: 'footer_address', label: 'Địa chỉ', type: 'textarea' },
-    { key: 'footer_email', label: 'Email hiển thị', type: 'text' }, { key: 'footer_phone', label: 'Số điện thoại footer', type: 'text' },
-    { key: 'footer_working_hours', label: 'Giờ làm việc', type: 'text' }, { key: 'footer_copyright', label: 'Dòng bản quyền', type: 'text' },
+    { key: 'footer_branch_name', label: 'Tên chi nhánh', type: 'text' }, { key: 'contact_address', label: 'Địa chỉ liên hệ', type: 'textarea' },
+    { key: 'contact_email', label: 'Email liên hệ', type: 'text' }, { key: 'working_hours', label: 'Giờ làm việc', type: 'text' },
+    { key: 'footer_copyright', label: 'Dòng bản quyền', type: 'text' },
   ] },
   social: { group: 'general', label: 'Mạng xã hội & hỗ trợ', description: 'Các liên kết ngoài và lời nhắn bên cạnh nút gọi/Zalo.', fields: [
     { key: 'footer_facebook_url', label: 'Facebook URL', type: 'url' }, { key: 'footer_zalo_url', label: 'Zalo URL', type: 'url' }, { key: 'footer_youtube_url', label: 'YouTube URL', type: 'url' },

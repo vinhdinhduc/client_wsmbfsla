@@ -8,9 +8,12 @@ import styles from './PublicLayout.module.scss';
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.shell}>
+      <a className="skip-link" href="#noi-dung-chinh">
+        Bỏ qua điều hướng
+      </a>
       <ThemeColorInjector />
       <Header />
-      <main className={styles.main}>{children}</main>
+      <main id="noi-dung-chinh" className={styles.main} tabIndex={-1}>{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />

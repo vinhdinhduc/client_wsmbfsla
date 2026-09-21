@@ -1,0 +1,14 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  padding: clamp(2rem, 5vw, 4rem) 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+.empty svg { width: 2.5rem; height: 2.5rem; color: var(--color-primary); }
+.empty h3 { margin: 0.8rem 0 0; color: var(--text-primary); }
+.empty p { max-width: 520px; margin: 0.5rem 0 0; line-height: 1.6; }
+.action { margin-top: 1rem; }

@@ -6,6 +6,7 @@ import { ReactNode, useState } from 'react';
 import { ShoppingCart, MapPin, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatDate, formatPrice } from '@/lib/format';
+import { assetUrl } from '@/lib/assets';
 import { Badge } from './Badge';
 import { Button } from './Button';
 import { useCart } from '@/hooks/useCart';
@@ -54,7 +55,7 @@ function CardThumbnail({ src, alt }: { src: string | null; alt: string }) {
     <div className={styles.thumbnail}>
       {src && !hasImageError ? (
         <Image
-          src={src}
+          src={assetUrl(src)!}
           alt={alt}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
@@ -147,7 +148,7 @@ export function SimCard({ sim }: { sim: SimNumber }) {
         </div>
         <p className={styles.phoneNumber}>{sim.phone_number}</p>
         {sim.bundle_note && <p className={styles.muted}>{sim.bundle_note}</p>}
-        <p className={styles.price}>{formatPrice(sim.price)}</p>
+        <p className={styles.price}>{formatPrice(sim.activation_fee)}</p>
       </Link>
       <div className={styles.action}>
         <Button
@@ -162,7 +163,7 @@ export function SimCard({ sim }: { sim: SimNumber }) {
               type: 'sim',
               reference_id: sim.id,
               name: sim.phone_number,
-              price: sim.price,
+              price: sim.activation_fee,
               image: null,
             });
           }}

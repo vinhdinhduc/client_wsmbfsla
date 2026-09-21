@@ -15,7 +15,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { TextField, SelectField, CheckboxField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
-import { env } from '@/lib/env';
+import { assetUrl } from '@/lib/assets';
 import styles from '../admin-shared.module.scss';
 
 const ANIMATION_OPTIONS = [
@@ -48,10 +48,7 @@ const itemSchema = z.object({
 type ItemSchemaValues = z.infer<typeof itemSchema>;
 
 function getImageUrl(imageUrl: string | null | undefined) {
-  if (!imageUrl) return null;
-  if (/^https?:\/\//i.test(imageUrl) || imageUrl.startsWith('blob:')) return imageUrl;
-  const apiBaseUrl = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '').replace(/\/api$/i, '');
-  return `${apiBaseUrl}/${imageUrl.replace(/^\/+/, '')}`;
+  return assetUrl(imageUrl);
 }
 
 export default function AdminSlidersPage() {

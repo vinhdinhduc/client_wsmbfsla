@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ShoppingCart, Phone, Menu, X, LogIn, ChevronDown, Moon, Sun } from 'lucide-react';
+import { ShoppingCart, Phone, Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { useCart } from '@/hooks/useCart';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useQuery } from '@tanstack/react-query';
+import { settingsApi } from '@/lib/api/settings';
 import styles from './Header.module.scss';
 
 const NAV_LINKS: Array<
@@ -39,6 +41,11 @@ export function Header() {
   const { count, openDrawer } = useCart();
   const { data: dutyStaff } = useCurrentDutyStaff();
   const { theme, toggleTheme } = useTheme();
+  const { data: settings } = useQuery({
+    queryKey: ['public-settings'],
+    queryFn: () => settingsApi.listPublic(),
+    staleTime: 300_000,
+  });
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -86,18 +93,13 @@ export function Header() {
 
         <div className={styles.header__tools}>
           <a
-            href={`tel:${dutyStaff?.phone ?? ''}`}
+            href={`tel:${settings?.hotline ?? dutyStaff?.phone ?? ''}`}
             className={styles.header__contact}
             title={dutyStaff?.name}
           >
             <Phone className={styles.header__contactIcon} />
-            {dutyStaff?.phone ?? '1800 xxxx'}
+            {settings?.hotline ?? dutyStaff?.phone ?? '18001090'}
           </a>
-
-          <Link href="/admin/login" className={styles.header__adminLogin}>
-            <LogIn className={styles.header__adminLoginIcon} />
-            <span>Đăng nhập quản trị</span>
-          </Link>
 
           <button
             type="button"
@@ -181,14 +183,6 @@ export function Header() {
                   )}
                 </div>
               ))}
-              <Link
-                href="/admin/login"
-                onClick={() => setIsMobileNavOpen(false)}
-                className={styles.header__mobileAdminLogin}
-              >
-                <LogIn className={styles.header__adminLoginIcon} />
-                Đăng nhập quản trị
-              </Link>
             </div>
           </motion.nav>
         )}

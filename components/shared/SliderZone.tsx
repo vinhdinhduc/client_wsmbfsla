@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Navigation, Pagination as SwiperPagination } from 'swiper/modules';
 import { slidersApi } from '@/lib/api/sliders';
+import { assetUrl } from '@/lib/assets';
 import styles from './SliderZone.module.scss';
 
 import 'swiper/css';
@@ -69,7 +70,7 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
             className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : styles.aspectHero}`}
           >
             <Image
-              src={item.image_url}
+              src={assetUrl(item.image_url)!}
               alt={item.title ?? 'MobiFone Sơn La'}
               fill
               sizes="100vw"

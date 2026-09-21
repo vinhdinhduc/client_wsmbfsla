@@ -9,11 +9,12 @@ import { z } from 'zod';
  * RECAPTCHA_SECRET_KEY...) vao day - cac key do chi ton tai o backend.
  */
 const envSchema = z.object({
-  NEXT_PUBLIC_API_URL: z.string().url({ message: 'NEXT_PUBLIC_API_URL phai la mot URL hop le' }),
-  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, 'Thieu NEXT_PUBLIC_RECAPTCHA_SITE_KEY'),
+  NEXT_PUBLIC_API_URL: z.string().url({ message: 'NEXT_PUBLIC_API_URL phải là một URL hợp lệ' }),
+  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, 'Thiếu NEXT_PUBLIC_RECAPTCHA_SITE_KEY'),
   NEXT_PUBLIC_GA4_ID: z.string().optional().default(''),
   NEXT_PUBLIC_FB_PIXEL_ID: z.string().optional().default(''),
-  NEXT_PUBLIC_SITE_URL: z.string().url({ message: 'NEXT_PUBLIC_SITE_URL phai la mot URL hop le' }),
+  NEXT_PUBLIC_SITE_URL: z.string().url({ message: 'NEXT_PUBLIC_SITE_URL phải là một URL hợp lệ' }),
+  NEXT_PUBLIC_ASSET_BASE_URL: z.union([z.string().url(), z.literal('')]).optional().default(''),
 });
 
 function loadClientEnv() {
@@ -23,12 +24,13 @@ function loadClientEnv() {
     NEXT_PUBLIC_GA4_ID: process.env.NEXT_PUBLIC_GA4_ID,
     NEXT_PUBLIC_FB_PIXEL_ID: process.env.NEXT_PUBLIC_FB_PIXEL_ID,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_ASSET_BASE_URL: process.env.NEXT_PUBLIC_ASSET_BASE_URL,
   });
 
   if (!parsed.success) {
     // eslint-disable-next-line no-console
-    console.error('❌ Bien moi truong frontend khong hop le:', parsed.error.flatten().fieldErrors);
-    throw new Error('Cau hinh bien moi truong (.env) khong hop le - xem log ben tren.');
+    console.error('❌ Biến môi trường frontend không hợp lệ:', parsed.error.flatten().fieldErrors);
+    throw new Error('Cấu hình biến môi trường (.env) không hợp lệ - xem log bên trên.');
   }
 
   return parsed.data;

@@ -32,7 +32,7 @@ export default function AdminDashboardPage() {
   });
   const { data: sims } = useQuery({
     queryKey: ['dashboard-sims'],
-    queryFn: () => simsApi.listAdmin(),
+    queryFn: () => simsApi.listAdmin({ status: 'available', page_size: 1 }),
     enabled: isContentRole,
   });
   const { data: mySchedule } = useQuery({
@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
   });
 
   const publishedNews = news?.filter((n) => n.status === 'published').length ?? 0;
-  const availableSims = sims?.filter((s) => s.status === 'available').length ?? 0;
+  const availableSims = sims?.total ?? 0;
 
   return (
     <div className={styles.page}>

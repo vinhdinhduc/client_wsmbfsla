@@ -12,10 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsListPage() {
-  const initialData = await newsApi.listPublic(
-    { page: 1, page_size: 9 },
-    { next: { revalidate: 60 } },
-  );
+  const initialData = await newsApi
+    .listPublic({ page: 1, page_size: 9 }, { next: { revalidate: 60 } })
+    .catch(() => ({ items: [], total: 0, page: 1, page_size: 9 }));
 
   return (
     <div className={styles.page}>

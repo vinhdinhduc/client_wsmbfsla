@@ -22,6 +22,11 @@ export interface PublicSettings {
   site_name?: string;
   site_logo?: string;
   hotline?: string;
+  contact_email?: string;
+  contact_address?: string;
+  working_hours?: string;
+  sim_activation_fee_prepaid?: string;
+  sim_activation_fee_postpaid?: string;
   theme_primary_color?: string;
   home_banner?: string;
   ai_chatbot_enabled?: string;

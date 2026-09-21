@@ -4,10 +4,12 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { MessageCircle, Send, X, Bot, User, Phone } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { chatbotApi } from '@/lib/api/chatbot';
 import { settingsApi } from '@/lib/api/settings';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { cn } from '@/lib/cn';
+import { assetUrl } from '@/lib/assets';
 import styles from './ChatWidget.module.scss';
 
 const SESSION_STORAGE_KEY = 'mfsl_chat_session_id';
@@ -276,9 +278,12 @@ export function ChatWidget() {
               className={styles.dutyStaff}
             >
               {dutyStaff?.avatar_url ? (
-                <img
-                  src={dutyStaff.avatar_url}
+                <Image
+                  src={assetUrl(dutyStaff.avatar_url)!}
                   alt={dutyStaff.name}
+                  width={40}
+                  height={40}
+                  unoptimized
                   className={styles.dutyAvatar}
                 />
               ) : (

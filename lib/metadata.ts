@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { env } from '@/lib/env';
+import { assetUrl } from '@/lib/assets';
 
 const SITE_NAME = 'MobiFone Sơn La';
 
@@ -17,7 +18,7 @@ interface BuildMetadataArgs {
  */
 export function buildMetadata({ title, description, image, path }: BuildMetadataArgs): Metadata {
   const fullTitle = `${title} | ${SITE_NAME}`;
-  const desc = description?.trim() || `${title} - ${SITE_NAME}, tong dai cham soc khach hang.`;
+  const desc = description?.trim() || `${title} - ${SITE_NAME}, tổng đài chăm sóc khách hàng.`;
   const url = `${env.NEXT_PUBLIC_SITE_URL}${path}`;
 
   return {
@@ -29,7 +30,7 @@ export function buildMetadata({ title, description, image, path }: BuildMetadata
       description: desc,
       url,
       siteName: SITE_NAME,
-      images: image ? [{ url: image }] : undefined,
+      images: image ? [{ url: assetUrl(image)! }] : undefined,
       locale: 'vi_VN',
       type: 'website',
     },
@@ -37,7 +38,7 @@ export function buildMetadata({ title, description, image, path }: BuildMetadata
       card: image ? 'summary_large_image' : 'summary',
       title: fullTitle,
       description: desc,
-      images: image ? [image] : undefined,
+      images: image ? [assetUrl(image)!] : undefined,
     },
   };
 }

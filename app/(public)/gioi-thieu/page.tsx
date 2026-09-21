@@ -73,9 +73,9 @@ export default async function AboutPage() {
         </div>
         <p className={styles.contactText}>
           Địa chỉ:{' '}
-          {settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, Thành phố Sơn La, tỉnh Sơn La'}
+          {settings.contact_address ?? settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
         </p>
-        <p className={styles.contactText}>Hotline: {settings.hotline ?? '1800 xxxx'}</p>
+        <p className={styles.contactText}>Hotline: {settings.hotline ?? '18001090'}</p>
       </div>
     </div>
   );

@@ -93,14 +93,14 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
       next,
     });
   } catch {
-    throw new ApiError('Khong the ket noi toi may chu, vui long kiem tra lai duong truyen mang', 0);
+    throw new ApiError('Không thể kết nối tới máy chủ, vui lòng kiểm tra lại đường truyền mạng', 0);
   }
 
   // File binary (vd export Excel) - tra ve truc tiep response, khong parse JSON.
   const contentType = response.headers.get('content-type') ?? '';
   if (!contentType.includes('application/json')) {
     if (!response.ok) {
-      throw new ApiError('Co loi xay ra khi tai file tu may chu', response.status);
+      throw new ApiError('Có lỗi xảy ra khi tải file từ máy chủ', response.status);
     }
     return (await response.blob()) as unknown as T;
   }
@@ -108,7 +108,7 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   const payload = (await response.json()) as BackendEnvelope<T>;
 
   if (!payload.success) {
-    throw new ApiError(payload.message || 'Da co loi xay ra, vui long thu lai', response.status);
+    throw new ApiError(payload.message || 'Đã có lỗi xảy ra, vui lòng thử lại', response.status);
   }
 
   return payload.data;

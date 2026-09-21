@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Upload, Download } from 'lucide-react';
 import { simsApi, SimFormValues, SimImportResult } from '@/lib/api/sims';
 import { SimNumber } from '@/types/product';
 import { Table, TableColumn } from '@/components/ui/Table';
@@ -15,6 +16,10 @@ import { Badge } from '@/components/ui/Badge';
 import { TextField, SelectField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import { formatPrice } from '@/lib/format';
+import { settingsApi } from '@/lib/api/settings';
+import { Pagination } from '@/components/ui/Pagination';
+import { useDebounce } from '@/hooks/useDebounce';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import styles from '../admin-shared.module.scss';
 
 const CATALOG_OPTIONS = [
@@ -36,27 +41,41 @@ const STATUS_OPTIONS = [
   { value: 'available', label: 'Còn hàng' },
   { value: 'reserved', label: 'Đang giữ' },
   { value: 'sold', label: 'Đã bán' },
+  { value: 'hidden', label: 'Ẩn' },
 ];
 const STATUS_TONE: Record<string, 'success' | 'warning' | 'danger'> = {
   available: 'success',
   reserved: 'warning',
   sold: 'danger',
+  hidden: 'warning',
 };
+const SUBSCRIPTION_OPTIONS = [
+  { value: 'postpaid', label: 'Trả sau' },
+  { value: 'prepaid', label: 'Trả trước' },
+];
 
 const simSchema = z.object({
-  phone_number: z.string().min(9, 'Số điện thoại không hợp lệ').max(15),
-  prefix: z.string().min(2, 'Vui lòng nhập đầu số').max(5),
+  phone_number: z.string().regex(/^0\d{9}$/, 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0'),
+  subscription_type: z.enum(['prepaid', 'postpaid']),
   catalog: z.enum(['so_dep', 'phong_thuy', 'nam_sinh', 'tra_truoc', 'sim_data', 'esim']),
   sim_type: z.enum(['tam_hoa', 'tu_quy', 'phat_loc', 'than_tai', 'thuong']),
-  price: z.coerce.number().nonnegative('Giá không được âm'),
   bundle_note: z.string().max(255).optional().or(z.literal('')),
-  commitment_months: z.coerce.number().int().nonnegative().optional(),
-  status: z.enum(['available', 'reserved', 'sold']),
+  commitment_months: z.coerce.number().int().min(0).max(36).optional(),
+  status: z.enum(['available', 'reserved', 'sold', 'hidden']),
 });
 
 type SimSchemaValues = z.infer<typeof simSchema>;
 
 export default function AdminSimsPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const page = Math.max(1, Number(searchParams.get('page') ?? 1));
+  const pageSize = [10, 20, 50].includes(Number(searchParams.get('page_size')))
+    ? Number(searchParams.get('page_size'))
+    : 20;
+  const [searchValue, setSearchValue] = useState(searchParams.get('q') ?? '');
+  const debouncedSearch = useDebounce(searchValue, 300);
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [modalState, setModalState] = useState<{
@@ -65,27 +84,64 @@ export default function AdminSimsPage() {
   } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SimNumber | null>(null);
   const [importResult, setImportResult] = useState<SimImportResult | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: sims, isLoading } = useQuery({
-    queryKey: ['admin-sims'],
-    queryFn: () => simsApi.listAdmin(),
+    queryKey: ['admin-sims', searchParams.toString()],
+    queryFn: () => simsApi.listAdmin({
+      q: searchParams.get('q') || undefined,
+      prefix: searchParams.get('prefix') || undefined,
+      catalog: (searchParams.get('catalog') || undefined) as SimFormValues['catalog'] | undefined,
+      sim_type: (searchParams.get('sim_type') || undefined) as SimFormValues['sim_type'] | undefined,
+      type: (searchParams.get('type') || undefined) as SimFormValues['subscription_type'] | undefined,
+      status: (searchParams.get('status') || undefined) as SimFormValues['status'] | undefined,
+      page,
+      page_size: pageSize,
+    }),
   });
+  const { data: publicSettings } = useQuery({
+    queryKey: ['public-settings'],
+    queryFn: () => settingsApi.listPublic(),
+    staleTime: 300_000,
+  });
+  const activationFees = {
+    prepaid: Number(publicSettings?.sim_activation_fee_prepaid ?? 50000),
+    postpaid: Number(publicSettings?.sim_activation_fee_postpaid ?? 60000),
+  };
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<SimSchemaValues>({ resolver: zodResolver(simSchema) });
+  const selectedSubscriptionType = watch('subscription_type', 'postpaid');
+
+  function updateQuery(key: string, value?: string | number) {
+    const next = new URLSearchParams(searchParams.toString());
+    if (value === undefined || value === '') next.delete(key);
+    else next.set(key, String(value));
+    if (key !== 'page') next.set('page', '1');
+    router.replace(`${pathname}?${next.toString()}`);
+  }
+
+  useEffect(() => {
+    const current = searchParams.get('q') ?? '';
+    if (debouncedSearch !== current) updateQuery('q', debouncedSearch);
+    // updateQuery intentionally derives the latest URL state from searchParams.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   function openCreate() {
     reset({
       phone_number: '',
-      prefix: '',
+      subscription_type: 'postpaid',
       catalog: 'so_dep',
       sim_type: 'thuong',
-      price: 0,
       bundle_note: '',
       commitment_months: 0,
       status: 'available',
@@ -96,10 +152,9 @@ export default function AdminSimsPage() {
   function openEdit(item: SimNumber) {
     reset({
       phone_number: item.phone_number,
-      prefix: item.prefix,
+      subscription_type: item.subscription_type,
       catalog: item.catalog,
       sim_type: item.sim_type,
-      price: item.price,
       bundle_note: item.bundle_note ?? '',
       commitment_months: item.commitment_months ?? 0,
       status: item.status,
@@ -129,13 +184,66 @@ export default function AdminSimsPage() {
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
+  const bulkStatusMutation = useMutation({
+    mutationFn: (status: SimFormValues['status']) => simsApi.bulkUpdateStatus(selectedIds, status),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
+      showToast(`Đã cập nhật ${result.updated} số sim`);
+      setSelectedIds([]);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+  const bulkDeleteMutation = useMutation({
+    mutationFn: () => simsApi.bulkRemove(selectedIds),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
+      showToast(`Đã xóa mềm ${result.deleted} số sim`);
+      setSelectedIds([]);
+      setBulkDeleteOpen(false);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
 
   const importMutation = useMutation({
-    mutationFn: (file: File) => simsApi.importExcel(file),
+    mutationFn: (file: File) => simsApi.importExcel(file, importMode),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
       setImportResult(result);
-      showToast(`Đã nhập ${result.inserted} số sim thành công`);
+      showToast(`Đã thêm ${result.inserted}, cập nhật ${result.updated} số sim`);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+  const templateMutation = useMutation({
+    mutationFn: () => simsApi.downloadImportTemplate(),
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'mau-import-kho-sim.xlsx';
+      anchor.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+
+  const exportMutation = useMutation({
+    mutationFn: (format: 'xlsx' | 'csv') =>
+      simsApi.exportData(format, {
+        q: searchParams.get('q') || undefined,
+        prefix: searchParams.get('prefix') || undefined,
+        catalog: searchParams.get('catalog') || undefined,
+        sim_type: searchParams.get('sim_type') || undefined,
+        type: searchParams.get('type') || undefined,
+        status: searchParams.get('status') || undefined,
+      }),
+    onSuccess: (blob, format) => {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `kho-sim.${format}`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      showToast('Xuất dữ liệu kho sim thành công');
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
@@ -154,7 +262,39 @@ export default function AdminSimsPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
+  function downloadImportErrors() {
+    if (!importResult?.errors.length) return;
+    const rows = ['Dòng,Lý do', ...importResult.errors.map((error) =>
+      `${error.row},"${error.message.replace(/"/g, '""')}"`,
+    )];
+    const blob = new Blob([`\uFEFF${rows.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'loi-import-kho-sim.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   const columns: TableColumn<SimNumber>[] = [
+    {
+      key: 'select',
+      header: 'Chọn',
+      render: (sim) => (
+        <input
+          type="checkbox"
+          aria-label={`Chọn số ${sim.phone_number}`}
+          checked={selectedIds.includes(sim.id)}
+          onChange={(event) =>
+            setSelectedIds((current) =>
+              event.target.checked
+                ? [...current, sim.id]
+                : current.filter((id) => id !== sim.id),
+            )
+          }
+        />
+      ),
+    },
     {
       key: 'phone_number',
       header: 'Số điện thoại',
@@ -162,15 +302,19 @@ export default function AdminSimsPage() {
       sortAccessor: (s) => s.phone_number,
     },
     {
+      key: 'subscription_type',
+      header: 'Hình thức',
+      render: (s) => <Badge>{s.subscription_type === 'prepaid' ? 'Trả trước' : 'Trả sau'}</Badge>,
+    },
+    {
       key: 'sim_type',
-      header: 'Loại sim',
+      header: 'Kiểu số',
       render: (s) => SIM_TYPE_OPTIONS.find((t) => t.value === s.sim_type)?.label,
     },
     {
-      key: 'price',
-      header: 'Giá',
-      render: (s) => formatPrice(s.price),
-      sortAccessor: (s) => s.price,
+      key: 'activation_fee',
+      header: 'Phí hòa mạng',
+      render: (s) => formatPrice(activationFees[s.subscription_type]),
     },
     {
       key: 'status',
@@ -227,13 +371,115 @@ export default function AdminSimsPage() {
           >
             <Upload className={styles.icon} /> Import Excel
           </Button>
+          <select
+            aria-label="Xử lý số sim trùng khi import"
+            value={importMode}
+            onChange={(event) => setImportMode(event.target.value as 'skip' | 'update')}
+          >
+            <option value="skip">Trùng: bỏ qua</option>
+            <option value="update">Trùng: cập nhật</option>
+          </select>
+          <Button
+            variant="outline"
+            isLoading={templateMutation.isPending}
+            onClick={() => templateMutation.mutate()}
+          >
+            <Download className={styles.icon} /> Tải file mẫu
+          </Button>
+          <Button
+            variant="outline"
+            isLoading={exportMutation.isPending}
+            onClick={() => exportMutation.mutate('xlsx')}
+          >
+            <Download className={styles.icon} /> Xuất Excel
+          </Button>
+          <Button
+            variant="outline"
+            isLoading={exportMutation.isPending}
+            onClick={() => exportMutation.mutate('csv')}
+          >
+            <Download className={styles.icon} /> Xuất CSV
+          </Button>
           <Button onClick={openCreate}>
             <Plus className={styles.icon} /> Thêm số sim
           </Button>
         </div>
       </div>
 
-      <Table columns={columns} data={sims ?? []} rowKey={(s) => s.id} isLoading={isLoading} />
+      <div className={styles.grid3} aria-label="Bộ lọc kho sim">
+        <TextField
+          label="Tìm số thuê bao"
+          placeholder="Ví dụ: 090* hoặc *8888"
+          inputMode="numeric"
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.target.value)}
+        />
+        <SelectField
+          label="Hình thức thuê bao"
+          value={searchParams.get('type') ?? ''}
+          options={[{ value: '', label: 'Tất cả' }, ...SUBSCRIPTION_OPTIONS]}
+          onChange={(event) => updateQuery('type', event.target.value)}
+        />
+        <SelectField
+          label="Trạng thái"
+          value={searchParams.get('status') ?? ''}
+          options={[{ value: '', label: 'Tất cả' }, ...STATUS_OPTIONS]}
+          onChange={(event) => updateQuery('status', event.target.value)}
+        />
+        <SelectField
+          label="Nhóm hiển thị"
+          value={searchParams.get('catalog') ?? ''}
+          options={[{ value: '', label: 'Tất cả' }, ...CATALOG_OPTIONS]}
+          onChange={(event) => updateQuery('catalog', event.target.value)}
+        />
+        <SelectField
+          label="Kiểu số"
+          value={searchParams.get('sim_type') ?? ''}
+          options={[{ value: '', label: 'Tất cả' }, ...SIM_TYPE_OPTIONS]}
+          onChange={(event) => updateQuery('sim_type', event.target.value)}
+        />
+        <SelectField
+          label="Số dòng mỗi trang"
+          value={String(pageSize)}
+          options={[10, 20, 50].map((value) => ({ value: String(value), label: `${value} dòng` }))}
+          onChange={(event) => updateQuery('page_size', event.target.value)}
+        />
+      </div>
+
+      {selectedIds.length > 0 && (
+        <div className={styles.toolbar} role="region" aria-label="Thao tác hàng loạt">
+          <strong>Đã chọn {selectedIds.length} số</strong>
+          <div className={styles.buttonGroup}>
+            <SelectField
+              label="Đổi trạng thái"
+              value=""
+              options={[{ value: '', label: 'Chọn trạng thái' }, ...STATUS_OPTIONS]}
+              onChange={(event) => {
+                if (event.target.value) {
+                  bulkStatusMutation.mutate(event.target.value as SimFormValues['status']);
+                }
+              }}
+            />
+            <Button variant="danger" onClick={() => setBulkDeleteOpen(true)}>
+              Xóa các số đã chọn
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <Table
+        columns={columns}
+        data={sims?.items ?? []}
+        rowKey={(s) => s.id}
+        isLoading={isLoading}
+        emptyMessage="Không tìm thấy số phù hợp — hãy thử bớt điều kiện lọc"
+      />
+      <Pagination
+        page={sims?.page ?? page}
+        pageSize={sims?.page_size ?? pageSize}
+        total={sims?.total ?? 0}
+        onPageChange={(nextPage) => updateQuery('page', nextPage)}
+      />
 
       <Modal
         isOpen={modalState !== null}
@@ -246,21 +492,21 @@ export default function AdminSimsPage() {
             error={errors.phone_number?.message}
             {...register('phone_number')}
           />
-          <TextField
-            label="Đầu số"
-            placeholder="090, 093..."
-            error={errors.prefix?.message}
-            {...register('prefix')}
+          <SelectField
+            label="Hình thức thuê bao *"
+            options={SUBSCRIPTION_OPTIONS}
+            error={errors.subscription_type?.message}
+            {...register('subscription_type')}
           />
           <div className={styles.grid2}>
             <SelectField
-              label="Danh mục"
+              label="Nhóm hiển thị"
               options={CATALOG_OPTIONS}
               error={errors.catalog?.message}
               {...register('catalog')}
             />
             <SelectField
-              label="Loại sim"
+              label="Kiểu số đẹp"
               options={SIM_TYPE_OPTIONS}
               error={errors.sim_type?.message}
               {...register('sim_type')}
@@ -268,10 +514,9 @@ export default function AdminSimsPage() {
           </div>
           <div className={styles.grid2}>
             <TextField
-              type="number"
-              label="Giá (đ)"
-              error={errors.price?.message}
-              {...register('price')}
+              label="Phí hòa mạng dự kiến"
+              value={formatPrice(activationFees[selectedSubscriptionType])}
+              readOnly
             />
             <TextField
               type="number"
@@ -301,6 +546,18 @@ export default function AdminSimsPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={bulkDeleteOpen}
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={() => bulkDeleteMutation.mutate()}
+        isPending={bulkDeleteMutation.isPending}
+        destructive
+        title="Xóa mềm nhiều số sim"
+        confirmLabel={`Xóa ${selectedIds.length} số`}
+      >
+        Các số đã chọn sẽ bị ẩn khỏi hệ thống nhưng dữ liệu vẫn được giữ để có thể phục hồi.
+      </ConfirmDialog>
 
       <Modal
         isOpen={deleteTarget !== null}
@@ -333,7 +590,8 @@ export default function AdminSimsPage() {
           <div className={styles.form}>
             <p className={styles.confirm}>
               Đã nhập thành công <strong>{importResult.inserted}</strong> số, bỏ qua{' '}
-              <strong>{importResult.skipped}</strong> dòng.
+              <strong>{importResult.skipped}</strong> dòng và cập nhật{' '}
+              <strong>{importResult.updated}</strong> số.
             </p>
             {importResult.errors.length > 0 && (
               <div className={styles.errorBox}>
@@ -348,6 +606,11 @@ export default function AdminSimsPage() {
               </div>
             )}
             <div className={styles.actions}>
+              {importResult.errors.length > 0 && (
+                <Button variant="outline" onClick={downloadImportErrors}>
+                  Tải danh sách lỗi CSV
+                </Button>
+              )}
               <Button onClick={() => setImportResult(null)}>Đóng</Button>
             </div>
           </div>

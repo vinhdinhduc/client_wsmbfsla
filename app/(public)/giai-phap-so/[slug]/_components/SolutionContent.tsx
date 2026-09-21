@@ -6,6 +6,7 @@ import { useState } from 'react';
 import * as Icons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Solution } from '@/types/product';
+import { assetUrl } from '@/lib/assets';
 import styles from './SolutionContent.module.scss';
 
 const governmentCategories = new Set(['ubnd', 'cuc_nganh', 'chuyen_doi_so']);
@@ -45,7 +46,7 @@ export function SolutionContent({
         {solution.thumbnail && (
           <Image
             className={styles.heroImage}
-            src={solution.thumbnail}
+            src={assetUrl(solution.thumbnail)!}
             alt={solution.name}
             width={520}
             height={320}
@@ -146,7 +147,7 @@ export function SolutionContent({
                 onClick={() => setLightbox(item.image_url)}
               >
                 <Image
-                  src={item.image_url}
+                  src={assetUrl(item.image_url)!}
                   alt={item.caption ?? 'Sơ đồ giải pháp'}
                   width={320}
                   height={200}

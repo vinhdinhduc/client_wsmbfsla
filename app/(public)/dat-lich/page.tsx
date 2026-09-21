@@ -10,7 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AppointmentPage() {
-  const stores = await storesApi.listPublic(undefined, { next: { revalidate: 60 } });
+  const stores = await storesApi
+    .listPublic(undefined, { next: { revalidate: 60 } })
+    .catch(() => []);
   return (
     <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Đặt lịch đến cửa hàng' }]} />

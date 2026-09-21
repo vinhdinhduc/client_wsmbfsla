@@ -35,7 +35,7 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
                     {sim.phone_number}
                   </Link>
                 </td>
-                <td>{formatPrice(sim.price)}</td>
+                <td>{formatPrice(sim.activation_fee)}</td>
                 <td>
                   {sim.commitment_months ? `${sim.commitment_months} tháng` : 'Không cam kết'}
                 </td>
@@ -51,7 +51,7 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
                           type: 'sim',
                           reference_id: sim.id,
                           name: sim.phone_number,
-                          price: sim.price,
+                          price: sim.activation_fee,
                           image: null,
                         });
                         router.push(`/goi-cuoc?sim_id=${sim.id}`);
