@@ -8,6 +8,11 @@ export interface AdminUser {
   email: string;
   phone: string;
   avatar_url: string | null;
+  store_id?: number | null;
+  job_title?: string | null;
+  is_public_profile?: boolean;
+  public_phone?: string | null;
+  public_zalo?: string | null;
   role: UserRole;
   status: UserStatus;
   created_at: string;

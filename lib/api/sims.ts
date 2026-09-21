@@ -19,6 +19,13 @@ export interface SimImportResult {
   errors: Array<{ row: number; message: string }>;
 }
 
+export interface SimImportPreview extends SimImportResult {
+  digest: string;
+  preview_token: string;
+  total: number;
+  sample: Array<{ row: number; phone_number: string; subscription_type: string; action: string }>;
+}
+
 export const simsApi = {
   // ---- Public ----
   listPublic: (
@@ -58,10 +65,21 @@ export const simsApi = {
   bulkRemove: (ids: number[]) =>
     apiFetch<{ deleted: number }>('/admin/sims/bulk', { method: 'DELETE', body: { ids } }),
 
-  importExcel: (file: File, mode: 'skip' | 'update') => {
+  previewImport: (file: File, mode: 'skip' | 'update') => {
     const form = new FormData();
     form.append('file', file);
     form.append('mode', mode);
+    return apiFetch<SimImportPreview>('/admin/sims/import/preview', {
+      method: 'POST', body: form, isFormData: true,
+    });
+  },
+
+  importExcel: (file: File, mode: 'skip' | 'update', digest: string, previewToken: string) => {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('mode', mode);
+    form.append('digest', digest);
+    form.append('preview_token', previewToken);
     return apiFetch<SimImportResult>('/admin/sims/import', {
       method: 'POST',
       body: form,

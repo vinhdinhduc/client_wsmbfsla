@@ -140,6 +140,44 @@
   background: var(--bg-card);
   box-shadow: var(--shadow-sm);
 }
+.storeCardSelected {
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+.storeStaff {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-2;
+  padding: $space-2 0;
+  border-top: 1px solid var(--color-neutral-100);
+  font-size: $font-size-sm;
+}
+.storeStaff span {
+  min-width: 0;
+  flex: 1;
+}
+.storeStaff small {
+  color: var(--color-neutral-500);
+}
+.storeStaff a {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.staffAvatar,
+.staffAvatarFallback {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.staffAvatarFallback {
+  display: grid;
+  place-items: center;
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+}
 .storeAddress {
   display: flex;
   align-items: flex-start;

@@ -4,6 +4,7 @@ import { Providers } from '@/contexts/providers';
 import { AnalyticsScripts } from '@/components/shared/AnalyticsScripts';
 import { env } from '@/lib/env';
 import './globals.scss';
+import 'leaflet/dist/leaflet.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],

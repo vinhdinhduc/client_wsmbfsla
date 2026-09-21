@@ -4,6 +4,7 @@ import {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
   forwardRef,
+  useId,
 } from 'react';
 import { cn } from '@/lib/cn';
 import styles from './FormField.module.scss';
@@ -14,16 +15,18 @@ function FieldWrapper({
   children,
   hint,
   required,
+  id,
 }: {
   label: string;
   error?: string;
   children: ReactNode;
   hint?: string;
   required?: boolean;
+  id: string;
 }) {
   return (
     <div className={styles.field}>
-      <label className={styles.label}>
+      <label className={styles.label} htmlFor={id}>
         {label}
         {required && <span className={styles.requiredMark}> *</span>}
       </label>
@@ -41,16 +44,19 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
-  ({ label, error, hint, className, required, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint} required={required}>
+  ({ label, error, hint, className, required, id, ...props }, ref) => {
+    const generatedId = useId();
+    const fieldId = id ?? generatedId;
+    return <FieldWrapper label={label} error={error} hint={hint} required={required} id={fieldId}>
       <input
         ref={ref}
+        id={fieldId}
         className={cn(styles.control, error ? styles.invalid : styles.valid, className)}
         required={required}
         {...props}
       />
-    </FieldWrapper>
-  ),
+    </FieldWrapper>;
+  },
 );
 TextField.displayName = 'TextField';
 
@@ -61,17 +67,20 @@ interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
 }
 
 export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  ({ label, error, hint, className, rows = 4, required, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint} required={required}>
+  ({ label, error, hint, className, rows = 4, required, id, ...props }, ref) => {
+    const generatedId = useId();
+    const fieldId = id ?? generatedId;
+    return <FieldWrapper label={label} error={error} hint={hint} required={required} id={fieldId}>
       <textarea
         ref={ref}
+        id={fieldId}
         rows={rows}
         className={cn(styles.textarea, error ? styles.invalid : styles.valid, className)}
         required={required}
         {...props}
       />
-    </FieldWrapper>
-  ),
+    </FieldWrapper>;
+  },
 );
 TextareaField.displayName = 'TextareaField';
 
@@ -83,10 +92,13 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
-  ({ label, error, hint, options, className, required, ...props }, ref) => (
-    <FieldWrapper label={label} error={error} hint={hint} required={required}>
+  ({ label, error, hint, options, className, required, id, ...props }, ref) => {
+    const generatedId = useId();
+    const fieldId = id ?? generatedId;
+    return <FieldWrapper label={label} error={error} hint={hint} required={required} id={fieldId}>
       <select
         ref={ref}
+        id={fieldId}
         className={cn(
           styles.control,
           styles.select,
@@ -102,8 +114,8 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           </option>
         ))}
       </select>
-    </FieldWrapper>
-  ),
+    </FieldWrapper>;
+  },
 );
 SelectField.displayName = 'SelectField';
 

@@ -124,6 +124,17 @@ export interface Store {
   lat: number;
   lng: number;
   opening_hours: string | null;
+  province_code?: string | null;
+  ward_code?: string | null;
+  street_address?: string | null;
+  full_address?: string | null;
+  email?: string | null;
+  opening_hours_json?: Array<{ days: number[]; open: string; close: string }> | null;
+  needs_review?: boolean;
+  status?: 'active' | 'inactive';
+    open_now?: boolean | null;
+    staff_count?: number;
+    staff?: Array<{ id: number; full_name: string; job_title: string | null; avatar_url: string | null; public_phone: string; public_zalo: string | null; on_duty: boolean }>;
 }
 
 export interface PaginatedResult<T> {

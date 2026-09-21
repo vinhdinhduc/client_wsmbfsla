@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { CalendarDays, Gem, Grid2X2, HelpCircle, ListFilter, Search } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { SimFilterParams } from '../_types/sim';
@@ -18,6 +18,14 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
   const router = useRouter();
   const pathname = usePathname();
   const [query, setQuery] = useState(initial.q ?? '');
+  const [selectedType, setSelectedType] = useState(initial.type ?? 'postpaid');
+
+  useEffect(() => { setSelectedType(initial.type ?? 'postpaid'); }, [initial.type]);
+
+  function selectType(type: 'prepaid' | 'postpaid') {
+    setSelectedType(type);
+    navigate({ type });
+  }
 
   function navigate(next: Partial<SimFilterParams>) {
     const values = { ...initial, ...next };
@@ -88,8 +96,8 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
             type="radio"
             name="subscription-type"
             value="postpaid"
-            checked={(initial.type ?? 'postpaid') === 'postpaid'}
-            onChange={() => navigate({ type: 'postpaid' })}
+            checked={selectedType === 'postpaid'}
+            onChange={() => selectType('postpaid')}
           />
           Trả sau
         </label>
@@ -98,8 +106,8 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
             type="radio"
             name="subscription-type"
             value="prepaid"
-            checked={initial.type === 'prepaid'}
-            onChange={() => navigate({ type: 'prepaid' })}
+            checked={selectedType === 'prepaid'}
+            onChange={() => selectType('prepaid')}
           />
           Trả trước
         </label>

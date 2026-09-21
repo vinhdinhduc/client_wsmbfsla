@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Upload, Download } from 'lucide-react';
-import { simsApi, SimFormValues, SimImportResult } from '@/lib/api/sims';
+import { simsApi, SimFormValues, SimImportResult, SimImportPreview } from '@/lib/api/sims';
 import { SimNumber } from '@/types/product';
 import { Table, TableColumn } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
@@ -84,6 +84,8 @@ export default function AdminSimsPage() {
   } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SimNumber | null>(null);
   const [importResult, setImportResult] = useState<SimImportResult | null>(null);
+  const [importPreview, setImportPreview] = useState<SimImportPreview | null>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
@@ -204,10 +206,20 @@ export default function AdminSimsPage() {
     onError: (err: Error) => showToast(err.message, 'error'),
   });
 
+  const previewMutation = useMutation({
+    mutationFn: (file: File) => simsApi.previewImport(file, importMode),
+    onSuccess: (result) => setImportPreview(result),
+    onError: (err: Error) => { setImportFile(null); showToast(err.message, 'error'); },
+  });
   const importMutation = useMutation({
-    mutationFn: (file: File) => simsApi.importExcel(file, importMode),
+    mutationFn: () => {
+      if (!importFile || !importPreview) throw new Error('Vui lòng xem trước tệp Excel');
+      return simsApi.importExcel(importFile, importMode, importPreview.digest, importPreview.preview_token);
+    },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
+      setImportPreview(null);
+      setImportFile(null);
       setImportResult(result);
       showToast(`Đã thêm ${result.inserted}, cập nhật ${result.updated} số sim`);
     },
@@ -258,13 +270,21 @@ export default function AdminSimsPage() {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) importMutation.mutate(file);
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.xlsx') || file.size > 5 * 1024 * 1024) {
+        showToast('Chỉ chấp nhận tệp .xlsx tối đa 5 MB', 'error');
+      } else {
+        setImportFile(file);
+        setImportPreview(null);
+        previewMutation.mutate(file);
+      }
+    }
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  function downloadImportErrors() {
-    if (!importResult?.errors.length) return;
-    const rows = ['Dòng,Lý do', ...importResult.errors.map((error) =>
+  function downloadImportErrors(errors: SimImportResult['errors']) {
+    if (!errors.length) return;
+    const rows = ['Dòng,Lý do', ...errors.map((error) =>
       `${error.row},"${error.message.replace(/"/g, '""')}"`,
     )];
     const blob = new Blob([`\uFEFF${rows.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
@@ -360,13 +380,13 @@ export default function AdminSimsPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xlsx,.xls"
+            accept=".xlsx"
             className={styles.hidden}
             onChange={handleFileChange}
           />
           <Button
             variant="outline"
-            isLoading={importMutation.isPending}
+            isLoading={previewMutation.isPending}
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload className={styles.icon} /> Import Excel
@@ -374,7 +394,11 @@ export default function AdminSimsPage() {
           <select
             aria-label="Xử lý số sim trùng khi import"
             value={importMode}
-            onChange={(event) => setImportMode(event.target.value as 'skip' | 'update')}
+            onChange={(event) => {
+              setImportMode(event.target.value as 'skip' | 'update');
+              setImportPreview(null);
+              setImportFile(null);
+            }}
           >
             <option value="skip">Trùng: bỏ qua</option>
             <option value="update">Trùng: cập nhật</option>
@@ -582,6 +606,32 @@ export default function AdminSimsPage() {
       </Modal>
 
       <Modal
+        isOpen={importPreview !== null}
+        onClose={() => { setImportPreview(null); setImportFile(null); }}
+        title="Xem trước import kho sim"
+      >
+        {importPreview && (
+          <div className={styles.form}>
+            <p>Tệp: <strong>{importFile?.name}</strong> · {importPreview.total} dòng dữ liệu</p>
+            <p>Dự kiến thêm {importPreview.inserted}, cập nhật {importPreview.updated}, bỏ qua {importPreview.skipped} dòng. Số liệu có thể thay đổi nếu kho sim được sửa trước khi xác nhận.</p>
+            <p>20 dòng đầu được kiểm tra:</p>
+            <ul className={styles.errorList}>
+              {importPreview.sample.map((row) => <li key={row.row}>Dòng {row.row}: {row.phone_number} · {row.subscription_type} · {row.action}</li>)}
+            </ul>
+            {importPreview.errors.length > 0 && <div className={styles.errorBox}>
+              <p className={styles.errorTitle}>{importPreview.errors.length} dòng lỗi:</p>
+              <ul className={styles.errorList}>{importPreview.errors.slice(0, 20).map((error) => <li key={error.row}>Dòng {error.row}: {error.message}</li>)}</ul>
+            </div>}
+            <div className={styles.actions}>
+              {importPreview.errors.length > 0 && <Button variant="outline" onClick={() => downloadImportErrors(importPreview.errors)}>Tải danh sách lỗi CSV</Button>}
+              <Button variant="outline" onClick={() => { setImportPreview(null); setImportFile(null); }}>Hủy</Button>
+              <Button isLoading={importMutation.isPending} disabled={importPreview.inserted + importPreview.updated === 0} onClick={() => importMutation.mutate()}>Xác nhận nhập</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
         isOpen={importResult !== null}
         onClose={() => setImportResult(null)}
         title="Kết quả Import Excel"
@@ -607,7 +657,7 @@ export default function AdminSimsPage() {
             )}
             <div className={styles.actions}>
               {importResult.errors.length > 0 && (
-                <Button variant="outline" onClick={downloadImportErrors}>
+                <Button variant="outline" onClick={() => downloadImportErrors(importResult.errors)}>
                   Tải danh sách lỗi CSV
                 </Button>
               )}

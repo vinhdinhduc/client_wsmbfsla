@@ -3,17 +3,26 @@ import { Store } from '@/types/product';
 
 export interface StoreFormValues {
   name: string;
-  address: string;
-  district: string;
+  street_address: string;
+  ward_code: string;
   phone: string;
+  email?: string | null;
   lat: number;
   lng: number;
-  opening_hours?: string | null;
+  opening_hours_json: Array<{ days: number[]; open: string; close: string }>;
+  status: 'active' | 'inactive';
+  geocode_source?: 'map' | 'address' | 'manual' | null;
 }
 
+export interface Ward { code: string; name_with_type: string }
+
 export const storesApi = {
-  listPublic: (district?: string, opts?: Pick<ApiFetchOptions, 'next' | 'cache'>) =>
-    apiFetch<Store[]>('/public/stores', { params: { district }, ...opts }),
+  listPublic: (ward_code?: string, opts?: Pick<ApiFetchOptions, 'next' | 'cache'>) =>
+    apiFetch<Store[]>('/public/stores', { params: { ward_code }, ...opts }),
+
+  listWards: () => apiFetch<Ward[]>('/public/wards'),
+
+  geocode: (address: string) => apiFetch<{ lat: number; lng: number; label: string; source: string } | null>('/admin/stores/geocode', { params: { address } }),
 
   listAdmin: () => apiFetch<Store[]>('/admin/stores'),
 

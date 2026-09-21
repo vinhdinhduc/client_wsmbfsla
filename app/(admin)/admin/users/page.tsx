@@ -16,6 +16,7 @@ import { TextField, SelectField } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/Toast';
 import styles from '../admin-shared.module.scss';
 import { assetUrl } from '@/lib/assets';
+import { storesApi } from '@/lib/api/stores';
 
 const ROLE_OPTIONS = [
   { value: 'admin', label: 'Quản trị viên' },
@@ -36,6 +37,14 @@ const userSchema = z.object({
   phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
   role: z.enum(['admin', 'chuyen_vien', 'giao_dich_vien', 'nhan_vien']),
   status: z.enum(['active', 'locked']),
+  store_id: z.coerce.number().int().nonnegative().nullable().optional(),
+  job_title: z.string().max(100).optional(),
+  is_public_profile: z.boolean().optional(),
+  public_phone: z.string().regex(/^0\d{9}$/, 'Số công việc phải có 10 chữ số').optional().or(z.literal('')),
+  public_zalo: z.string().regex(/^0\d{9}$/, 'Số Zalo phải có 10 chữ số').optional().or(z.literal('')),
+}).superRefine((value, context) => {
+  if (value.role === 'giao_dich_vien' && !value.store_id) context.addIssue({ code: 'custom', path: ['store_id'], message: 'Giao dịch viên phải thuộc một cửa hàng' });
+  if (value.role === 'giao_dich_vien' && value.is_public_profile && !value.public_phone) context.addIssue({ code: 'custom', path: ['public_phone'], message: 'Cần số điện thoại công việc để hiển thị công khai' });
 });
 
 type UserSchemaValues = z.infer<typeof userSchema>;
@@ -62,15 +71,18 @@ export default function AdminUsersPage() {
     queryKey: ['admin-users'],
     queryFn: () => usersApi.list(),
   });
+  const { data: stores = [] } = useQuery({ queryKey: ['admin-stores'], queryFn: storesApi.listAdmin });
 
   const {
     register,
     handleSubmit,
+    watch,
     reset,
     formState: { errors },
   } = useForm<UserSchemaValues>({
     resolver: zodResolver(userSchema),
   });
+  const selectedRole = watch('role');
 
   function openCreate() {
     setAvatarFile(null);
@@ -83,6 +95,11 @@ export default function AdminUsersPage() {
       phone: '',
       role: 'nhan_vien',
       status: 'active',
+      store_id: 0,
+      job_title: '',
+      is_public_profile: false,
+      public_phone: '',
+      public_zalo: '',
     });
     setModalState({ mode: 'create' });
   }
@@ -98,6 +115,11 @@ export default function AdminUsersPage() {
       phone: item.phone,
       role: item.role,
       status: item.status,
+      store_id: item.store_id ?? 0,
+      job_title: item.job_title ?? '',
+      is_public_profile: item.is_public_profile ?? false,
+      public_phone: item.public_phone ?? '',
+      public_zalo: item.public_zalo ?? '',
     });
     setModalState({ mode: 'edit', item });
   }
@@ -126,7 +148,7 @@ export default function AdminUsersPage() {
   });
 
   function onSubmit(values: UserSchemaValues) {
-    const payload: UserFormValues = { ...values, avatar: avatarFile ?? undefined };
+    const payload: UserFormValues = { ...values, store_id: values.role === 'giao_dich_vien' ? values.store_id : null, is_public_profile: values.role === 'giao_dich_vien' && Boolean(values.is_public_profile), public_phone: values.public_phone || null, public_zalo: values.public_zalo || null, avatar: avatarFile ?? undefined };
     if (!payload.password) delete payload.password;
     saveMutation.mutate(payload);
   }
@@ -143,6 +165,7 @@ export default function AdminUsersPage() {
       sortAccessor: (u) => u.full_name,
     },
     { key: 'username', header: 'Tên đăng nhập', render: (u) => u.username },
+    { key: 'store', header: 'Cửa hàng', render: (u) => stores.find((store) => store.id === u.store_id)?.name ?? (u.role === 'giao_dich_vien' ? 'Chưa gán' : '—') },
     {
       key: 'role',
       header: 'Vai trò',
@@ -225,6 +248,15 @@ export default function AdminUsersPage() {
             />
             <TextField label="Số điện thoại" error={errors.phone?.message} {...register('phone')} />
           </div>
+          {selectedRole === 'giao_dich_vien' && (
+            <>
+              <SelectField label="Cửa hàng *" options={[{ value: '0', label: 'Chọn cửa hàng' }, ...stores.filter((store) => store.status === 'active').map((store) => ({ value: String(store.id), label: store.name }))]} error={errors.store_id?.message} {...register('store_id', { setValueAs: (value) => Number(value) })} />
+              <TextField label="Chức danh" error={errors.job_title?.message} {...register('job_title')} />
+              <label><input type="checkbox" {...register('is_public_profile')} /> Hiển thị giao dịch viên trên trang Cửa hàng</label>
+              <TextField label="Số điện thoại công việc" inputMode="tel" error={errors.public_phone?.message} {...register('public_phone')} />
+              <TextField label="Số Zalo công việc" inputMode="tel" error={errors.public_zalo?.message} {...register('public_zalo')} />
+            </>
+          )}
           <div className={styles.fileField}>
             <label htmlFor="user-avatar">Ảnh đại diện</label>
             <input
