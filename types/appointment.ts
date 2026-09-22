@@ -4,6 +4,7 @@ export interface StoreAppointment {
   id: number;
   customer_name: string;
   phone: string;
+  email?: string | null;
   store_id: number;
   appointment_date: string;
   appointment_time: string;

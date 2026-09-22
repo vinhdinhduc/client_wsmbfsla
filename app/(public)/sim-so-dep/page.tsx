@@ -12,8 +12,9 @@ export const metadata: Metadata = {
   description: 'Kho sim số đẹp MobiFone Sơn La - lọc theo đầu số, loại sim, mức giá.',
 };
 
-export default async function SimsPage({ searchParams }: { searchParams: SimFilterParams }) {
-  const sims = await simsApi.listPublic(searchParams);
+export default async function SimsPage({ searchParams }: { searchParams: Promise<SimFilterParams> }) {
+  const filters = await searchParams;
+  const sims = await simsApi.listPublic(filters);
 
   return (
     <div className={styles.page}>
@@ -35,7 +36,7 @@ export default async function SimsPage({ searchParams }: { searchParams: SimFilt
         </div>
       </header>
 
-      <SimCatalogControls initial={searchParams} />
+      <SimCatalogControls initial={filters} />
 
       {sims.length === 0 ? (
         <p className={styles.emptyText}>Không tìm thấy số phù hợp với bộ lọc</p>

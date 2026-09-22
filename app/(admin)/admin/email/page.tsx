@@ -1,0 +1,37 @@
+'use client';
+
+import { FormEvent, useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { emailApi, EmailTemplate, SmtpConfig } from '@/lib/api/email';
+import { useToast } from '@/components/ui/Toast';
+import styles from './page.module.scss';
+
+const blank: SmtpConfig = { host: '', port: 587, security: 'starttls', username: '', from_name: 'MobiFone Sơn La', from_email: '', reply_to: null, bcc: null, send_limit_hour: 200, password_configured: false };
+const variables = ['customer_name', 'registration_code', 'phone', 'status', 'message', 'store_name', 'hotline', 'branch_name', 'item_count'];
+export default function AdminEmailPage() {
+  const client = useQueryClient(); const { showToast } = useToast();
+  const config = useQuery({ queryKey: ['email-config'], queryFn: emailApi.config });
+  const templates = useQuery({ queryKey: ['email-templates'], queryFn: emailApi.templates });
+  const logs = useQuery({ queryKey: ['email-logs'], queryFn: emailApi.logs });
+  const suppression = useQuery({ queryKey: ['email-suppressions'], queryFn: emailApi.suppressions });
+  const [smtp, setSmtp] = useState<SmtpConfig>(blank); const [password, setPassword] = useState('');
+  const [selectedKey, setSelectedKey] = useState('registration_received_customer');
+  const [draft, setDraft] = useState<EmailTemplate | null>(null); const [preview, setPreview] = useState<{ subject: string; html: string } | null>(null);
+  const [suppressEmail, setSuppressEmail] = useState(''); const [suppressReason, setSuppressReason] = useState('manual');
+  useEffect(() => { if (config.data) setSmtp(config.data); }, [config.data]);
+  useEffect(() => { const row = templates.data?.find((item) => item.key === selectedKey); if (row) setDraft(row); }, [templates.data, selectedKey]);
+  const run = useMutation({ mutationFn: async (task: () => Promise<unknown>) => task(), onSuccess: () => { client.invalidateQueries({ queryKey: ['email-config'] }); client.invalidateQueries({ queryKey: ['email-templates'] }); client.invalidateQueries({ queryKey: ['email-logs'] }); client.invalidateQueries({ queryKey: ['email-suppressions'] }); showToast('Thao tác thành công'); }, onError: (error: Error) => showToast(error.message, 'error') });
+  const saveConfig = (event: FormEvent) => { event.preventDefault(); const { password_configured, ...fields } = smtp; run.mutate(() => emailApi.saveConfig({ ...fields, password: password || undefined })); setPassword(''); };
+  const saveTemplate = (event: FormEvent) => { event.preventDefault(); if (draft) run.mutate(() => emailApi.saveTemplate(draft.key, draft)); };
+  return <main className={styles.page}><h1>Email & thông báo</h1>
+    <section className={styles.card}><h2>Cấu hình SMTP</h2><p>Mật khẩu chỉ ghi mới, máy chủ không trả lại giá trị đã lưu.</p><form onSubmit={saveConfig} className={styles.grid}>
+      <label>Host<input required value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} /></label><label>Port<input type="number" min="1" max="65535" required value={smtp.port} onChange={(e) => setSmtp({ ...smtp, port: Number(e.target.value) })} /></label>
+      <label>Bảo mật<select value={smtp.security} onChange={(e) => setSmtp({ ...smtp, security: e.target.value as SmtpConfig['security'] })}><option value="none">Không</option><option value="starttls">STARTTLS</option><option value="ssl">SSL</option></select></label><label>Username<input required value={smtp.username} onChange={(e) => setSmtp({ ...smtp, username: e.target.value })} /></label>
+      <label>Mật khẩu {smtp.password_configured ? '(đã cấu hình)' : ''}<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Để trống nếu giữ mật khẩu cũ" /></label><label>Tên người gửi<input required value={smtp.from_name} onChange={(e) => setSmtp({ ...smtp, from_name: e.target.value })} /></label>
+      <label>Email gửi<input type="email" required value={smtp.from_email} onChange={(e) => setSmtp({ ...smtp, from_email: e.target.value })} /></label><label>Reply-To<input type="email" value={smtp.reply_to || ''} onChange={(e) => setSmtp({ ...smtp, reply_to: e.target.value || null })} /></label><label>BCC nội bộ<input type="email" value={smtp.bcc || ''} onChange={(e) => setSmtp({ ...smtp, bcc: e.target.value || null })} /></label><label>Giới hạn gửi / giờ<input type="number" min="1" max="10000" value={smtp.send_limit_hour} onChange={(e) => setSmtp({ ...smtp, send_limit_hour: Number(e.target.value) })} /></label><button disabled={run.isPending}>Lưu SMTP</button>
+    </form><div className={styles.actions}><button type="button" onClick={() => run.mutate(emailApi.verify)}>Kiểm tra kết nối</button><button type="button" onClick={() => run.mutate(emailApi.test)}>Gửi thư thử tới email tài khoản</button></div></section>
+    <section className={styles.card}><h2>Mẫu thư</h2><select aria-label="Chọn mẫu thư" value={selectedKey} onChange={(e) => { setSelectedKey(e.target.value); setPreview(null); }}>{templates.data?.map((item) => <option key={item.key} value={item.key}>{item.name}</option>)}</select>{draft && <form onSubmit={saveTemplate} className={styles.template}><label><input type="checkbox" checked={Boolean(draft.enabled)} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} /> Bật mẫu thư</label><label>Tiêu đề<input value={draft.subject} onChange={(e) => setDraft({ ...draft, subject: e.target.value })} /></label><label>Nội dung HTML<textarea rows={8} value={draft.html} onChange={(e) => setDraft({ ...draft, html: e.target.value })} /></label><p>Biến hỗ trợ: {variables.map((variable) => <button key={variable} type="button" onClick={() => setDraft({ ...draft, html: `${draft.html} {{${variable}}}` })}>{`{{${variable}}}`}</button>)}</p><div className={styles.actions}><button disabled={run.isPending}>Lưu mẫu</button><button type="button" onClick={async () => { try { setPreview(await emailApi.preview(draft.key)); } catch (error) { showToast((error as Error).message, 'error'); } }}>Xem trước</button><button type="button" onClick={() => run.mutate(() => emailApi.restore(draft.key))}>Khôi phục mặc định</button></div></form>}{preview && <div><h3>{preview.subject}</h3><iframe title="Xem trước email" sandbox="" srcDoc={preview.html} className={styles.preview} /></div>}</section>
+    <section className={styles.card}><h2>Nhật ký gửi</h2>{logs.data?.map((row) => <p key={row.id}>#{row.id} · {row.recipient} · {row.template_key} · {row.status} · {row.attempts} lần {row.last_error || ''} {row.status === 'failed' && <button type="button" onClick={() => run.mutate(() => emailApi.retry(row.id))}>Gửi lại</button>}</p>)}</section>
+    <section className={styles.card}><h2>Danh sách không gửi</h2><form className={styles.actions} onSubmit={(e) => { e.preventDefault(); run.mutate(() => emailApi.suppress(suppressEmail, suppressReason)); setSuppressEmail(''); }}><input type="email" required placeholder="Email" value={suppressEmail} onChange={(e) => setSuppressEmail(e.target.value)} /><input placeholder="Lý do" value={suppressReason} onChange={(e) => setSuppressReason(e.target.value)} /><button>Thêm</button></form>{suppression.data?.map((item) => <p key={item.email}>{item.email} · {item.reason} <button type="button" onClick={() => run.mutate(() => emailApi.unsuppress(item.email))}>Bỏ chặn</button></p>)}</section>
+  </main>;
+}

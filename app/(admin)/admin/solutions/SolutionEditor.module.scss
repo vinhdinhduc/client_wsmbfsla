@@ -1,0 +1,16 @@
+.form { display: grid; gap: 1rem; color: var(--color-neutral-900); }
+.form header, .sectionHead, .form footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.form section { padding: 1.2rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--bg-card); }
+.form h1 { margin: 0; font-size: 1.7rem; }
+.form h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.grid label { display: grid; gap: .4rem; }
+.wide { grid-column: 1 / -1; }
+.form input:not([type='checkbox']), .form textarea, .form select { width: 100%; min-width: 0; padding: .65rem; border: 1px solid var(--border); border-radius: .4rem; background: var(--bg-card); color: inherit; }
+.form textarea { min-height: 4rem; }
+.form button, .form footer a { padding: .55rem .85rem; border: 1px solid var(--border); border-radius: .4rem; background: var(--bg-card); color: inherit; cursor: pointer; }
+.form footer button { background: var(--color-primary); color: white; }
+.toggles { display: flex; flex-wrap: wrap; gap: 1rem; }
+.toggles label { display: flex; align-items: center; gap: .4rem; }
+.item { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); align-items: center; gap: .6rem; padding: .8rem 0; border-top: 1px solid var(--border); }
+@media (max-width: 600px) { .grid { grid-template-columns: minmax(0, 1fr); } .wide { grid-column: auto; } .form header { flex-direction: column; align-items: flex-start; } }

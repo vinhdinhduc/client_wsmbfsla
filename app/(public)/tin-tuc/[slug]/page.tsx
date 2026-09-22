@@ -27,10 +27,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
   try {
-    const news = await newsApi.getPublicBySlug(params.slug);
+    const news = await newsApi.getPublicBySlug(slug);
     return buildMetadata({
       title: news.title,
       description: news.summary,
@@ -38,14 +39,15 @@ export async function generateMetadata({
       path: `/tin-tuc/${news.slug}`,
     });
   } catch {
-    return buildMetadata({ title: 'Tin tức', path: `/tin-tuc/${params.slug}` });
+    return buildMetadata({ title: 'Tin tức', path: `/tin-tuc/${slug}` });
   }
 }
 
-export default async function NewsDetailPage({ params }: { params: { slug: string } }) {
+export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   let news;
   try {
-    news = await newsApi.getPublicBySlug(params.slug, { next: { revalidate: 60 } });
+    news = await newsApi.getPublicBySlug(slug, { next: { revalidate: 60 } });
   } catch {
     notFound();
   }

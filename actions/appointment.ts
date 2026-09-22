@@ -11,6 +11,7 @@ const appointmentSchema = z.object({
     .min(9, 'Số điện thoại không hợp lệ')
     .max(20)
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
+  email: z.union([z.string().email('Email không hợp lệ'), z.literal('')]).optional(),
   store_id: z.coerce.number().int().positive('Vui lòng chọn cửa hàng'),
   appointment_date: z.string().min(1, 'Vui lòng chọn ngày đến'),
   appointment_time: z.string().min(1, 'Vui lòng chọn giờ đến'),
@@ -30,6 +31,7 @@ export async function submitAppointmentAction(
   const parsed = appointmentSchema.safeParse({
     customer_name: String(formData.get('customer_name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
+    email: String(formData.get('email') ?? ''),
     store_id: formData.get('store_id'),
     appointment_date: String(formData.get('appointment_date') ?? ''),
     appointment_time: String(formData.get('appointment_time') ?? ''),

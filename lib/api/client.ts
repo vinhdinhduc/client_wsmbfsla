@@ -31,6 +31,7 @@ export type ApiFetchOptions = {
   cache?: RequestCache;
   /** Query string params - undefined/null se tu dong bi bo qua. */
   params?: Record<string, string | number | boolean | undefined | null>;
+  headers?: Record<string, string>;
 };
 
 function readTokenFromBrowser(): string | undefined {
@@ -67,7 +68,7 @@ function buildUrl(path: string, params?: ApiFetchOptions['params']): string {
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
   const { method = 'GET', body, isFormData, token, next, cache, params } = options;
 
-  const headers: HeadersInit = {};
+  const headers: HeadersInit = { ...options.headers };
   const authToken = token ?? readTokenFromBrowser();
   if (authToken) {
     headers.Authorization = `Bearer ${authToken}`;

@@ -1,4 +1,4 @@
-export type CartItemType = 'sim' | 'goi_cuoc' | 'giai_phap';
+export type CartItemType = 'sim' | 'goi_cuoc' | 'giai_phap' | 'solution_plan';
 
 /** 1 dong trong CartContext (localStorage) - chua du thong tin de hien thi CartDrawer/gio hang. */
 export interface CartItem {
@@ -21,10 +21,17 @@ export interface RegistrationItem {
   reference_id: number;
   reference_label: string;
   price_snapshot: number | null;
+  fee_snapshot: number;
+  quantity: number;
 }
 
 export interface RegistrationGroup {
   id: number;
+  code?: string | null;
+  total_amount?: number;
+  customer_type?: 'individual' | 'business';
+  store_id?: number | null;
+  events?: Array<{ from_status: RegistrationStatus | null; to_status: RegistrationStatus; actor_id: number | null; note: string | null; created_at: string }>;
   customer_name: string;
   phone: string;
   province: string;

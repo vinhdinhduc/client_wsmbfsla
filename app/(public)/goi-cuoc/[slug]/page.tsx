@@ -23,24 +23,26 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
   try {
-    const pkg = await packagesApi.getPublicBySlug(params.slug);
+    const pkg = await packagesApi.getPublicBySlug(slug);
     return buildMetadata({
       title: pkg.name,
       description: pkg.headline_desc,
       path: `/goi-cuoc/${pkg.slug}`,
     });
   } catch {
-    return buildMetadata({ title: 'Gói cước', path: `/goi-cuoc/${params.slug}` });
+    return buildMetadata({ title: 'Gói cước', path: `/goi-cuoc/${slug}` });
   }
 }
 
-export default async function PackageDetailPage({ params }: { params: { slug: string } }) {
+export default async function PackageDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   let pkg;
   try {
-    pkg = await packagesApi.getPublicBySlug(params.slug, { next: { revalidate: 60 } });
+    pkg = await packagesApi.getPublicBySlug(slug, { next: { revalidate: 60 } });
   } catch {
     notFound();
   }

@@ -1,0 +1,12 @@
+.page { display: grid; gap: 1rem; color: var(--color-neutral-900); }
+.page header { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
+.page header h1 { width: 100%; margin: 0; }
+.page button { border: 1px solid var(--color-neutral-100); border-radius: var(--radius-md); padding: .5rem .8rem; background: var(--color-surface); color: var(--color-neutral-900); cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 1rem; }
+.card { display: grid; gap: .7rem; padding: 1rem; background: var(--color-surface); border: 1px solid var(--color-neutral-100); border-radius: var(--radius-lg); }
+.card h2 { margin: 0; font-size: 1.1rem; }
+.card label { display: grid; gap: .3rem; }
+.card label:has(input[type='checkbox']) { display: flex; }
+.fields { display: flex; flex-wrap: wrap; gap: .7rem; }
+.fields > * { flex: 1 1 120px; }
+.card input:not([type='checkbox']), .card select { width: 100%; min-height: 2.4rem; border: 1px solid var(--color-neutral-100); border-radius: var(--radius-md); padding: .4rem; background: var(--color-surface); color: var(--color-neutral-900); }

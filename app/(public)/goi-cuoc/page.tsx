@@ -13,8 +13,9 @@ export const metadata: Metadata = {
 export default async function PackagesPage({
   searchParams,
 }: {
-  searchParams: { sim_id?: string };
+  searchParams: Promise<{ sim_id?: string }>;
 }) {
+  const { sim_id: simId } = await searchParams;
   const packages = await packagesApi
     .listPublic(undefined, { next: { revalidate: 60 } })
     .catch(() => []);
@@ -30,7 +31,7 @@ export default async function PackagesPage({
         </h1>
         <p className={styles.subtitle}>Chọn gói cước phù hợp cho nhu cầu kết nối mỗi ngày.</p>
       </section>
-      <PackageFilterBar packages={packages} simId={searchParams.sim_id} />
+      <PackageFilterBar packages={packages} simId={simId} />
     </div>
   );
 }

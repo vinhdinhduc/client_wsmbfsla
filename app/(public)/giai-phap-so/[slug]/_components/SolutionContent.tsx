@@ -3,15 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import * as Icons from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { DynamicIcon } from 'lucide-react/dynamic';
 import { Solution } from '@/types/product';
 import { assetUrl } from '@/lib/assets';
+import { resolveSolutionIcon } from '@/lib/solution-icons';
+import { useCart } from '@/hooks/useCart';
 import styles from './SolutionContent.module.scss';
 
 const governmentCategories = new Set(['ubnd', 'cuc_nganh', 'chuyen_doi_so']);
 const priceFormatter = new Intl.NumberFormat('vi-VN');
-const iconSet = Icons as unknown as Record<string, LucideIcon>;
 
 export function SolutionContent({
   solution,
@@ -22,10 +23,14 @@ export function SolutionContent({
 }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const { addItem } = useCart();
   const features = solution.features ?? [];
   const pricing = solution.pricing ?? [];
   const faqs = solution.faqs ?? [];
   const gallery = solution.gallery ?? [];
+  const steps = solution.steps ?? [];
+  const visible = (key: string) => solution.section_visibility?.[key] !== false;
+  const title = (key: string, fallback: string) => solution.section_titles?.[key] || fallback;
   const targetCustomers =
     solution.target_customers
       ?.split(/[;\n]/)
@@ -36,11 +41,11 @@ export function SolutionContent({
     <div className={styles.content}>
       <section className={styles.hero}>
         <div>
-          <p className={styles.eyebrow}>MobiFone Sơn La</p>
-          <h2 className={styles.heroTitle}>{solution.name}</h2>
-          {solution.summary && <p className={styles.heroSummary}>{solution.summary}</p>}
-          <Link className={styles.cta} href="/lien-he">
-            Liên hệ tư vấn
+          <p className={styles.eyebrow}>{solution.hero_badge || 'MobiFone Sơn La'}</p>
+          <h2 className={styles.heroTitle}>{solution.hero_title || solution.name}</h2>
+          {(solution.hero_subtitle || solution.summary) && <p className={styles.heroSummary}>{solution.hero_subtitle || solution.summary}</p>}
+          <Link className={styles.cta} href={solution.cta_url || '/lien-he'}>
+            {solution.cta_label || 'Liên hệ tư vấn'}
           </Link>
         </div>
         {solution.thumbnail && (
@@ -55,25 +60,25 @@ export function SolutionContent({
         )}
       </section>
 
-      <section className={styles.section}>
-        <h2>Tổng quan</h2>
+      {visible('overview') && <section className={styles.section}>
+        <h2>{title('overview', 'Tổng quan')}</h2>
         <div className={styles.richText} dangerouslySetInnerHTML={{ __html: solution.content }} />
         {solution.video_url && (
           <a className={styles.textLink} href={solution.video_url} target="_blank" rel="noreferrer">
             Xem video giới thiệu
           </a>
         )}
-      </section>
+      </section>}
 
-      {features.length > 0 && (
+      {visible('features') && features.length > 0 && (
         <section className={styles.section}>
-          <h2>Tính năng nổi bật</h2>
+          <h2>{title('features', 'Tính năng nổi bật')}</h2>
           <div className={styles.featureGrid}>
             {features.map((feature) => {
-              const FeatureIcon = iconSet[feature.icon ?? ''] ?? Icons.Sparkles;
+              const iconName = resolveSolutionIcon(feature.icon);
               return (
               <article className={styles.feature} key={feature.id}>
-                <span className={styles.featureIcon}><FeatureIcon size={25} aria-hidden /></span>
+                <span className={styles.featureIcon}>{iconName ? <DynamicIcon name={iconName} size={25} aria-hidden fallback={() => <Check size={25} aria-hidden />} /> : <Check size={25} aria-hidden />}</span>
                 <h3>{feature.title}</h3>
                 {feature.description && <p>{feature.description}</p>}
               </article>
@@ -83,11 +88,11 @@ export function SolutionContent({
         </section>
       )}
 
-      {targetCustomers.length > 0 && (
+      {visible('audience') && (targetCustomers.length > 0 || Boolean(solution.audience_cards?.length)) && (
         <section className={styles.section}>
-          <h2>Đối tượng khách hàng</h2>
+          <h2>{title('audience', 'Đối tượng khách hàng')}</h2>
           <div className={styles.customerGrid}>
-            {targetCustomers.map((customer) => (
+            {solution.audience_cards?.length ? solution.audience_cards.map((card) => <div className={styles.customer} key={card.title}><strong>{card.title}</strong><p>{card.description}</p></div>) : targetCustomers.map((customer) => (
               <div className={styles.customer} key={customer}>
                 {customer}
               </div>
@@ -96,9 +101,9 @@ export function SolutionContent({
         </section>
       )}
 
-      {pricing.length > 0 && (
+      {visible('pricing') && pricing.length > 0 && (
         <section className={styles.section}>
-          <h2>Bảng giá</h2>
+          <h2>{title('pricing', 'Bảng giá')}</h2>
           <div className={styles.tableWrap}>
             <table className={styles.pricing}>
               <thead>
@@ -123,9 +128,7 @@ export function SolutionContent({
                     </td>
                     <td>{item.condition_note ?? 'Theo chính sách hiện hành'}</td>
                     <td>
-                      <Link href="/lien-he" className={styles.tableCta}>
-                        Đăng ký
-                      </Link>
+                      <button type="button" className={styles.tableCta} onClick={() => addItem({ key: `solution_plan-${item.id}`, type: 'solution_plan', reference_id: item.id, name: `${solution.name} - ${item.package_name}`, price: item.price, image: solution.thumbnail })}>Đăng ký</button>
                     </td>
                   </tr>
                 ))}
@@ -135,10 +138,11 @@ export function SolutionContent({
         </section>
       )}
 
-      {gallery.length > 0 && (
+      {visible('process') && (gallery.length > 0 || steps.length > 0) && (
         <section className={styles.section}>
-          <h2>Sơ đồ và quy trình</h2>
+          <h2>{title('process', 'Sơ đồ và quy trình')}</h2>
           <div className={styles.gallery}>
+            {steps.map((step, index) => <article className={styles.galleryItem} key={step.id}><strong>{index + 1}. {step.title}</strong><p>{step.description}</p></article>)}
             {gallery.map((item) => (
               <button
                 type="button"
@@ -166,9 +170,9 @@ export function SolutionContent({
         </section>
       )}
 
-      {faqs.length > 0 && (
+      {visible('faq') && faqs.length > 0 && (
         <section className={styles.section}>
-          <h2>Câu hỏi thường gặp</h2>
+          <h2>{title('faq', 'Câu hỏi thường gặp')}</h2>
           <div className={styles.faqs}>
             {faqs.map((faq) => (
               <div className={styles.faq} key={faq.id}>

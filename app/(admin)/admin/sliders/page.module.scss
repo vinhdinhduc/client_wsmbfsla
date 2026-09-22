@@ -1,0 +1,10 @@
+.thumbnail { display: block; width: 80px; height: 45px; padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: .4rem; background: var(--bg-card); cursor: zoom-in; }
+.thumbnail img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.placeholder { display: flex; align-items: center; gap: .2rem; width: 80px; height: 45px; padding: .2rem; border-radius: .4rem; background: var(--border); font-size: .65rem; }
+.lightbox { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; padding: 2rem; background: rgb(0 0 0 / 85%); }
+.lightbox img { max-width: 95vw; max-height: 90vh; object-fit: contain; }
+.lightbox button { position: absolute; top: 1rem; right: 1rem; border: 0; background: transparent; color: white; font-size: 2rem; cursor: pointer; }
+.sortList { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+.sortList div { padding: .45rem .7rem; border: 1px dashed var(--border); border-radius: .4rem; background: var(--bg-card); cursor: grab; }
+.mobilePreview { width: 140px; height: 200px; overflow: hidden; border: 1px solid var(--border); border-radius: .5rem; }
+.mobilePreview img { width: 100%; height: 100%; object-fit: cover; }

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Settings2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Settings2, ImageOff } from 'lucide-react';
 import { slidersApi, SliderItem, SliderItemFormValues, SliderZone } from '@/lib/api/sliders';
 import { Table, TableColumn } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
@@ -17,6 +17,17 @@ import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
 import { assetUrl } from '@/lib/assets';
 import styles from '../admin-shared.module.scss';
+import local from './page.module.scss';
+
+function SlideThumbnail({ item, onOpen }: { item: SliderItem; onOpen: (url: string) => void }) {
+  const [failed, setFailed] = useState(false);
+  const url = getImageUrl(item.image_url);
+  if (!url || failed) return <span className={local.placeholder} title="Không thể tải ảnh"><ImageOff size={20} /> Ảnh lỗi</span>;
+  return <button type="button" className={local.thumbnail} onClick={() => onOpen(url)} title={`${item.image_width || '?'} × ${item.image_height || '?'} px · ${item.image_bytes ? Math.round(item.image_bytes / 1024) : '?'} KB`} aria-label={`Xem ảnh ${item.title || 'banner'}`}>
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img src={url} alt={item.title || 'Banner'} onError={() => setFailed(true)} />
+  </button>;
+}
 
 const ANIMATION_OPTIONS = [
   { value: 'fade', label: 'Mờ dần' },
@@ -40,6 +51,12 @@ const itemSchema = z.object({
   link_url: z.string().max(500).optional().or(z.literal('')),
   title: z.string().max(150).optional().or(z.literal('')),
   caption: z.string().max(255).optional().or(z.literal('')),
+  mobile_image_url: z.string().max(255).optional().or(z.literal('')),
+  alt_text: z.string().max(255).optional().or(z.literal('')),
+  open_new_tab: z.boolean().default(false),
+  person_name: z.string().max(100).optional().or(z.literal('')),
+  job_title: z.string().max(100).optional().or(z.literal('')),
+  rating: z.coerce.number().int().min(1).max(5).optional(),
   display_order: z.coerce.number().int(),
   status: z.enum(['active', 'inactive']),
   start_date: z.string().optional().or(z.literal('')),
@@ -51,6 +68,19 @@ function getImageUrl(imageUrl: string | null | undefined) {
   return assetUrl(imageUrl);
 }
 
+async function cropToAspect(file: File, aspect: number): Promise<File> {
+  const bitmap = await createImageBitmap(file);
+  try {
+    const width = Math.min(bitmap.width, bitmap.height * aspect);
+    const height = Math.min(bitmap.height, bitmap.width / aspect);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(width); canvas.height = Math.round(height);
+    canvas.getContext('2d')?.drawImage(bitmap, (bitmap.width - width) / 2, (bitmap.height - height) / 2, width, height, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => result ? resolve(result) : reject(new Error('Không thể crop ảnh')), 'image/webp', .86));
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.webp`, { type: 'image/webp' });
+  } finally { bitmap.close(); }
+}
+
 export default function AdminSlidersPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -60,11 +90,21 @@ export default function AdminSlidersPage() {
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<SliderItem | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedMobileImage, setSelectedMobileImage] = useState<File | null>(null);
+  const [mobilePreviewUrl, setMobilePreviewUrl] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imagePreviewError, setImagePreviewError] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!lightboxUrl) return;
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setLightboxUrl(null); };
+    document.addEventListener('keydown', close);
+    return () => document.removeEventListener('keydown', close);
+  }, [lightboxUrl]);
 
   useEffect(() => {
     if (!selectedImage) return;
@@ -72,6 +112,12 @@ export default function AdminSlidersPage() {
     setImagePreviewUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedImage]);
+  useEffect(() => {
+    if (!selectedMobileImage) return;
+    const url = URL.createObjectURL(selectedMobileImage);
+    setMobilePreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedMobileImage]);
 
   const { data: zones } = useQuery({
     queryKey: ['admin-slider-zones'],
@@ -112,6 +158,7 @@ export default function AdminSlidersPage() {
 
   function openCreateItem() {
     setSelectedImage(null);
+    setSelectedMobileImage(null); setMobilePreviewUrl(null);
     setExistingImageUrl(null);
     setImagePreviewUrl(null);
     setImagePreviewError(false);
@@ -121,6 +168,7 @@ export default function AdminSlidersPage() {
       link_url: '',
       title: '',
       caption: '',
+      mobile_image_url: '', alt_text: '', open_new_tab: false, person_name: '', job_title: '', rating: 5,
       display_order: 0,
       status: 'active',
       start_date: '',
@@ -131,6 +179,7 @@ export default function AdminSlidersPage() {
 
   function openEditItem(item: SliderItem) {
     setSelectedImage(null);
+    setSelectedMobileImage(null); setMobilePreviewUrl(getImageUrl(item.mobile_image_url));
     const currentImageUrl = getImageUrl(item.image_url);
     setExistingImageUrl(currentImageUrl);
     setImagePreviewUrl(currentImageUrl);
@@ -141,6 +190,7 @@ export default function AdminSlidersPage() {
       link_url: item.link_url ?? '',
       title: item.title ?? '',
       caption: item.caption ?? '',
+      mobile_image_url: item.mobile_image_url ?? '', alt_text: item.alt_text ?? '', open_new_tab: item.open_new_tab ?? false, person_name: item.person_name ?? '', job_title: item.job_title ?? '', rating: item.rating ?? 5,
       display_order: item.display_order,
       status: item.status,
       start_date: item.start_date ?? '',
@@ -171,20 +221,49 @@ export default function AdminSlidersPage() {
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
+  const reorderMutation = useMutation({
+    mutationFn: async ({ sourceId, targetId }: { sourceId: number; targetId: number }) => {
+      if (!items) return;
+      const ordered = [...items];
+      const from = ordered.findIndex((item) => item.id === sourceId);
+      const to = ordered.findIndex((item) => item.id === targetId);
+      if (from < 0 || to < 0 || from === to) return;
+      const [moving] = ordered.splice(from, 1);
+      ordered.splice(to, 0, moving);
+      await Promise.all(ordered.map((item, index) => slidersApi.updateItem(item.id, { display_order: index })));
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-slider-items', resolvedZoneId] }),
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
 
-  function onSubmitItem(values: ItemSchemaValues) {
+  async function onSubmitItem(values: ItemSchemaValues) {
     if (!resolvedZoneId) return;
     if (itemModal?.mode === 'create' && !selectedImage) {
       showToast('Vui lòng chọn ảnh cho slide', 'error');
       return;
     }
+    let desktop = selectedImage;
+    let mobile = selectedMobileImage;
+    try {
+      [desktop, mobile] = await Promise.all([
+        selectedImage ? cropToAspect(selectedImage, activeZone?.code === 'hero_banner' ? 16 / 9 : 1) : Promise.resolve(null),
+        selectedMobileImage ? cropToAspect(selectedMobileImage, 4 / 5) : Promise.resolve(null),
+      ]);
+    } catch (error) { showToast((error as Error).message, 'error'); return; }
     saveItemMutation.mutate({
       ...values,
       zone_id: resolvedZoneId,
-      image: selectedImage ?? undefined,
+      image: desktop ?? undefined,
+      mobile_image: mobile ?? undefined,
       link_url: values.link_url || null,
       title: values.title || null,
       caption: values.caption || null,
+      mobile_image_url: values.mobile_image_url || null,
+      alt_text: values.alt_text || null,
+      open_new_tab: values.open_new_tab,
+      person_name: values.person_name || null,
+      job_title: values.job_title || null,
+      rating: values.rating || null,
       start_date: values.start_date || null,
       end_date: values.end_date || null,
     });
@@ -195,7 +274,7 @@ export default function AdminSlidersPage() {
     {
       key: 'image_url',
       header: 'Ảnh',
-      render: (i) => <span className={styles.imageUrl}>{i.image_url}</span>,
+      render: (i) => <SlideThumbnail item={i} onOpen={setLightboxUrl} />,
     },
     {
       key: 'display_order',
@@ -207,8 +286,8 @@ export default function AdminSlidersPage() {
       key: 'status',
       header: 'Trạng thái',
       render: (i) => (
-        <Badge tone={i.status === 'active' ? 'success' : 'neutral'}>
-          {STATUS_OPTIONS.find((s) => s.value === i.status)?.label}
+        <Badge tone={i.effective_status === 'active' ? 'success' : 'neutral'}>
+          {i.effective_status === 'expired' ? 'Hết hạn' : i.effective_status === 'scheduled' ? 'Chưa đến hạn' : i.effective_status === 'hidden' ? 'Ẩn' : STATUS_OPTIONS.find((s) => s.value === i.status)?.label}
         </Badge>
       ),
     },
@@ -275,6 +354,8 @@ export default function AdminSlidersPage() {
       </div>
 
       <Table columns={columns} data={items ?? []} rowKey={(i) => i.id} isLoading={isLoading} />
+      {Boolean(items?.length) && <div className={local.sortList} aria-label="Kéo thả sắp xếp banner">{items?.map((item) => <div key={item.id} draggable onDragStart={() => setDraggedId(item.id)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (draggedId !== null) reorderMutation.mutate({ sourceId: draggedId, targetId: item.id }); setDraggedId(null); }} onDragEnd={() => setDraggedId(null)} title="Kéo để đổi thứ tự">⋮⋮ {item.title || `Banner ${item.id}`}</div>)}</div>}
+      {lightboxUrl && <div className={local.lightbox} role="dialog" aria-modal="true" aria-label="Xem ảnh banner" onClick={() => setLightboxUrl(null)}><button type="button" onClick={() => setLightboxUrl(null)} aria-label="Đóng ảnh">×</button>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={lightboxUrl} alt="Ảnh banner phóng lớn" /></div>}
 
       <Modal
         isOpen={isConfigOpen}
@@ -315,7 +396,7 @@ export default function AdminSlidersPage() {
         title={itemModal?.mode === 'edit' ? 'Sửa banner' : 'Thêm banner'}
       >
         <form onSubmit={itemForm.handleSubmit(onSubmitItem)} className={styles.form}>
-          <div className={styles.fileField}>
+          <div className={styles.fileField} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setSelectedImage(event.dataTransfer.files[0] || null); }}>
             <label htmlFor="slider-image">Ảnh slide</label>
             <input
               ref={imageInputRef}
@@ -349,6 +430,7 @@ export default function AdminSlidersPage() {
             <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
             {selectedImage && <p className={styles.imageUrl}>Đã chọn: {selectedImage.name}</p>}
           </div>
+          <div className={styles.fileField}><label htmlFor="slider-mobile-image">Ảnh mobile riêng</label><input id="slider-mobile-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setSelectedMobileImage(event.target.files?.[0] ?? null)} />{mobilePreviewUrl && <div className={local.mobilePreview}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={mobilePreviewUrl} alt="Xem trước banner mobile" /></div>}</div>
           <TextField
             label="Liên kết khi bấm vào (tùy chọn)"
             placeholder="https://..."
@@ -365,6 +447,14 @@ export default function AdminSlidersPage() {
             error={itemForm.formState.errors.caption?.message}
             {...itemForm.register('caption')}
           />
+          <TextField label="Mô tả ảnh (alt)" {...itemForm.register('alt_text')} />
+          <TextField label="Ảnh mobile (URL)" {...itemForm.register('mobile_image_url')} />
+          <CheckboxField label="Mở liên kết trong tab mới" {...itemForm.register('open_new_tab')} />
+          {activeZone?.code === 'testimonials' && <div className={styles.grid2}>
+            <TextField label="Tên khách hàng" {...itemForm.register('person_name')} />
+            <TextField label="Chức danh" {...itemForm.register('job_title')} />
+            <TextField type="number" min="1" max="5" label="Số sao" {...itemForm.register('rating')} />
+          </div>}
           <div className={styles.grid2}>
             <TextField
               type="number"

@@ -92,5 +92,8 @@ export const simsApi = {
   exportData: (
     format: 'xlsx' | 'csv',
     filters: Record<string, string | number | undefined> = {},
-  ) => apiFetch<Blob>('/admin/sims/export', { params: { ...filters, format, scope: 'filtered' } }),
+    options: { scope: 'filtered' | 'all'; columns: string[] },
+  ) => apiFetch<Blob>('/admin/sims/export', {
+    params: { ...filters, format, scope: options.scope, columns: options.columns.join(',') },
+  }),
 };

@@ -70,6 +70,14 @@ test('TC-06: xuất XLSX theo bộ lọc giữ số 0 đầu và ghi nhật ký'
   const rows = XLSX.utils.sheet_to_json<string[]>(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
   expect(rows).toHaveLength(2);
   expect(rows[1][0]).toBe(number);
+  const csvResponse = await api.get(`admin/sims/export?format=csv&scope=filtered&q=${number}&columns=phone,fee`, { headers: auth() });
+  expect(csvResponse.ok()).toBeTruthy();
+  const csv = await csvResponse.text();
+  expect(csv.startsWith('\uFEFF"Số thuê bao","Phí hòa mạng"')).toBeTruthy();
+  expect(csv).toContain(`"${number}","50000"`);
+  expect(csv.trim().split('\r\n')).toHaveLength(2);
+  const invalidColumns = await api.get('admin/sims/export?columns=phone,password', { headers: auth() });
+  expect(invalidColumns.status()).toBe(422);
   const audit = await api.get('admin/audit-logs?module=sims', { headers: auth() });
   expect(audit.ok()).toBeTruthy();
   expect(JSON.stringify(await audit.json())).toContain('Xuất 1 dòng kho sim');

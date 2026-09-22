@@ -296,3 +296,8 @@
     flex-direction: column;
   }
 }
+.compareWrap { margin-top: 2rem; padding: 1rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--bg-card); }
+.compareGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.compareGrid article { padding: 1rem; border: 1px solid var(--border); border-radius: .5rem; }
+@media (max-width: 600px) { .compareGrid { grid-template-columns: minmax(0, 1fr); } }
+.packageImage { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }

@@ -9,6 +9,7 @@ const TYPE_LABEL: Record<string, string> = {
   sim: 'Sim số',
   goi_cuoc: 'Gói cước',
   giai_phap: 'Giải pháp',
+  solution_plan: 'Gói giải pháp',
 };
 
 export function CartItemRow({

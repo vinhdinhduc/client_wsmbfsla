@@ -17,11 +17,21 @@ export interface SliderItem {
   id: number;
   zone_id: number;
   image_url: string;
+  mobile_image_url?: string | null;
+  alt_text?: string | null;
+  open_new_tab?: boolean;
+  image_width?: number | null;
+  image_height?: number | null;
+  image_bytes?: number | null;
+  person_name?: string | null;
+  job_title?: string | null;
+  rating?: number | null;
   link_url: string | null;
   title: string | null;
   caption: string | null;
   display_order: number;
   status: SliderStatus;
+  effective_status?: 'active' | 'scheduled' | 'expired' | 'hidden';
   start_date: string | null;
   end_date: string | null;
   created_at: string;
@@ -45,7 +55,14 @@ export interface SliderZoneUpdateValues {
 export interface SliderItemFormValues {
   zone_id: number;
   image_url?: string;
+  mobile_image_url?: string | null;
+  alt_text?: string | null;
+  open_new_tab?: boolean;
+  person_name?: string | null;
+  job_title?: string | null;
+  rating?: number | null;
   image?: File;
+  mobile_image?: File;
   link_url?: string | null;
   title?: string | null;
   caption?: string | null;
@@ -89,10 +106,11 @@ export const slidersApi = {
 function toFormData(values: Partial<SliderItemFormValues>) {
   const formData = new FormData();
   Object.entries(values).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && key !== 'image') {
-      formData.append(key, String(value));
+    if (value !== undefined && key !== 'image' && key !== 'mobile_image') {
+      formData.append(key, value === null ? '' : String(value));
     }
   });
   if (values.image) formData.append('image', values.image);
+  if (values.mobile_image) formData.append('mobile_image', values.mobile_image);
   return formData;
 }

@@ -15,10 +15,21 @@ export interface SolutionFormValues {
   video_url?: string | null;
   is_hot: boolean;
   status: 'active' | 'inactive';
+  hero_badge?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+  cta_label?: string | null;
+  cta_url?: string | null;
+  audience_cards?: Array<{ icon: string; title: string; description: string }> | null;
+  section_visibility?: Record<string, boolean> | null;
+  section_titles?: Record<string, string> | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
   features?: Array<{ icon?: string | null; title: string; description?: string | null; sort_order?: number }>;
-  pricing?: Array<{ package_code: string; package_name: string; price: number; cycle_months?: number; condition_note?: string | null; sort_order?: number }>;
+  pricing?: Array<{ package_code: string; package_name: string; price: number; cycle_months?: number; condition_note?: string | null; status?: 'active' | 'inactive'; sort_order?: number }>;
   faqs?: Array<{ question: string; answer?: string | null; sort_order?: number }>;
   gallery?: Array<{ image_url: string; caption?: string | null; sort_order?: number }>;
+  steps?: Array<{ title: string; description?: string | null; icon?: string | null; sort_order?: number }>;
 }
 
 export const solutionsApi = {
@@ -45,7 +56,7 @@ function solutionRequest(method: 'POST' | 'PUT', dto: Partial<SolutionFormValues
   if (!dto.image) return { method, body: dto };
   const form = new FormData();
   Object.entries(dto).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && key !== 'image') form.append(key, String(value));
+    if (value !== undefined && value !== null && key !== 'image') form.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
   });
   form.append('image', dto.image);
   return { method, body: form, isFormData: true };

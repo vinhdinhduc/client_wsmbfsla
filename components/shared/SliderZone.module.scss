@@ -89,6 +89,10 @@
     transform: scale(1.1);
   }
 }
+.partnerImage { width: 100%; height: 100%; object-fit: contain; padding: 1rem; filter: grayscale(1); transition: filter 180ms ease; }
+.slide:hover .partnerImage { filter: grayscale(0); }
+.testimonialMeta { position: absolute; right: 1rem; bottom: 1rem; display: grid; gap: .2rem; padding: .65rem 1rem; border-radius: .5rem; background: var(--bg-card); color: var(--color-neutral-900); }
+.testimonialMeta span { color: #d1840d; }
 .caption {
   position: absolute;
   right: 0;

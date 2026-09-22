@@ -5,7 +5,7 @@ import { apiFetch, ApiError } from '@/lib/api/client';
 import { RegistrationGroup } from '@/types/order';
 
 const cartItemSchema = z.object({
-  type: z.enum(['sim', 'goi_cuoc', 'giai_phap']),
+  type: z.enum(['sim', 'goi_cuoc', 'giai_phap', 'solution_plan']),
   reference_id: z.coerce.number().int().positive(),
 });
 
@@ -16,7 +16,11 @@ const submitCartSchema = z.object({
     .min(9, 'Số điện thoại không hợp lệ')
     .max(20)
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
-  email: z.string().email('Email không hợp lệ').max(150),
+  email: z.union([z.string().email('Email không hợp lệ').max(150), z.literal('')]),
+  customer_type: z.enum(['individual', 'business']),
+  consent: z.literal(true, { errorMap: () => ({ message: 'Cần đồng ý điều khoản' }) }),
+  website: z.string().max(100).default(''),
+  source_utm: z.record(z.string().max(100)).optional(),
   note: z.string().optional().nullable(),
   delivery_method: z.enum(['address', 'store']),
   sim_type: z.enum(['physical', 'esim']),
@@ -39,8 +43,9 @@ const submitCartSchema = z.object({
 export interface RegistrationActionState {
   status: 'idle' | 'success' | 'error';
   message?: string;
-  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'email' | 'note' | 'items' | 'province' | 'ward' | 'delivery_address' | 'delivery_store', string>>;
+  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'email' | 'note' | 'items' | 'province' | 'ward' | 'delivery_address' | 'delivery_store' | 'consent', string>>;
   registrationId?: number;
+  registrationCode?: string;
 }
 
 /**
@@ -63,6 +68,10 @@ export async function submitRegistrationAction(
     customer_name: String(formData.get('customer_name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
     email: String(formData.get('email') ?? ''),
+    customer_type: String(formData.get('customer_type') ?? 'individual'),
+    consent: formData.get('consent') === 'on',
+    website: String(formData.get('website') ?? ''),
+    source_utm: Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].map((key) => [key, String(formData.get(key) || '')]).filter(([, value]) => value)),
     note: formData.get('note') ? String(formData.get('note')) : null,
     delivery_method: String(formData.get('delivery_method') ?? ''),
     sim_type: String(formData.get('sim_type') ?? ''),
@@ -88,11 +97,13 @@ export async function submitRegistrationAction(
     const result = await apiFetch<RegistrationGroup>('/public/registrations', {
       method: 'POST',
       body: parsed.data,
+      headers: { 'Idempotency-Key': String(formData.get('idempotency_key') || '') },
     });
     return {
       status: 'success',
       message: 'Đăng ký thành công, nhân viên sẽ liên hệ trong thời gian sớm nhất',
       registrationId: result.id,
+      registrationCode: result.code || undefined,
     };
   } catch (err) {
     const message = err instanceof ApiError ? err.message : 'Đã có lỗi xảy ra, vui lòng thử lại';

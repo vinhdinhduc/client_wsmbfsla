@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FormEvent, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Facebook, Phone, Mail, MapPin, Clock3, MessageCircle, Youtube } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock3, MessageCircle } from 'lucide-react';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { newsletterApi } from '@/lib/api/newsletter';
 import { settingsApi } from '@/lib/api/settings';
@@ -138,7 +138,7 @@ export function Footer() {
               aria-label="Facebook MobiFone Sơn La"
               className={styles.footer__socialLink}
             >
-              <Facebook className={styles.footer__socialIcon} />
+              <svg className={styles.footer__socialIcon} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z" /></svg>
             </a>
             {settings?.footer_zalo_url && (
               <a
@@ -159,7 +159,7 @@ export function Footer() {
                 aria-label="YouTube MobiFone Sơn La"
                 className={styles.footer__socialLink}
               >
-                <Youtube className={styles.footer__socialIcon} />
+                <svg className={styles.footer__socialIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" /><path d="m10 9 5 3-5 3V9z" fill="currentColor" stroke="none" /></svg>
               </a>
             )}
           </div>

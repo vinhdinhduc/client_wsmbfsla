@@ -29,34 +29,38 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
   try {
-    const solution = await solutionsApi.getPublicBySlug(params.slug);
+    const solution = await solutionsApi.getPublicBySlug(slug);
     return buildMetadata({
-      title: solution.name,
-      description: solution.summary,
+      title: solution.seo_title || solution.name,
+      description: solution.seo_description || solution.summary,
       image: solution.thumbnail,
       path: `/giai-phap-so/${solution.slug}`,
     });
   } catch {
-    return buildMetadata({ title: 'Giải pháp số', path: `/giai-phap-so/${params.slug}` });
+    return buildMetadata({ title: 'Giải pháp số', path: `/giai-phap-so/${slug}` });
   }
 }
 
-export default async function SolutionDetailPage({ params }: { params: { slug: string } }) {
+export default async function SolutionDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   let solution;
   try {
-    solution = await solutionsApi.getPublicBySlug(params.slug, { next: { revalidate: 60 } });
+    solution = await solutionsApi.getPublicBySlug(slug, { next: { revalidate: 60 } });
   } catch {
     notFound();
   }
   const related = (await solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }))
     .filter((item) => item.category === solution.category && item.id !== solution.id)
     .slice(0, 3);
+  const faqJson = solution.section_visibility?.faq !== false && solution.faqs?.length ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: solution.faqs.map((faq) => ({ '@type': 'Question', name: faq.question, acceptedAnswer: { '@type': 'Answer', text: faq.answer || '' } })) }).replace(/</g, '\\u003c') : null;
 
   return (
     <div className={styles.page}>
+      {faqJson && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJson }} />}
       <Breadcrumb
         items={[{ label: 'Giải pháp số', href: '/giai-phap-so' }, { label: solution.name }]}
       />

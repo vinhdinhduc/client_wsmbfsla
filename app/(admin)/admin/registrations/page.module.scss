@@ -32,6 +32,15 @@
   color: var(--color-neutral-900);
 }
 
+.tabs { display: flex; flex-wrap: wrap; gap: .5rem; }
+.tabs button { padding: .5rem .8rem; border: 1px solid var(--color-neutral-100); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-neutral-900); cursor: pointer; }
+.tabs button[aria-pressed='true'] { background: var(--color-primary); color: white; }
+.filters { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.filters input, .filters select, .detailPanel textarea { min-height: 2.5rem; padding: .5rem; border: 1px solid var(--color-neutral-100); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-neutral-900); }
+.filters label { display: flex; gap: .4rem; align-items: center; }
+.detailPanel textarea { display: block; width: 100%; min-height: 4rem; }
+.event { border-left: 3px solid var(--color-primary); padding: .5rem .75rem; margin: .25rem 0; background: var(--color-surface); }
+
 .paginationWrap {
   display: flex;
   justify-content: center;

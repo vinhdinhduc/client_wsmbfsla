@@ -15,6 +15,8 @@ import {
   Globe2,
   Settings as SettingsIcon,
   X,
+  Mail,
+  Shield,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { menuForRole } from '@/lib/rbac';
@@ -33,7 +35,7 @@ export function AdminSidebar({
   const { user } = useAuth();
   const menu = user ? menuForRole(user.role) : [];
   const isSettingsRoute =
-    pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/ai-');
+    pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/ai-') || pathname.startsWith('/admin/email') || pathname.startsWith('/admin/rate-limits');
   const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsRoute);
 
   const settingsItems = [
@@ -46,6 +48,8 @@ export function AdminSidebar({
     { href: '/admin/ai-knowledge', label: 'Dữ liệu tri thức', icon: CircleHelp },
     { href: '/admin/ai-chat-logs', label: 'Lịch sử hội thoại', icon: BarChart3 },
     { href: '/admin/settings?section=analytics', label: 'Đo lường', icon: BarChart3 },
+    { href: '/admin/email', label: 'Email', icon: Mail },
+    { href: '/admin/rate-limits', label: 'Bảo mật & giới hạn', icon: Shield },
   ];
 
   return (

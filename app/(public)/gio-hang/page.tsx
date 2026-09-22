@@ -92,6 +92,7 @@ function CartPageContent() {
   const { showToast } = useToast();
   const [state, formAction] = useFormState(submitRegistrationAction, INITIAL_STATE);
   const tokenInputRef = useRef<HTMLInputElement>(null);
+  const idempotencyKeyRef = useRef<string>('');
   const [deliveryMethod, setDeliveryMethod] = useState<'address' | 'store'>('address');
   const [simType, setSimType] = useState<'physical' | 'esim'>('physical');
   const { data: stores = [], isLoading: storesLoading } = useQuery({
@@ -144,6 +145,14 @@ function CartPageContent() {
       const token = await getToken('submit_registration');
       formData.set('recaptcha_token', token);
       formData.set('items', serializeCartItemsForSubmit(items));
+      if (!idempotencyKeyRef.current) {
+        idempotencyKeyRef.current = globalThis.crypto?.randomUUID?.() || (globalThis.crypto?.getRandomValues ? Array.from(globalThis.crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('') : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`);
+      }
+      formData.set('idempotency_key', idempotencyKeyRef.current);
+      for (const key of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']) {
+        const value = searchParams.get(key);
+        if (value) formData.set(key, value);
+      }
       formAction(formData);
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Không thể xác thực reCAPTCHA', 'error');
@@ -192,6 +201,8 @@ function CartPageContent() {
       {state.status === 'success' ? (
         <div className={styles.successState}>
           <p className={styles.successMessage}>{state.message}</p>
+          {state.registrationCode && <p>Mã đăng ký: <strong>{state.registrationCode}</strong>. Vui lòng lưu mã để tra cứu tình trạng.</p>}
+          {state.registrationCode && <Link href={`/tra-cuu?code=${encodeURIComponent(state.registrationCode)}`} className={styles.link}>Tra cứu tình trạng và tải phiếu</Link>}
           <Link href="/" className={styles.link}>
             Quay về trang chủ
           </Link>
@@ -312,9 +323,9 @@ function CartPageContent() {
                     type="email"
                     label="Email"
                     placeholder="email@example.com"
-                    required
                     error={state.fieldErrors?.email}
                   />
+                  <label>Loại khách hàng <select name="customer_type" defaultValue="individual"><option value="individual">Cá nhân</option><option value="business">Doanh nghiệp</option></select></label>
                   <fieldset className={styles.choiceGroup}>
                     <legend>Hình thức nhận hàng</legend>
                     <label>
@@ -390,6 +401,9 @@ function CartPageContent() {
                     </label>
                   </fieldset>
                   <TextareaField name="note" label="Ghi chú" placeholder="Ghi chú thêm (nếu có)" />
+                  <label><input type="checkbox" name="consent" required /> Tôi đồng ý với <Link href="/dieu-khoan-su-dung">điều khoản sử dụng</Link> và <Link href="/chinh-sach-bao-mat">chính sách bảo mật</Link>.</label>
+                  {state.fieldErrors?.consent && <p role="alert">{state.fieldErrors.consent}</p>}
+                  <input name="website" tabIndex={-1} autoComplete="off" className={styles.honeypot} aria-hidden="true" />
                   <input ref={tokenInputRef} type="hidden" name="recaptcha_token" />
                   <p className={styles.notice}>
                     Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách bảo mật và Điều

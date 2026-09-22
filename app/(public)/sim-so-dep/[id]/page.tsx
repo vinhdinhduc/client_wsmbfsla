@@ -18,19 +18,21 @@ const SIM_TYPE_LABEL: Record<string, string> = {
   thuong: 'Thường',
 };
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   try {
-    const sim = await simsApi.getPublicById(Number(params.id));
+    const sim = await simsApi.getPublicById(Number(id));
     return buildMetadata({ title: `Sim ${sim.phone_number}`, path: `/sim-so-dep/${sim.id}` });
   } catch {
-    return buildMetadata({ title: 'Sim số đẹp', path: `/sim-so-dep/${params.id}` });
+    return buildMetadata({ title: 'Sim số đẹp', path: `/sim-so-dep/${id}` });
   }
 }
 
-export default async function SimDetailPage({ params }: { params: { id: string } }) {
+export default async function SimDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   let sim;
   try {
-    sim = await simsApi.getPublicById(Number(params.id));
+    sim = await simsApi.getPublicById(Number(id));
   } catch {
     notFound();
   }

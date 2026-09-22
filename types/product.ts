@@ -1,6 +1,6 @@
 export type PackageGroupType = 'hot' | 'tra_truoc' | 'tra_sau' | 'wifi_5g';
 export type PackageDurationUnit = 'ngay' | 'thang';
-export type PackageStatus = 'active' | 'inactive';
+export type PackageStatus = 'active' | 'inactive' | 'hidden';
 
 export interface Package {
   id: number;
@@ -19,6 +19,19 @@ export interface Package {
   description: string | null;
   status: PackageStatus;
   display_order: number;
+  service_type?: 'mobile' | 'data' | 'wifi_5g' | 'combo';
+  subscription_type?: 'prepaid' | 'postpaid' | 'none';
+  badges?: Array<'hot' | 'new' | 'bestseller'>;
+  sms_syntax?: string | null;
+  image_url?: string | null;
+  conditions?: string | null;
+  audience?: string | null;
+  data_per_day_gb?: number | null;
+  data_per_cycle_gb?: number | null;
+  unlimited_data?: boolean;
+  benefits?: string[] | null;
+  effective_from?: string | null;
+  effective_to?: string | null;
 }
 
 export type SimCatalog = 'so_dep' | 'phong_thuy' | 'nam_sinh' | 'tra_truoc' | 'sim_data' | 'esim';
@@ -59,10 +72,21 @@ export interface Solution {
   video_url: string | null;
   is_hot: boolean;
   status: SolutionStatus;
+  hero_badge?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+  cta_label?: string | null;
+  cta_url?: string | null;
+  audience_cards?: Array<{ icon: string; title: string; description: string }> | null;
+  section_visibility?: Record<string, boolean> | null;
+  section_titles?: Record<string, string> | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
   features?: SolutionFeature[];
   pricing?: SolutionPricing[];
   faqs?: SolutionFaq[];
   gallery?: SolutionGallery[];
+  steps?: Array<{ id: number; title: string; description: string | null; icon: string | null; sort_order: number }>;
 }
 
 export interface SolutionFeature {
@@ -81,6 +105,7 @@ export interface SolutionPricing {
   cycle_months: number;
   condition_note: string | null;
   sort_order: number;
+  status?: 'active' | 'inactive';
 }
 
 export interface SolutionFaq {

@@ -53,6 +53,17 @@ const SUBSCRIPTION_OPTIONS = [
   { value: 'postpaid', label: 'Trả sau' },
   { value: 'prepaid', label: 'Trả trước' },
 ];
+const EXPORT_COLUMNS = [
+  { value: 'phone', label: 'Số thuê bao' },
+  { value: 'subscription', label: 'Hình thức' },
+  { value: 'catalog', label: 'Nhóm' },
+  { value: 'pattern', label: 'Kiểu số' },
+  { value: 'fee', label: 'Phí hòa mạng' },
+  { value: 'commitment', label: 'Cam kết' },
+  { value: 'status', label: 'Trạng thái' },
+  { value: 'note', label: 'Ghi chú' },
+  { value: 'createdAt', label: 'Ngày tạo' },
+];
 
 const simSchema = z.object({
   phone_number: z.string().regex(/^0\d{9}$/, 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0'),
@@ -89,6 +100,9 @@ export default function AdminSimsPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportScope, setExportScope] = useState<'filtered' | 'all'>('filtered');
+  const [exportColumns, setExportColumns] = useState(EXPORT_COLUMNS.map((column) => column.value));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: sims, isLoading } = useQuery({
@@ -247,7 +261,7 @@ export default function AdminSimsPage() {
         sim_type: searchParams.get('sim_type') || undefined,
         type: searchParams.get('type') || undefined,
         status: searchParams.get('status') || undefined,
-      }),
+      }, { scope: exportScope, columns: exportColumns }),
     onSuccess: (blob, format) => {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -255,6 +269,7 @@ export default function AdminSimsPage() {
       anchor.download = `kho-sim.${format}`;
       anchor.click();
       URL.revokeObjectURL(url);
+      setExportOpen(false);
       showToast('Xuất dữ liệu kho sim thành công');
     },
     onError: (err: Error) => showToast(err.message, 'error'),
@@ -410,19 +425,8 @@ export default function AdminSimsPage() {
           >
             <Download className={styles.icon} /> Tải file mẫu
           </Button>
-          <Button
-            variant="outline"
-            isLoading={exportMutation.isPending}
-            onClick={() => exportMutation.mutate('xlsx')}
-          >
-            <Download className={styles.icon} /> Xuất Excel
-          </Button>
-          <Button
-            variant="outline"
-            isLoading={exportMutation.isPending}
-            onClick={() => exportMutation.mutate('csv')}
-          >
-            <Download className={styles.icon} /> Xuất CSV
+          <Button variant="outline" onClick={() => setExportOpen(true)}>
+            <Download className={styles.icon} /> Xuất dữ liệu
           </Button>
           <Button onClick={openCreate}>
             <Plus className={styles.icon} /> Thêm số sim
@@ -504,6 +508,54 @@ export default function AdminSimsPage() {
         total={sims?.total ?? 0}
         onPageChange={(nextPage) => updateQuery('page', nextPage)}
       />
+
+      <Modal
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        title="Xuất dữ liệu kho sim"
+      >
+        <div className={styles.form}>
+          <SelectField
+            label="Phạm vi xuất"
+            value={exportScope}
+            options={[
+              { value: 'filtered', label: 'Theo bộ lọc hiện tại' },
+              { value: 'all', label: 'Tất cả số sim' },
+            ]}
+            onChange={(event) => setExportScope(event.target.value as 'filtered' | 'all')}
+          />
+          <fieldset>
+            <legend>Chọn cột xuất</legend>
+            <div className={styles.grid2}>
+              {EXPORT_COLUMNS.map((column) => (
+                <label key={column.value}>
+                  <input
+                    type="checkbox"
+                    checked={exportColumns.includes(column.value)}
+                    onChange={(event) => setExportColumns((current) => event.target.checked
+                      ? [...current, column.value]
+                      : current.filter((value) => value !== column.value))}
+                  />{' '}{column.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className={styles.actions}>
+            <Button variant="outline" onClick={() => setExportOpen(false)}>Hủy</Button>
+            <Button
+              variant="outline"
+              disabled={exportColumns.length === 0}
+              isLoading={exportMutation.isPending}
+              onClick={() => exportMutation.mutate('csv')}
+            >Xuất CSV</Button>
+            <Button
+              disabled={exportColumns.length === 0}
+              isLoading={exportMutation.isPending}
+              onClick={() => exportMutation.mutate('xlsx')}
+            >Xuất Excel</Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={modalState !== null}

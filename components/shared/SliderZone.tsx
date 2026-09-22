@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade, Navigation, Pagination as SwiperPagination } from 'swiper/modules';
+import { A11y, Autoplay, EffectFade, Keyboard, Navigation, Pagination as SwiperPagination } from 'swiper/modules';
 import { slidersApi } from '@/lib/api/sliders';
 import { assetUrl } from '@/lib/assets';
 import styles from './SliderZone.module.scss';
@@ -27,6 +28,14 @@ interface SliderZoneProps {
  * animation_type/autoplay cau hinh tu Admin (khong hard-code).
  */
 export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneProps) {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
   const { data, isLoading } = useQuery({
     queryKey: ['slider-zone', zoneCode],
     queryFn: () => slidersApi.getByZoneCode(zoneCode),
@@ -49,7 +58,9 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
 
   return (
     <Swiper
-      modules={[Autoplay, EffectFade, Navigation, SwiperPagination]}
+      modules={[A11y, Autoplay, EffectFade, Keyboard, Navigation, SwiperPagination]}
+      keyboard={{ enabled: true }}
+      a11y={{ enabled: true, prevSlideMessage: 'Ảnh trước', nextSlideMessage: 'Ảnh tiếp theo' }}
       effect={effect === 'fade' ? 'fade' : 'slide'}
       fadeEffect={{ crossFade: true }}
       slidesPerView={1}
@@ -57,38 +68,42 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
       navigation={data.items.length > 1}
       pagination={data.items.length > 1 ? { clickable: true } : false}
       autoplay={
-        data.autoplay_enabled
+        data.autoplay_enabled && !reducedMotion
           ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true }
           : false
       }
       loop={data.items.length > 1}
       className={`${styles.root} ${className ?? ''}`}
     >
-      {data.items.map((item) => {
+      {data.items.map((item, index) => {
         const slideContent = (
           <div
             className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : styles.aspectHero}`}
           >
+            <picture>
+            {item.mobile_image_url && <source media="(max-width: 640px)" srcSet={assetUrl(item.mobile_image_url)!} />}
             <Image
               src={assetUrl(item.image_url)!}
-              alt={item.title ?? 'MobiFone Sơn La'}
+              alt={item.alt_text || item.title || 'MobiFone Sơn La'}
               fill
               sizes="100vw"
-              quality={100}
-              priority
-              className={effect === 'zoom' ? styles.imageZoom : styles.image}
+              quality={82}
+              priority={index === 0}
+              className={zoneCode === 'partners' ? styles.partnerImage : effect === 'zoom' ? styles.imageZoom : styles.image}
             />
+            </picture>
             {(item.title || item.caption) && (
               <div className={styles.caption}>
                 {item.title && <p className={styles.captionTitle}>{item.title}</p>}
                 {item.caption && <p className={styles.captionText}>{item.caption}</p>}
               </div>
             )}
+            {zoneCode === 'testimonials' && (item.person_name || item.rating) && <div className={styles.testimonialMeta}><span aria-label={`${item.rating || 5} trên 5 sao`}>{'★'.repeat(item.rating || 5)}</span><strong>{item.person_name}</strong><small>{item.job_title}</small></div>}
           </div>
         );
         return (
           <SwiperSlide key={item.id}>
-            {item.link_url ? <Link href={item.link_url}>{slideContent}</Link> : slideContent}
+            {item.link_url ? <Link href={item.link_url} target={item.open_new_tab ? '_blank' : undefined} rel={item.open_new_tab ? 'noopener noreferrer' : undefined}>{slideContent}</Link> : slideContent}
           </SwiperSlide>
         );
       })}

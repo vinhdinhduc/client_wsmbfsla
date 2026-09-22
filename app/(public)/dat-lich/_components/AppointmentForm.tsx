@@ -76,6 +76,7 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
         error={state.fieldErrors?.customer_name}
       />
       <TextField name="phone" label="Số điện thoại" required error={state.fieldErrors?.phone} />
+      <TextField name="email" type="email" label="Email nhận xác nhận (không bắt buộc)" error={state.fieldErrors?.email} />
       <TextareaField
         name="note"
         label="Nội dung cần hỗ trợ"
