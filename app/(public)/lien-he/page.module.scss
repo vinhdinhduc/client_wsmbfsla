@@ -121,3 +121,63 @@
     grid-template-columns: 1fr;
   }
 }
+.page {
+  padding-bottom: 9rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  :global(body):has(.page) :global([data-contact-summary]) {
+    display: none;
+  }
+  :global(body):has(.page) :global([data-contact-buttons]) {
+    flex-direction: row;
+  }
+  :global(body):has(.page) :global([data-contact-actions]) {
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  :global(body):has(.page) :global([data-contact-widget]) {
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .page input,
+  .page select,
+  .page textarea,
+  .page button {
+    scroll-margin-block: 6rem;
+  }
+}
+.contactLayout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.infoPanel {
+  order: 2;
+  min-width: 0;
+}
+.card {
+  order: 1;
+  padding: 1rem;
+}
+.infoList span {
+  min-width: 0;
+}
+.infoList a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+:global([data-theme='dark']) .infoPanel {
+  background: linear-gradient(145deg, #063461, #07528c);
+}
+@media (min-width: 1024px) {
+  .contactLayout {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+  .infoPanel {
+    order: 0;
+    position: sticky;
+    top: 6.5rem;
+  }
+  .card {
+    padding: 2rem;
+  }
+}

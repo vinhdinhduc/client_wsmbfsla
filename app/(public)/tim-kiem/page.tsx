@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { searchApi } from '@/lib/api/search';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { SimCard, PackageCard, NewsCard } from '@/components/ui/Card';
+import Link from 'next/link';
 import styles from './page.module.scss';
 
 /**
@@ -24,7 +25,12 @@ function SearchResults() {
   });
 
   const hasResults =
-    data && (data.sims.length > 0 || data.packages.length > 0 || data.news.length > 0);
+    data &&
+    (data.sims.length > 0 ||
+      data.packages.length > 0 ||
+      data.news.length > 0 ||
+      data.solutions.length > 0 ||
+      data.stores.length > 0);
 
   return (
     <div className={styles.page}>
@@ -63,6 +69,35 @@ function SearchResults() {
               <div className={styles.gridThree}>
                 {data!.news.map((news) => (
                   <NewsCard key={news.id} news={news} />
+                ))}
+              </div>
+            </section>
+          )}
+          {data!.solutions.length > 0 && (
+            <section>
+              <h2 className={styles.sectionTitle}>Giải pháp số</h2>
+              <div className={styles.gridThree}>
+                {data!.solutions.map((solution) => (
+                  <article key={solution.id}>
+                    <h3>
+                      <Link href={`/giai-phap-so/${solution.slug}`}>{solution.name}</Link>
+                    </h3>
+                    <p>{solution.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+          {data!.stores.length > 0 && (
+            <section>
+              <h2 className={styles.sectionTitle}>Cửa hàng</h2>
+              <div className={styles.gridThree}>
+                {data!.stores.map((store) => (
+                  <article key={store.id}>
+                    <h3>{store.name}</h3>
+                    <p>{store.address}</p>
+                    <Link href="/cua-hang">Xem trên bản đồ</Link>
+                  </article>
                 ))}
               </div>
             </section>

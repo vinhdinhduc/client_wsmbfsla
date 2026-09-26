@@ -1,0 +1,28 @@
+.icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.75rem;
+  flex-shrink: 0;
+  border-radius: 0.875rem;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--bg-card));
+  svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    stroke-width: 1.6;
+  }
+}
+.sim {
+  border-radius: 0.875rem 1.5rem 0.875rem 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+.goi_cuoc {
+  color: #087d72;
+  background: color-mix(in srgb, #087d72 10%, var(--bg-card));
+}
+.giai_phap,
+.solution_plan {
+  color: #8054ce;
+  background: color-mix(in srgb, #8054ce 10%, var(--bg-card));
+}

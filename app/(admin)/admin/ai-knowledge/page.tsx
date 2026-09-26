@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { aiApi, AiKnowledgeEntry } from '@/lib/api/ai';
 import { Button } from '@/components/ui/Button';
+import { FilterBar } from '@/components/ui/FilterBar';
 import { useToast } from '@/components/ui/Toast';
 import styles from './page.module.scss';
 
@@ -18,10 +19,13 @@ export default function AiKnowledgePage() {
   const { showToast } = useToast();
   const [editing, setEditing] = useState<AiKnowledgeEntry | null>(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
   const { data = [] } = useQuery({
-    queryKey: ['ai-knowledge'],
-    queryFn: () => aiApi.listKnowledge(),
+    queryKey: ['ai-knowledge', search],
+    queryFn: () => aiApi.listKnowledge(search.trim() || undefined),
   });
+  const filtered = data.filter((item) => !status || item.status === status);
   const save = useMutation({
     mutationFn: () =>
       editing ? aiApi.updateKnowledge(editing.id, form) : aiApi.createKnowledge(form),
@@ -52,6 +56,34 @@ export default function AiKnowledgePage() {
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Dữ liệu tri thức AI</h1>
+      <FilterBar
+        label="Lọc dữ liệu tri thức"
+        onReset={
+          search || status
+            ? () => {
+                setSearch('');
+                setStatus('');
+              }
+            : undefined
+        }
+      >
+        <input
+          type="search"
+          aria-label="Tìm tri thức"
+          placeholder="Tìm tiêu đề, nội dung hoặc thẻ"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+        <select
+          aria-label="Trạng thái tri thức"
+          value={status}
+          onChange={(event) => setStatus(event.target.value)}
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="active">Đang dùng</option>
+          <option value="inactive">Tạm tắt</option>
+        </select>
+      </FilterBar>
       <div className={styles.layout}>
         <form
           className={styles.panel}
@@ -63,23 +95,27 @@ export default function AiKnowledgePage() {
           <h2>{editing ? 'Sửa tri thức' : 'Thêm tri thức'}</h2>
           <input
             required
+            aria-label="Tiêu đề tri thức"
             placeholder="Tiêu đề"
             value={form.title}
             onChange={(event) => setForm({ ...form, title: event.target.value })}
           />
           <textarea
             required
+            aria-label="Nội dung tri thức"
             rows={12}
             placeholder="Nội dung trả lời đáng tin cậy..."
             value={form.content}
             onChange={(event) => setForm({ ...form, content: event.target.value })}
           />
           <input
+            aria-label="Thẻ tri thức"
             placeholder="Tags, phân cách bằng dấu phẩy"
             value={form.tags ?? ''}
             onChange={(event) => setForm({ ...form, tags: event.target.value })}
           />
           <select
+            aria-label="Trạng thái của tri thức"
             value={form.status}
             onChange={(event) =>
               setForm({ ...form, status: event.target.value as 'active' | 'inactive' })
@@ -105,8 +141,9 @@ export default function AiKnowledgePage() {
           </div>
         </form>
         <section className={styles.panel}>
-          <h2>Danh sách ({data.length})</h2>
-          {data.map((item) => (
+          <h2>Danh sách ({filtered.length})</h2>
+          {!filtered.length && <p>Chưa có tri thức phù hợp với bộ lọc.</p>}
+          {filtered.map((item) => (
             <article className={styles.item} key={item.id}>
               <div>
                 <strong>{item.title}</strong>

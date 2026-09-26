@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import styles from '@/app/(admin)/admin/admin-shared.module.scss';
-import { env } from '@/lib/env';
+import { assetUrl } from '@/lib/assets';
 
 interface ImageUploadFieldProps {
   id: string;
@@ -59,8 +59,5 @@ export function ImageUploadField({ id, label, value, onChange }: ImageUploadFiel
 }
 
 function resolveImageUrl(imageUrl?: string | null) {
-  if (!imageUrl) return null;
-  if (/^(https?:|blob:|data:)/i.test(imageUrl)) return imageUrl;
-  const apiBaseUrl = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '').replace(/\/api$/i, '');
-  return `${apiBaseUrl}/${imageUrl.replace(/^\/+/, '')}`;
+  return assetUrl(imageUrl);
 }

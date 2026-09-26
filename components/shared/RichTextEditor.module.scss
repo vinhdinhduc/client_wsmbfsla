@@ -1,6 +1,7 @@
 @use '../../styles/variables' as *;
 
 .wrapper {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
@@ -12,11 +13,15 @@
   color: var(--color-neutral-900);
 }
 .editor {
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-card);
   color: var(--color-neutral-900);
-  &:focus-within { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  &:focus-within {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 .editorError {
   border-color: var(--color-danger);
@@ -32,6 +37,7 @@
   gap: 0.125rem;
   padding: 0.375rem;
   border-bottom: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 .toolbarButton {
   display: flex;
@@ -47,6 +53,10 @@
   &:hover {
     background: var(--color-neutral-100);
   }
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
 }
 .toolbarActive {
   background: var(--color-primary);
@@ -57,14 +67,68 @@
   height: 1rem;
 }
 .editorContent {
+  max-height: 40rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
   min-height: 20rem;
   padding: 1rem;
   outline: none;
   line-height: 1.65;
-  :global(table) { width: 100%; border-collapse: collapse; }
-  :global(td), :global(th) { border: 1px solid var(--border); padding: .5rem; }
+  > * + * {
+    margin-top: 0.75rem;
+  }
+  :global(h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  :global(h3) {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  :global(h4) {
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+  :global(ul) {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+  :global(ol) {
+    list-style: decimal;
+    padding-left: 1.5rem;
+  }
+  :global(blockquote) {
+    margin-left: 0;
+    padding-left: 1rem;
+    border-left: 3px solid var(--color-primary);
+    color: var(--text-secondary);
+  }
+  :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+  :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  :global(td),
+  :global(th) {
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+  }
 }
-.counter { padding: .4rem .75rem; border-top: 1px solid var(--border); text-align: right; color: var(--color-neutral-500); font-size: .75rem; }
+.counter {
+  padding: 0.4rem 0.75rem;
+  border-top: 1px solid var(--border);
+  text-align: right;
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+}
 .error {
   margin: 0;
   font-size: 0.875rem;

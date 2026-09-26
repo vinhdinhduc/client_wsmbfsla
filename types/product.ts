@@ -123,7 +123,7 @@ export interface SolutionGallery {
 }
 
 export type NewsCategory = 'khuyen_mai' | 'su_kien' | 'thong_bao';
-export type NewsStatus = 'draft' | 'published';
+export type NewsStatus = 'draft' | 'scheduled' | 'published' | 'archived';
 
 export interface News {
   id: number;
@@ -131,6 +131,8 @@ export interface News {
   slug: string;
   category: NewsCategory;
   thumbnail: string | null;
+  cover_url?: string | null;
+  cover_alt?: string | null;
   summary: string | null;
   content: string;
   status: NewsStatus;
@@ -138,6 +140,17 @@ export interface News {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  is_featured?: boolean;
+  is_pinned?: boolean;
+  view_count?: number;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  og_image_url?: string | null;
+  canonical_url?: string | null;
+  preview_token?: string | null;
+  tags?: string[];
+  author_name?: string | null;
+  related?: News[];
 }
 
 export interface Store {

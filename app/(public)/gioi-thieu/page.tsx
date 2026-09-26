@@ -39,22 +39,37 @@ export default async function AboutPage() {
   const settings = await settingsApi
     .listPublic({ next: { revalidate: 300 } })
     .catch(() => ({}) as import('@/lib/api/settings').PublicSettings);
+  let blocks: Array<{ type: string; enabled: boolean; title: string; content: string }> = [];
+  try {
+    blocks = JSON.parse(settings.about_blocks || '[]');
+  } catch {
+    blocks = [];
+  }
+  const hero = blocks.find((block) => block.enabled && block.type === 'hero');
 
   return (
     <div className={styles.page}>
       <Breadcrumb items={[{ label: 'Giới thiệu' }]} />
       <div className={styles.hero}>
         <p className={styles.eyebrow}>MobiFone Sơn La</p>
-        <h1 className={styles.title}>Kết nối gần hơn, phục vụ tốt hơn</h1>
+        <h1 className={styles.title}>{hero?.title ?? 'Kết nối gần hơn, phục vụ tốt hơn'}</h1>
         <p className={styles.intro}>
-          MobiFone Chi nhánh Sơn La là đơn vị trực thuộc Tổng công ty Viễn thông MobiFone, chịu
-          trách nhiệm cung cấp dịch vụ viễn thông - công nghệ số cho khách hàng cá nhân, doanh
-          nghiệp và các cơ quan nhà nước trên địa bàn tỉnh Sơn La. Với phương châm lấy khách hàng
-          làm trung tâm, chúng tôi không ngừng đầu tư hạ tầng mạng lưới, nâng cao chất lượng dịch vụ
-          và mở rộng mạng lưới điểm giao dịch để phục vụ tốt nhất nhu cầu của người dân và doanh
-          nghiệp địa phương.
+          {hero?.content ??
+            'MobiFone Chi nhánh Sơn La cung cấp dịch vụ viễn thông và công nghệ số trên địa bàn tỉnh.'}
         </p>
       </div>
+
+      {blocks
+        .filter((block) => block.enabled && block.type !== 'hero')
+        .map((block) => (
+          <section key={`${block.type}-${block.title}`} className={styles.contactBox}>
+            <div>
+              <p className={styles.eyebrow}>{block.type}</p>
+              <h2 className={styles.contactTitle}>{block.title}</h2>
+            </div>
+            <p className={styles.contactText}>{block.content}</p>
+          </section>
+        ))}
 
       <div className={styles.highlights}>
         {HIGHLIGHTS.map((h) => (
@@ -73,7 +88,9 @@ export default async function AboutPage() {
         </div>
         <p className={styles.contactText}>
           Địa chỉ:{' '}
-          {settings.contact_address ?? settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
+          {settings.contact_address ??
+            settings.footer_address ??
+            'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
         </p>
         <p className={styles.contactText}>Hotline: {settings.hotline ?? '18001090'}</p>
       </div>

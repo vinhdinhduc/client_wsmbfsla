@@ -7,6 +7,7 @@ import { newsApi } from '@/lib/api/news';
 import { NewsCard, SolutionCard } from '@/components/ui/Card';
 import { SliderZone } from '@/components/shared/SliderZone';
 import { HomeCatalogSections } from '@/components/home/HomeCatalogSections';
+import { utilitiesApi } from '@/lib/api/utilities';
 
 export const revalidate = 60;
 export const dynamic = 'force-dynamic';
@@ -25,11 +26,12 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 }
 
 export default async function HomePage() {
-  const [packages, hotSims, solutions, newsResult] = await Promise.all([
+  const [packages, hotSims, solutions, newsResult, utilities] = await Promise.all([
     packagesApi.listPublic(undefined, { next: { revalidate: 60 } }),
     simsApi.listPublic({}, { cache: 'no-store' }),
     solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }),
     newsApi.listPublic({ page_size: 3 }, { next: { revalidate: 60 } }),
+    utilitiesApi.list(4).catch(() => []),
   ]);
 
   return (
@@ -57,6 +59,8 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {utilities.length > 0 && <section className={styles.section}><SectionHeader title="Tiện ích" href="/tien-ich"/><div className={styles.grid3}>{utilities.map((item)=><article key={item.id}><h3>{item.name}</h3><p>{item.summary}</p><Link href={`/tien-ich/${item.slug}`}>Chi tiết <ArrowRight className={styles.viewAllIcon}/></Link></article>)}</div></section>}
 
       <section className={styles.section}>
         <h2 className={styles.centerTitle}>Đối tác & Thương hiệu</h2>

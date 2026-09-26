@@ -7,6 +7,10 @@ export interface ContactFormValues {
   phone: string;
   email: string;
   message: string;
+  topic: 'package' | 'sim' | 'solution' | 'support' | 'other';
+  store_id?: number;
+  consent: true;
+  website?: string;
   recaptcha_token: string;
 }
 

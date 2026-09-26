@@ -3,6 +3,8 @@ import { env } from '@/lib/env';
 import { packagesApi } from '@/lib/api/packages';
 import { solutionsApi } from '@/lib/api/solutions';
 import { newsApi } from '@/lib/api/news';
+import { jobsApi } from '@/lib/api/jobs';
+import { utilitiesApi } from '@/lib/api/utilities';
 
 const STATIC_ROUTES = [
   '',
@@ -14,6 +16,7 @@ const STATIC_ROUTES = [
   '/gioi-thieu',
   '/tuyen-dung',
   '/lien-he',
+  '/tien-ich',
   '/chinh-sach-bao-mat',
   '/dieu-khoan-su-dung',
 ];
@@ -28,10 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Goi API lay slug dang active/published - neu backend tam thoi khong san sang
   // luc build thi van tra ve sitemap voi cac route tinh, khong lam sap ca build.
-  const [packages, solutions, news] = await Promise.allSettled([
+  const [packages, solutions, news, jobs, utilities] = await Promise.allSettled([
     packagesApi.listPublic(undefined, { cache: 'no-store' }),
     solutionsApi.listPublic(undefined, { cache: 'no-store' }),
     newsApi.listPublic({ page_size: 200 }, { cache: 'no-store' }),
+    jobsApi.listPublic({ include_expired: false }),
+    utilitiesApi.list(),
   ]);
 
   const dynamicEntries: MetadataRoute.Sitemap = [];
@@ -47,6 +52,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       dynamicEntries.push({ url: `${base}/tin-tuc/${n.slug}`, changeFrequency: 'daily', priority: 0.6 }),
     );
   }
+  if (jobs.status === 'fulfilled') jobs.value.forEach((item) => dynamicEntries.push({ url: `${base}/tuyen-dung/${item.slug}`, changeFrequency: 'weekly', priority: 0.7 }));
+  if (utilities.status === 'fulfilled') utilities.value.forEach((item) => dynamicEntries.push({ url: `${base}/tien-ich/${item.slug}`, changeFrequency: 'monthly', priority: 0.6 }));
 
   return [...staticEntries, ...dynamicEntries];
 }

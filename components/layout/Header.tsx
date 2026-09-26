@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ShoppingCart, Phone, Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
+import { ShoppingCart, Phone, Menu, X, ChevronDown, Moon, Sun, Search, LogIn } from 'lucide-react';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
 import { useCart } from '@/hooks/useCart';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useQuery } from '@tanstack/react-query';
 import { settingsApi } from '@/lib/api/settings';
+import { TextField } from '@/components/ui/FormField';
+import { Button } from '@/components/ui/Button';
 import styles from './Header.module.scss';
 
 const NAV_LINKS: Array<
@@ -26,6 +29,7 @@ const NAV_LINKS: Array<
   { href: '/giai-phap-so', label: 'Giải pháp số' },
   { href: '/cua-hang', label: 'Cửa hàng' },
   { href: '/tin-tuc', label: 'Tin tức' },
+  { href: '/tien-ich', label: 'Tiện ích' },
   {
     href: '/gioi-thieu',
     label: 'Giới thiệu',
@@ -37,7 +41,11 @@ const NAV_LINKS: Array<
 ];
 
 export function Header() {
+  const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const { count, openDrawer } = useCart();
   const { data: dutyStaff } = useCurrentDutyStaff();
   const { theme, toggleTheme } = useTheme();
@@ -47,6 +55,29 @@ export function Header() {
     staleTime: 300_000,
   });
   const prefersReducedMotion = useReducedMotion();
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+      if (event.key === 'Escape') {
+        setSearchOpen(false);
+        setIsMobileNavOpen(false);
+        setAboutOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  const submitSearch = (event: FormEvent) => {
+    event.preventDefault();
+    const value = search.trim();
+    if (value) {
+      setSearchOpen(false);
+      router.push(`/tim-kiem?q=${encodeURIComponent(value)}`);
+    }
+  };
 
   return (
     <header className={styles.header}>
@@ -67,16 +98,33 @@ export function Header() {
           {NAV_LINKS.map((link) =>
             'children' in link ? (
               <div key={link.href} className={styles.header__navDropdown}>
-                <Link href={link.href} className={styles.header__navLink}>
+                <button
+                  type="button"
+                  aria-expanded={aboutOpen}
+                  aria-controls="public-about-menu"
+                  onClick={() => setAboutOpen((open) => !open)}
+                  className={styles.header__navLink}
+                >
                   {link.label}
                   <ChevronDown className={styles.header__navChevron} aria-hidden="true" />
-                </Link>
-                <div className={styles.header__dropdownMenu}>
+                </button>
+                <div
+                  id="public-about-menu"
+                  className={`${styles.header__dropdownMenu} ${aboutOpen ? styles.header__dropdownOpen : ''}`}
+                >
+                  <Link
+                    href={link.href}
+                    className={styles.header__dropdownLink}
+                    onClick={() => setAboutOpen(false)}
+                  >
+                    Giới thiệu MobiFone Sơn La
+                  </Link>
                   {link.children.map((child) => (
                     <Link
                       key={child.href + child.label}
                       href={child.href}
                       className={styles.header__dropdownLink}
+                      onClick={() => setAboutOpen(false)}
                     >
                       {child.label}
                     </Link>
@@ -92,13 +140,28 @@ export function Header() {
         </nav>
 
         <div className={styles.header__tools}>
+          <Link href="/admin/login" className={styles.header__adminLogin}>
+            <LogIn className={styles.header__adminLoginIcon} aria-hidden="true" />
+            Đăng nhập
+          </Link>
+          <button
+            type="button"
+            className={styles.header__iconButton}
+            aria-label="Tìm kiếm (Ctrl K)"
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className={styles.header__icon} />
+          </button>
           <a
             href={`tel:${settings?.hotline ?? dutyStaff?.phone ?? ''}`}
             className={styles.header__contact}
             title={dutyStaff?.name}
+            aria-label="Gọi hotline MobiFone"
           >
             <Phone className={styles.header__contactIcon} />
-            {settings?.hotline ?? dutyStaff?.phone ?? '18001090'}
+            <span className={styles.header__contactLabel}>
+              {settings?.hotline ?? dutyStaff?.phone ?? '18001090'}
+            </span>
           </a>
 
           <button
@@ -124,6 +187,8 @@ export function Header() {
             type="button"
             onClick={() => setIsMobileNavOpen((o) => !o)}
             aria-label={isMobileNavOpen ? 'Đóng menu' : 'Mở menu'}
+            aria-expanded={isMobileNavOpen}
+            aria-controls="public-mobile-menu"
             className={`${styles.header__iconButton} ${styles['header__iconButton--menu']}`}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -148,6 +213,7 @@ export function Header() {
       <AnimatePresence>
         {isMobileNavOpen && (
           <motion.nav
+            id="public-mobile-menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -183,10 +249,45 @@ export function Header() {
                   )}
                 </div>
               ))}
+              <Link
+                href="/admin/login"
+                onClick={() => setIsMobileNavOpen(false)}
+                className={styles.header__mobileAdminLogin}
+              >
+                <LogIn className={styles.header__adminLoginIcon} aria-hidden="true" />
+                Đăng nhập
+              </Link>
             </div>
           </motion.nav>
         )}
       </AnimatePresence>
+      {searchOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Tìm kiếm toàn site"
+          className={styles.searchOverlay}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSearchOpen(false);
+          }}
+        >
+          <form onSubmit={submitSearch} className={styles.searchPanel}>
+            <TextField
+              label="Tìm kiếm"
+              id="global-search"
+              autoFocus
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Sim, gói cước, tin tức, cửa hàng…"
+            />
+            <Button type="submit">Tìm</Button>
+            <Button type="button" variant="ghost" onClick={() => setSearchOpen(false)}>
+              Đóng
+            </Button>
+            <small>Nhấn Esc để đóng · Ctrl/⌘ K để mở</small>
+          </form>
+        </div>
+      )}
     </header>
   );
 }

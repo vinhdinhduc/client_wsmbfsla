@@ -12,6 +12,8 @@ export interface StoreAppointment {
   status: AppointmentStatus;
   assigned_to: number | null;
   created_at: string;
+  code?: string | null;
+  manage_token?: string | null;
   store?: { id: number; name: string; address: string; district: string };
   assignee?: { id: number; full_name: string; phone: string };
 }

@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Copy } from 'lucide-react';
+import Link from 'next/link';
 import { newsApi, NewsFormValues } from '@/lib/api/news';
 import { News } from '@/types/product';
 import { Table, TableColumn } from '@/components/ui/Table';
@@ -17,6 +18,8 @@ import { RichTextEditor } from '@/components/shared/RichTextEditor';
 import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/format';
+import { ContentImage } from '@/components/shared/ContentImage';
+import { FilterBar } from '@/components/ui/FilterBar';
 import styles from '../admin-shared.module.scss';
 
 const CATEGORY_OPTIONS = [
@@ -26,11 +29,15 @@ const CATEGORY_OPTIONS = [
 ];
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Bản nháp' },
+  { value: 'scheduled', label: 'Lên lịch' },
   { value: 'published', label: 'Đã đăng' },
+  { value: 'archived', label: 'Lưu trữ' },
 ];
-const STATUS_TONE: Record<string, 'success' | 'warning'> = {
+const STATUS_TONE: Record<string, 'success' | 'warning' | 'primary'> = {
   published: 'success',
   draft: 'warning',
+  scheduled: 'primary',
+  archived: 'warning',
 };
 
 const newsSchema = z.object({
@@ -40,7 +47,7 @@ const newsSchema = z.object({
   thumbnail: z.string().max(255).optional().or(z.literal('')),
   summary: z.string().optional().or(z.literal('')),
   content: z.string().min(1, 'Vui lòng nhập nội dung'),
-  status: z.enum(['draft', 'published']),
+  status: z.enum(['draft', 'scheduled', 'published', 'archived']),
 });
 
 type NewsSchemaValues = z.infer<typeof newsSchema>;
@@ -65,10 +72,17 @@ export default function AdminNewsPage() {
   );
   const [deleteTarget, setDeleteTarget] = useState<News | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [search, setSearch] = useState('');
+  const [listStatus, setListStatus] = useState('');
 
   const { data: news, isLoading } = useQuery({
-    queryKey: ['admin-news'],
-    queryFn: () => newsApi.listAdmin(),
+    queryKey: ['admin-news', search, listStatus],
+    queryFn: () =>
+      newsApi.listAdmin({
+        search: search || undefined,
+        status: listStatus || undefined,
+        page_size: 100,
+      }),
   });
 
   const {
@@ -143,7 +157,26 @@ export default function AdminNewsPage() {
   }
 
   const columns: TableColumn<News>[] = [
-    { key: 'title', header: 'Tiêu đề', render: (n) => n.title, sortAccessor: (n) => n.title },
+    {
+      key: 'thumbnail',
+      header: 'Ảnh',
+      render: (n) => (
+        <ContentImage
+          src={n.cover_url || n.thumbnail}
+          alt={n.cover_alt || n.title}
+          width={72}
+          height={48}
+          style={{ objectFit: 'cover', borderRadius: 8 }}
+        />
+      ),
+    },
+    {
+      key: 'title',
+      header: 'Tiêu đề',
+      render: (n) => n.title,
+      sortAccessor: (n) => n.title,
+      className: styles.newsTitle,
+    },
     {
       key: 'category',
       header: 'Danh mục',
@@ -164,19 +197,16 @@ export default function AdminNewsPage() {
       render: (n) => formatDate(n.published_at),
       sortAccessor: (n) => n.published_at ?? '',
     },
+    { key: 'view_count', header: 'Lượt xem', render: (n) => n.view_count || 0 },
+    { key: 'is_featured', header: 'Nổi bật', render: (n) => (n.is_featured ? '⭐' : '—') },
     {
       key: 'actions',
       header: '',
       render: (n) => (
         <div className={styles.iconActions}>
-          <button
-            type="button"
-            onClick={() => openEdit(n)}
-            aria-label="Sửa"
-            className={styles.iconButton}
-          >
+          <Link href={`/admin/news/${n.id}/edit`} aria-label="Sửa" className={styles.iconButton}>
             <Pencil className={styles.icon} />
-          </button>
+          </Link>
           <button
             type="button"
             onClick={() => setDeleteTarget(n)}
@@ -184,6 +214,18 @@ export default function AdminNewsPage() {
             className={styles.iconButton}
           >
             <Trash2 className={styles.icon} />
+          </button>
+          <button
+            type="button"
+            aria-label="Nhân bản"
+            className={styles.iconButton}
+            onClick={() =>
+              newsApi
+                .duplicate(n.id)
+                .then(() => queryClient.invalidateQueries({ queryKey: ['admin-news'] }))
+            }
+          >
+            <Copy className={styles.icon} />
           </button>
         </div>
       ),
@@ -195,12 +237,49 @@ export default function AdminNewsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Quản lý Tin tức</h1>
-        <Button onClick={openCreate}>
+        <Link href="/admin/news/new" className={styles.primaryLink}>
           <Plus className={styles.icon} /> Thêm tin tức
-        </Button>
+        </Link>
       </div>
 
-      <Table columns={columns} data={news ?? []} rowKey={(n) => n.id} isLoading={isLoading} />
+      <FilterBar
+        label="Lọc tin tức"
+        onReset={
+          search || listStatus
+            ? () => {
+                setSearch('');
+                setListStatus('');
+              }
+            : undefined
+        }
+      >
+        <input
+          type="search"
+          aria-label="Tìm tin"
+          placeholder="Tìm tiêu đề hoặc slug"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+        <select
+          aria-label="Lọc trạng thái"
+          value={listStatus}
+          onChange={(event) => setListStatus(event.target.value)}
+        >
+          <option value="">Tất cả trạng thái</option>
+          {STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </FilterBar>
+
+      <Table
+        columns={columns}
+        data={news?.items ?? []}
+        rowKey={(n) => n.id}
+        isLoading={isLoading}
+      />
 
       <Modal
         isOpen={modalState !== null}

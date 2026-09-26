@@ -1,4 +1,5 @@
 'use client';
+import { FilterBar } from '@/components/ui/FilterBar';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -32,8 +33,17 @@ const STATUS_OPTIONS = [
   { value: 'inactive', label: 'Ngừng bán' },
   { value: 'hidden', label: 'Ẩn' },
 ];
-const SERVICE_OPTIONS = [{ value: 'mobile', label: 'Di động' }, { value: 'data', label: 'Data' }, { value: 'wifi_5g', label: 'Wifi 5G' }, { value: 'combo', label: 'Combo' }];
-const SUBSCRIPTION_OPTIONS = [{ value: 'none', label: 'Không áp dụng' }, { value: 'prepaid', label: 'Trả trước' }, { value: 'postpaid', label: 'Trả sau' }];
+const SERVICE_OPTIONS = [
+  { value: 'mobile', label: 'Di động' },
+  { value: 'data', label: 'Data' },
+  { value: 'wifi_5g', label: 'Wifi 5G' },
+  { value: 'combo', label: 'Combo' },
+];
+const SUBSCRIPTION_OPTIONS = [
+  { value: 'none', label: 'Không áp dụng' },
+  { value: 'prepaid', label: 'Trả trước' },
+  { value: 'postpaid', label: 'Trả sau' },
+];
 
 const packageSchema = z.object({
   code: z.string().min(1, 'Vui lòng nhập mã gói').max(20),
@@ -110,8 +120,18 @@ export default function AdminPackagesPage() {
       speed_desc: '',
       description: '',
       status: 'active',
-      service_type: 'mobile', subscription_type: 'none', sms_syntax: '', image_url: '', conditions: '', audience: '', effective_from: '', effective_to: '',
-      data_per_day_gb: 0, data_per_cycle_gb: 0, unlimited_data: false, badges: [],
+      service_type: 'mobile',
+      subscription_type: 'none',
+      sms_syntax: '',
+      image_url: '',
+      conditions: '',
+      audience: '',
+      effective_from: '',
+      effective_to: '',
+      data_per_day_gb: 0,
+      data_per_cycle_gb: 0,
+      unlimited_data: false,
+      badges: [],
       display_order: 0,
     });
     setModalState({ mode: 'create' });
@@ -135,8 +155,18 @@ export default function AdminPackagesPage() {
       speed_desc: item.speed_desc ?? '',
       description: item.description ?? '',
       status: item.status,
-      service_type: item.service_type || 'mobile', subscription_type: item.subscription_type || 'none', sms_syntax: item.sms_syntax || '', image_url: item.image_url || '', conditions: item.conditions || '', audience: item.audience || '', effective_from: item.effective_from?.slice(0, 10) || '', effective_to: item.effective_to?.slice(0, 10) || '',
-      data_per_day_gb: item.data_per_day_gb || 0, data_per_cycle_gb: item.data_per_cycle_gb || 0, unlimited_data: item.unlimited_data || false, badges: item.badges || [],
+      service_type: item.service_type || 'mobile',
+      subscription_type: item.subscription_type || 'none',
+      sms_syntax: item.sms_syntax || '',
+      image_url: item.image_url || '',
+      conditions: item.conditions || '',
+      audience: item.audience || '',
+      effective_from: item.effective_from?.slice(0, 10) || '',
+      effective_to: item.effective_to?.slice(0, 10) || '',
+      data_per_day_gb: item.data_per_day_gb || 0,
+      data_per_cycle_gb: item.data_per_cycle_gb || 0,
+      unlimited_data: item.unlimited_data || false,
+      badges: item.badges || [],
       display_order: item.display_order,
     });
     setModalState({ mode: 'edit', item });
@@ -165,8 +195,18 @@ export default function AdminPackagesPage() {
     onError: (err: Error) => showToast(err.message, 'error'),
   });
   const duplicateMutation = useMutation({
-    mutationFn: (item: Package) => packagesApi.create({ ...item, code: `${item.code.slice(0, 13)}-COPY`, slug: `${item.slug}-copy-${Date.now()}`, name: `${item.name} (bản sao)`, status: 'inactive' }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-packages'] }); showToast('Đã nhân bản gói cước'); },
+    mutationFn: (item: Package) =>
+      packagesApi.create({
+        ...item,
+        code: `${item.code.slice(0, 13)}-COPY`,
+        slug: `${item.slug}-copy-${Date.now()}`,
+        name: `${item.name} (bản sao)`,
+        status: 'inactive',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-packages'] });
+      showToast('Đã nhân bản gói cước');
+    },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
   const reorderMutation = useMutation({
@@ -178,7 +218,9 @@ export default function AdminPackagesPage() {
       if (from < 0 || to < 0 || from === to) return;
       const [moving] = ordered.splice(from, 1);
       ordered.splice(to, 0, moving);
-      await Promise.all(ordered.map((item, index) => packagesApi.update(item.id, { display_order: index })));
+      await Promise.all(
+        ordered.map((item, index) => packagesApi.update(item.id, { display_order: index })),
+      );
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-packages'] }),
     onError: (err: Error) => showToast(err.message, 'error'),
@@ -193,9 +235,16 @@ export default function AdminPackagesPage() {
       sms_desc: values.sms_desc || null,
       speed_desc: values.speed_desc || null,
       description: values.description || null,
-      sms_syntax: values.sms_syntax || null, image_url: values.image_url || null, conditions: values.conditions || null, audience: values.audience || null,
-      effective_from: values.effective_from || null, effective_to: values.effective_to || null,
-      benefits: benefitsText.split('\n').map((line) => line.trim()).filter(Boolean),
+      sms_syntax: values.sms_syntax || null,
+      image_url: values.image_url || null,
+      conditions: values.conditions || null,
+      audience: values.audience || null,
+      effective_from: values.effective_from || null,
+      effective_to: values.effective_to || null,
+      benefits: benefitsText
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean),
       image: selectedImage || undefined,
     });
   }
@@ -229,7 +278,13 @@ export default function AdminPackagesPage() {
       render: (p) => (
         <div className={styles.iconActions}>
           <button
-            type="button" onClick={() => duplicateMutation.mutate(p)} aria-label="Nhân bản" className={styles.iconButton}><Copy className={styles.icon} /></button>
+            type="button"
+            onClick={() => duplicateMutation.mutate(p)}
+            aria-label="Nhân bản"
+            className={styles.iconButton}
+          >
+            <Copy className={styles.icon} />
+          </button>
           <button
             type="button"
             onClick={() => openEdit(p)}
@@ -260,9 +315,69 @@ export default function AdminPackagesPage() {
         </Button>
       </div>
 
-      <div className={styles.toolbar}><input aria-label="Tìm gói cước" placeholder="Tìm mã hoặc tên gói" value={search} onChange={(e) => setSearch(e.target.value)} /><select aria-label="Lọc trạng thái" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}><option value="all">Tất cả trạng thái</option>{STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
-      <Table columns={columns} data={(packages ?? []).filter((pkg) => `${pkg.code} ${pkg.name}`.toLowerCase().includes(search.toLowerCase()) && (statusFilter === 'all' || pkg.status === statusFilter))} rowKey={(p) => p.id} isLoading={isLoading} />
-      <div aria-label="Kéo thả sắp xếp gói cước" style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>{packages?.map((item) => <div key={item.id} draggable onDragStart={() => setDraggedPackageId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => { if (draggedPackageId !== null) reorderMutation.mutate({ source: draggedPackageId, target: item.id }); setDraggedPackageId(null); }} onDragEnd={() => setDraggedPackageId(null)} style={{ padding: '.4rem .6rem', border: '1px dashed var(--border)', cursor: 'grab' }}>⋮⋮ {item.code}</div>)}</div>
+      <FilterBar
+        label="Lọc gói cước"
+        onReset={
+          search || statusFilter !== 'all'
+            ? () => {
+                setSearch('');
+                setStatusFilter('all');
+              }
+            : undefined
+        }
+      >
+        <input
+          type="search"
+          aria-label="Tìm gói cước"
+          placeholder="Tìm mã hoặc tên gói"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          aria-label="Lọc trạng thái"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">Tất cả trạng thái</option>
+          {STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </FilterBar>
+      <Table
+        columns={columns}
+        data={(packages ?? []).filter(
+          (pkg) =>
+            `${pkg.code} ${pkg.name}`.toLowerCase().includes(search.toLowerCase()) &&
+            (statusFilter === 'all' || pkg.status === statusFilter),
+        )}
+        rowKey={(p) => p.id}
+        isLoading={isLoading}
+      />
+      <div
+        aria-label="Kéo thả sắp xếp gói cước"
+        style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}
+      >
+        {packages?.map((item) => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={() => setDraggedPackageId(item.id)}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={() => {
+              if (draggedPackageId !== null)
+                reorderMutation.mutate({ source: draggedPackageId, target: item.id });
+              setDraggedPackageId(null);
+            }}
+            onDragEnd={() => setDraggedPackageId(null)}
+            style={{ padding: '.4rem .6rem', border: '1px dashed var(--border)', cursor: 'grab' }}
+          >
+            ⋮⋮ {item.code}
+          </div>
+        ))}
+      </div>
 
       <Modal
         isOpen={modalState !== null}
@@ -290,17 +405,68 @@ export default function AdminPackagesPage() {
               {...register('status')}
             />
           </div>
-          <div className={styles.grid2}><SelectField label="Loại dịch vụ" options={SERVICE_OPTIONS} {...register('service_type')} /><SelectField label="Hình thức thuê bao" options={SUBSCRIPTION_OPTIONS} {...register('subscription_type')} /></div>
-          <div className={styles.grid2}><TextField type="number" step="0.01" label="GB mỗi ngày" {...register('data_per_day_gb')} /><TextField type="number" step="0.01" label="GB mỗi chu kỳ" {...register('data_per_cycle_gb')} /></div>
-          <label><input type="checkbox" {...register('unlimited_data')} /> Data không giới hạn</label>
-          <fieldset><legend>Nhãn</legend><label><input type="checkbox" value="hot" {...register('badges')} /> Hot</label><label><input type="checkbox" value="new" {...register('badges')} /> Mới</label><label><input type="checkbox" value="bestseller" {...register('badges')} /> Bán chạy</label></fieldset>
-          <TextareaField label="Ưu đãi kèm theo (mỗi dòng một mục)" value={benefitsText} onChange={(event) => setBenefitsText(event.target.value)} />
+          <div className={styles.grid2}>
+            <SelectField
+              label="Loại dịch vụ"
+              options={SERVICE_OPTIONS}
+              {...register('service_type')}
+            />
+            <SelectField
+              label="Hình thức thuê bao"
+              options={SUBSCRIPTION_OPTIONS}
+              {...register('subscription_type')}
+            />
+          </div>
+          <div className={styles.grid2}>
+            <TextField
+              type="number"
+              step="0.01"
+              label="GB mỗi ngày"
+              {...register('data_per_day_gb')}
+            />
+            <TextField
+              type="number"
+              step="0.01"
+              label="GB mỗi chu kỳ"
+              {...register('data_per_cycle_gb')}
+            />
+          </div>
+          <label>
+            <input type="checkbox" {...register('unlimited_data')} /> Data không giới hạn
+          </label>
+          <fieldset>
+            <legend>Nhãn</legend>
+            <label>
+              <input type="checkbox" value="hot" {...register('badges')} /> Hot
+            </label>
+            <label>
+              <input type="checkbox" value="new" {...register('badges')} /> Mới
+            </label>
+            <label>
+              <input type="checkbox" value="bestseller" {...register('badges')} /> Bán chạy
+            </label>
+          </fieldset>
+          <TextareaField
+            label="Ưu đãi kèm theo (mỗi dòng một mục)"
+            value={benefitsText}
+            onChange={(event) => setBenefitsText(event.target.value)}
+          />
           <TextField label="Cú pháp SMS" {...register('sms_syntax')} />
           <TextField label="URL ảnh" {...register('image_url')} />
-          <label>Hoặc tải ảnh lên <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setSelectedImage(event.target.files?.[0] || null)} /></label>
+          <label>
+            Hoặc tải ảnh lên{' '}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => setSelectedImage(event.target.files?.[0] || null)}
+            />
+          </label>
           <TextField label="Đối tượng" {...register('audience')} />
           <TextareaField label="Điều kiện" {...register('conditions')} />
-          <div className={styles.grid2}><TextField type="date" label="Hiệu lực từ" {...register('effective_from')} /><TextField type="date" label="Hiệu lực đến" {...register('effective_to')} /></div>
+          <div className={styles.grid2}>
+            <TextField type="date" label="Hiệu lực từ" {...register('effective_from')} />
+            <TextField type="date" label="Hiệu lực đến" {...register('effective_to')} />
+          </div>
           <TextField
             label="Mô tả ngắn (headline)"
             error={errors.headline_desc?.message}

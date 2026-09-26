@@ -76,3 +76,17 @@
     transform: rotate(360deg);
   }
 }
+.button {
+  min-height: 2.75rem;
+  height: auto;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.button svg {
+  flex-shrink: 0;
+}
+:global([data-theme='dark']) .primary {
+  color: #081b30;
+}

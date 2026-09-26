@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { appointmentsApi } from '@/lib/api/appointments';
+import { env } from '@/lib/env';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Store } from '@/types/product';
 import { submitAppointmentAction, AppointmentActionState } from '@/actions/appointment';
@@ -23,6 +26,13 @@ function SubmitButton() {
 export function AppointmentForm({ stores }: { stores: Store[] }) {
   const [state, formAction] = useFormState(submitAppointmentAction, INITIAL_STATE);
   const { showToast } = useToast();
+  const [storeId, setStoreId] = useState('');
+  const [date, setDate] = useState('');
+  const slots = useQuery({
+    queryKey: ['appointment-slots', storeId, date],
+    queryFn: () => appointmentsApi.slots(Number(storeId), date),
+    enabled: Boolean(storeId && date),
+  });
 
   useEffect(() => {
     if (state.status === 'error' && state.message && !state.fieldErrors)
@@ -34,6 +44,19 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
       <div className={styles.success}>
         <h2>Đã nhận lịch hẹn</h2>
         <p>{state.message}</p>
+        {state.appointment?.manage_token && (
+          <p>
+            <a
+              href={`${env.NEXT_PUBLIC_API_URL}/public/appointments/calendar.ics?token=${state.appointment.manage_token}`}
+            >
+              Thêm vào lịch (.ics)
+            </a>
+            {' · '}
+            <a href={`/dat-lich/quan-ly?token=${state.appointment.manage_token}`}>
+              Hủy hoặc đổi lịch
+            </a>
+          </p>
+        )}
       </div>
     );
   }
@@ -52,6 +75,8 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
           })),
         ]}
         error={state.fieldErrors?.store_id}
+        value={storeId}
+        onChange={(event) => setStoreId(event.target.value)}
       />
       <div className={styles.grid}>
         <TextField
@@ -60,12 +85,18 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
           label="Ngày đến"
           required
           error={state.fieldErrors?.appointment_date}
+          value={date}
+          min={new Date().toISOString().slice(0, 10)}
+          onChange={(event) => setDate(event.target.value)}
         />
-        <TextField
+        <SelectField
           name="appointment_time"
-          type="time"
           label="Giờ đến"
           required
+          options={[
+            { value: '', label: slots.isLoading ? 'Đang tải khung giờ…' : 'Chọn khung giờ' },
+            ...(slots.data || []).map((value) => ({ value, label: value })),
+          ]}
           error={state.fieldErrors?.appointment_time}
         />
       </div>
@@ -76,7 +107,12 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
         error={state.fieldErrors?.customer_name}
       />
       <TextField name="phone" label="Số điện thoại" required error={state.fieldErrors?.phone} />
-      <TextField name="email" type="email" label="Email nhận xác nhận (không bắt buộc)" error={state.fieldErrors?.email} />
+      <TextField
+        name="email"
+        type="email"
+        label="Email nhận xác nhận (không bắt buộc)"
+        error={state.fieldErrors?.email}
+      />
       <TextareaField
         name="note"
         label="Nội dung cần hỗ trợ"

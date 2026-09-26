@@ -12,7 +12,11 @@ const contactFormSchema = z.object({
     .max(20)
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
   email: z.string().email('Email không hợp lệ').max(100),
-  message: z.string().min(1, 'Vui lòng nhập nội dung'),
+  topic: z.enum(['package','sim','solution','support','other']),
+  store_id: z.coerce.number().int().positive().optional(),
+  message: z.string().min(1, 'Vui lòng nhập nội dung').max(1000, 'Nội dung tối đa 1.000 ký tự'),
+  consent: z.literal('on', { errorMap: () => ({ message: 'Cần đồng ý xử lý dữ liệu' }) }).transform(() => true as const),
+  website: z.string().max(100).optional().default(''),
   recaptcha_token: z.string().min(1, 'Thiếu recaptcha token, vui lòng thử lại'),
 });
 
@@ -35,7 +39,11 @@ export async function submitContactAction(
     name: String(formData.get('name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
     email: String(formData.get('email') ?? ''),
+    topic: String(formData.get('topic') ?? ''),
+    store_id: formData.get('store_id') ? Number(formData.get('store_id')) : undefined,
     message: String(formData.get('message') ?? ''),
+    consent: String(formData.get('consent') ?? ''),
+    website: String(formData.get('website') ?? ''),
     recaptcha_token: String(formData.get('recaptcha_token') ?? ''),
   };
 
@@ -50,8 +58,8 @@ export async function submitContactAction(
   }
 
   try {
-    await apiFetch<ContactMessage>('/public/contacts', { method: 'POST', body: parsed.data });
-    return { status: 'success', message: 'Gửi liên hệ thành công, chúng tôi sẽ phản hồi sớm nhất' };
+    const contact = await apiFetch<ContactMessage>('/public/contacts', { method: 'POST', body: parsed.data });
+    return { status: 'success', message: `Gửi liên hệ thành công. Mã liên hệ: ${contact.code}` };
   } catch (err) {
     const message = err instanceof ApiError ? err.message : 'Đã có lỗi xảy ra, vui lòng thử lại';
     return { status: 'error', message };

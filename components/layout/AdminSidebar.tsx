@@ -35,7 +35,10 @@ export function AdminSidebar({
   const { user } = useAuth();
   const menu = user ? menuForRole(user.role) : [];
   const isSettingsRoute =
-    pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/ai-') || pathname.startsWith('/admin/email') || pathname.startsWith('/admin/rate-limits');
+    pathname.startsWith('/admin/settings') ||
+    pathname.startsWith('/admin/ai-') ||
+    pathname.startsWith('/admin/email') ||
+    pathname.startsWith('/admin/rate-limits');
   const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsRoute);
 
   const settingsItems = [
@@ -53,7 +56,11 @@ export function AdminSidebar({
   ];
 
   return (
-    <aside className={cn(styles.sidebar, isMobileMenuOpen && styles.mobileOpen)}>
+    <aside
+      id="admin-navigation"
+      aria-label="Menu quản trị"
+      className={cn(styles.sidebar, isMobileMenuOpen && styles.mobileOpen)}
+    >
       <div className={styles.brand}>
         <span className={styles.brandMark} aria-hidden="true">
           <Image src="/logo_ngan_cropped.png" alt="" width={64} height={64} priority />

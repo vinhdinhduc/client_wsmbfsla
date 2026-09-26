@@ -1,4 +1,5 @@
 'use client';
+import { FilterBar } from '@/components/ui/FilterBar';
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -16,7 +17,8 @@ import styles from './page.module.scss';
 
 const STATUS_OPTIONS: Array<{ value: ContactStatus; label: string }> = [
   { value: 'moi', label: 'Mới' },
-  { value: 'da_xu_ly', label: 'Đã xử lý' },
+  { value: 'dang_xu_ly', label: 'Đang xử lý' },
+  { value: 'da_phan_hoi', label: 'Đã phản hồi' },
 ];
 const PAGE_SIZE = 10;
 
@@ -88,7 +90,10 @@ export default function AdminContactsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Danh sách liên hệ</h1>
+      </div>
+      <FilterBar label="Lọc liên hệ">
         <select
+          aria-label="Trạng thái liên hệ"
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value as typeof statusFilter);
@@ -103,7 +108,7 @@ export default function AdminContactsPage() {
             </option>
           ))}
         </select>
-      </div>
+      </FilterBar>
 
       <Table
         columns={columns}
@@ -147,7 +152,7 @@ export default function AdminContactsPage() {
                   size="sm"
                   isLoading={updateStatusMutation.isPending}
                   onClick={() =>
-                    updateStatusMutation.mutate({ id: detailTarget.id, status: 'da_xu_ly' })
+                    updateStatusMutation.mutate({ id: detailTarget.id, status: 'dang_xu_ly' })
                   }
                 >
                   Đánh dấu đã xử lý

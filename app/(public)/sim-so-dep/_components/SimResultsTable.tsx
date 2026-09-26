@@ -16,11 +16,11 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
       <table className={styles.resultsTable}>
         <thead>
           <tr>
-            <th>STT</th>
-            <th>Số thuê bao</th>
-            <th>Phí hòa mạng</th>
-            <th>Thời gian cam kết</th>
-            <th>Thao tác</th>
+            <th scope="col">STT</th>
+            <th scope="col">Số thuê bao</th>
+            <th scope="col">Phí hòa mạng</th>
+            <th scope="col">Thời gian cam kết</th>
+            <th scope="col">Thao tác</th>
           </tr>
         </thead>
         <tbody>
@@ -35,8 +35,8 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
                     {sim.phone_number}
                   </Link>
                 </td>
-                <td>{formatPrice(sim.activation_fee)}</td>
-                <td>
+                <td data-label="Phí hòa mạng">{formatPrice(sim.activation_fee)}</td>
+                <td data-label="Cam kết">
                   {sim.commitment_months ? `${sim.commitment_months} tháng` : 'Không cam kết'}
                 </td>
                 <td>

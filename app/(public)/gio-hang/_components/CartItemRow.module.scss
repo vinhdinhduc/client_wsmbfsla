@@ -2,10 +2,9 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(13rem, 2.1fr) minmax(4.5rem, 0.7fr) minmax(5.8rem, 0.85fr) minmax(
-      5.8rem,
-      0.85fr
-    ) minmax(6.8rem, 1fr) 2rem;
+  grid-template-columns:
+    minmax(13rem, 2.1fr) minmax(4.5rem, 0.7fr) minmax(5.8rem, 0.85fr) minmax(5.8rem, 0.85fr)
+    minmax(6.8rem, 1fr) 2rem;
   align-items: center;
   gap: 1rem;
   min-height: 5.5rem;
@@ -19,8 +18,10 @@
 
 .meta {
   display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .type {

@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { useQuery } from '@tanstack/react-query';
 import { env } from '@/lib/env';
 import { settingsApi } from '@/lib/api/settings';
+import { useEffect, useState } from 'react';
 
 /**
  * Nhung GA4 (gtag.js) + Meta Pixel qua <script> dong. Muc 12.1 dau bai mo ta ID lay
@@ -15,6 +16,8 @@ import { settingsApi } from '@/lib/api/settings';
  * duoc dinh nghia san trong .env.example).
  */
 export function AnalyticsScripts() {
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => { const read = () => { try { setAllowed(JSON.parse(localStorage.getItem('mfsl_cookie_consent_v1') || '{}').value === 'analytics'); } catch { setAllowed(false); } }; read(); const handler = (event: Event) => setAllowed((event as CustomEvent).detail === 'analytics'); window.addEventListener('cookie-consent', handler); return () => window.removeEventListener('cookie-consent', handler); }, []);
   const { data: settings } = useQuery({
     queryKey: ['public-settings'],
     queryFn: () => settingsApi.listPublic(),
@@ -25,7 +28,7 @@ export function AnalyticsScripts() {
 
   return (
     <>
-      {ga4Id && (
+      {allowed && ga4Id && (
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} strategy="afterInteractive" />
           <Script id="ga4-init" strategy="afterInteractive">
@@ -36,7 +39,7 @@ export function AnalyticsScripts() {
           </Script>
         </>
       )}
-      {fbPixelId && (
+      {allowed && fbPixelId && (
         <Script id="fb-pixel-init" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

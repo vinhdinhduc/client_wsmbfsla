@@ -1,4 +1,5 @@
 'use client';
+import { FilterBar } from '@/components/ui/FilterBar';
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -118,8 +119,10 @@ export default function AdminAuditLogsPage() {
     <div className={styles.page}>
       <h1 className={styles.title}>Nhật ký thao tác</h1>
 
-      <div className={styles.filters}>
+      <FilterBar label="Lọc nhật ký">
         <input
+          type="search"
+          aria-label="Lọc theo module"
           value={module}
           onChange={(e) => {
             setModule(e.target.value);
@@ -129,6 +132,7 @@ export default function AdminAuditLogsPage() {
           className={styles.control}
         />
         <select
+          aria-label="Lọc theo thao tác"
           value={action}
           onChange={(e) => {
             setAction(e.target.value);
@@ -142,7 +146,7 @@ export default function AdminAuditLogsPage() {
             </option>
           ))}
         </select>
-      </div>
+      </FilterBar>
 
       <Table
         columns={columns}

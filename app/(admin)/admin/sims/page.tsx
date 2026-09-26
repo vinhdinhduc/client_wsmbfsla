@@ -1,4 +1,5 @@
 'use client';
+import { FilterBar } from '@/components/ui/FilterBar';
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -107,16 +108,21 @@ export default function AdminSimsPage() {
 
   const { data: sims, isLoading } = useQuery({
     queryKey: ['admin-sims', searchParams.toString()],
-    queryFn: () => simsApi.listAdmin({
-      q: searchParams.get('q') || undefined,
-      prefix: searchParams.get('prefix') || undefined,
-      catalog: (searchParams.get('catalog') || undefined) as SimFormValues['catalog'] | undefined,
-      sim_type: (searchParams.get('sim_type') || undefined) as SimFormValues['sim_type'] | undefined,
-      type: (searchParams.get('type') || undefined) as SimFormValues['subscription_type'] | undefined,
-      status: (searchParams.get('status') || undefined) as SimFormValues['status'] | undefined,
-      page,
-      page_size: pageSize,
-    }),
+    queryFn: () =>
+      simsApi.listAdmin({
+        q: searchParams.get('q') || undefined,
+        prefix: searchParams.get('prefix') || undefined,
+        catalog: (searchParams.get('catalog') || undefined) as SimFormValues['catalog'] | undefined,
+        sim_type: (searchParams.get('sim_type') || undefined) as
+          | SimFormValues['sim_type']
+          | undefined,
+        type: (searchParams.get('type') || undefined) as
+          | SimFormValues['subscription_type']
+          | undefined,
+        status: (searchParams.get('status') || undefined) as SimFormValues['status'] | undefined,
+        page,
+        page_size: pageSize,
+      }),
   });
   const { data: publicSettings } = useQuery({
     queryKey: ['public-settings'],
@@ -223,12 +229,20 @@ export default function AdminSimsPage() {
   const previewMutation = useMutation({
     mutationFn: (file: File) => simsApi.previewImport(file, importMode),
     onSuccess: (result) => setImportPreview(result),
-    onError: (err: Error) => { setImportFile(null); showToast(err.message, 'error'); },
+    onError: (err: Error) => {
+      setImportFile(null);
+      showToast(err.message, 'error');
+    },
   });
   const importMutation = useMutation({
     mutationFn: () => {
       if (!importFile || !importPreview) throw new Error('Vui lòng xem trước tệp Excel');
-      return simsApi.importExcel(importFile, importMode, importPreview.digest, importPreview.preview_token);
+      return simsApi.importExcel(
+        importFile,
+        importMode,
+        importPreview.digest,
+        importPreview.preview_token,
+      );
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
@@ -254,14 +268,18 @@ export default function AdminSimsPage() {
 
   const exportMutation = useMutation({
     mutationFn: (format: 'xlsx' | 'csv') =>
-      simsApi.exportData(format, {
-        q: searchParams.get('q') || undefined,
-        prefix: searchParams.get('prefix') || undefined,
-        catalog: searchParams.get('catalog') || undefined,
-        sim_type: searchParams.get('sim_type') || undefined,
-        type: searchParams.get('type') || undefined,
-        status: searchParams.get('status') || undefined,
-      }, { scope: exportScope, columns: exportColumns }),
+      simsApi.exportData(
+        format,
+        {
+          q: searchParams.get('q') || undefined,
+          prefix: searchParams.get('prefix') || undefined,
+          catalog: searchParams.get('catalog') || undefined,
+          sim_type: searchParams.get('sim_type') || undefined,
+          type: searchParams.get('type') || undefined,
+          status: searchParams.get('status') || undefined,
+        },
+        { scope: exportScope, columns: exportColumns },
+      ),
     onSuccess: (blob, format) => {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -299,9 +317,10 @@ export default function AdminSimsPage() {
 
   function downloadImportErrors(errors: SimImportResult['errors']) {
     if (!errors.length) return;
-    const rows = ['Dòng,Lý do', ...errors.map((error) =>
-      `${error.row},"${error.message.replace(/"/g, '""')}"`,
-    )];
+    const rows = [
+      'Dòng,Lý do',
+      ...errors.map((error) => `${error.row},"${error.message.replace(/"/g, '""')}"`),
+    ];
     const blob = new Blob([`\uFEFF${rows.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -322,9 +341,7 @@ export default function AdminSimsPage() {
           checked={selectedIds.includes(sim.id)}
           onChange={(event) =>
             setSelectedIds((current) =>
-              event.target.checked
-                ? [...current, sim.id]
-                : current.filter((id) => id !== sim.id),
+              event.target.checked ? [...current, sim.id] : current.filter((id) => id !== sim.id),
             )
           }
         />
@@ -434,7 +451,7 @@ export default function AdminSimsPage() {
         </div>
       </div>
 
-      <div className={styles.grid3} aria-label="Bộ lọc kho sim">
+      <FilterBar label="Bộ lọc kho sim">
         <TextField
           label="Tìm số thuê bao"
           placeholder="Ví dụ: 090* hoặc *8888"
@@ -472,7 +489,7 @@ export default function AdminSimsPage() {
           options={[10, 20, 50].map((value) => ({ value: String(value), label: `${value} dòng` }))}
           onChange={(event) => updateQuery('page_size', event.target.value)}
         />
-      </div>
+      </FilterBar>
 
       {selectedIds.length > 0 && (
         <div className={styles.toolbar} role="region" aria-label="Thao tác hàng loạt">
@@ -509,11 +526,7 @@ export default function AdminSimsPage() {
         onPageChange={(nextPage) => updateQuery('page', nextPage)}
       />
 
-      <Modal
-        isOpen={exportOpen}
-        onClose={() => setExportOpen(false)}
-        title="Xuất dữ liệu kho sim"
-      >
+      <Modal isOpen={exportOpen} onClose={() => setExportOpen(false)} title="Xuất dữ liệu kho sim">
         <div className={styles.form}>
           <SelectField
             label="Phạm vi xuất"
@@ -532,27 +545,38 @@ export default function AdminSimsPage() {
                   <input
                     type="checkbox"
                     checked={exportColumns.includes(column.value)}
-                    onChange={(event) => setExportColumns((current) => event.target.checked
-                      ? [...current, column.value]
-                      : current.filter((value) => value !== column.value))}
-                  />{' '}{column.label}
+                    onChange={(event) =>
+                      setExportColumns((current) =>
+                        event.target.checked
+                          ? [...current, column.value]
+                          : current.filter((value) => value !== column.value),
+                      )
+                    }
+                  />{' '}
+                  {column.label}
                 </label>
               ))}
             </div>
           </fieldset>
           <div className={styles.actions}>
-            <Button variant="outline" onClick={() => setExportOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setExportOpen(false)}>
+              Hủy
+            </Button>
             <Button
               variant="outline"
               disabled={exportColumns.length === 0}
               isLoading={exportMutation.isPending}
               onClick={() => exportMutation.mutate('csv')}
-            >Xuất CSV</Button>
+            >
+              Xuất CSV
+            </Button>
             <Button
               disabled={exportColumns.length === 0}
               isLoading={exportMutation.isPending}
               onClick={() => exportMutation.mutate('xlsx')}
-            >Xuất Excel</Button>
+            >
+              Xuất Excel
+            </Button>
           </div>
         </div>
       </Modal>
@@ -659,25 +683,67 @@ export default function AdminSimsPage() {
 
       <Modal
         isOpen={importPreview !== null}
-        onClose={() => { setImportPreview(null); setImportFile(null); }}
+        onClose={() => {
+          setImportPreview(null);
+          setImportFile(null);
+        }}
         title="Xem trước import kho sim"
       >
         {importPreview && (
           <div className={styles.form}>
-            <p>Tệp: <strong>{importFile?.name}</strong> · {importPreview.total} dòng dữ liệu</p>
-            <p>Dự kiến thêm {importPreview.inserted}, cập nhật {importPreview.updated}, bỏ qua {importPreview.skipped} dòng. Số liệu có thể thay đổi nếu kho sim được sửa trước khi xác nhận.</p>
+            <p>
+              Tệp: <strong>{importFile?.name}</strong> · {importPreview.total} dòng dữ liệu
+            </p>
+            <p>
+              Dự kiến thêm {importPreview.inserted}, cập nhật {importPreview.updated}, bỏ qua{' '}
+              {importPreview.skipped} dòng. Số liệu có thể thay đổi nếu kho sim được sửa trước khi
+              xác nhận.
+            </p>
             <p>20 dòng đầu được kiểm tra:</p>
             <ul className={styles.errorList}>
-              {importPreview.sample.map((row) => <li key={row.row}>Dòng {row.row}: {row.phone_number} · {row.subscription_type} · {row.action}</li>)}
+              {importPreview.sample.map((row) => (
+                <li key={row.row}>
+                  Dòng {row.row}: {row.phone_number} · {row.subscription_type} · {row.action}
+                </li>
+              ))}
             </ul>
-            {importPreview.errors.length > 0 && <div className={styles.errorBox}>
-              <p className={styles.errorTitle}>{importPreview.errors.length} dòng lỗi:</p>
-              <ul className={styles.errorList}>{importPreview.errors.slice(0, 20).map((error) => <li key={error.row}>Dòng {error.row}: {error.message}</li>)}</ul>
-            </div>}
+            {importPreview.errors.length > 0 && (
+              <div className={styles.errorBox}>
+                <p className={styles.errorTitle}>{importPreview.errors.length} dòng lỗi:</p>
+                <ul className={styles.errorList}>
+                  {importPreview.errors.slice(0, 20).map((error) => (
+                    <li key={error.row}>
+                      Dòng {error.row}: {error.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className={styles.actions}>
-              {importPreview.errors.length > 0 && <Button variant="outline" onClick={() => downloadImportErrors(importPreview.errors)}>Tải danh sách lỗi CSV</Button>}
-              <Button variant="outline" onClick={() => { setImportPreview(null); setImportFile(null); }}>Hủy</Button>
-              <Button isLoading={importMutation.isPending} disabled={importPreview.inserted + importPreview.updated === 0} onClick={() => importMutation.mutate()}>Xác nhận nhập</Button>
+              {importPreview.errors.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => downloadImportErrors(importPreview.errors)}
+                >
+                  Tải danh sách lỗi CSV
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setImportPreview(null);
+                  setImportFile(null);
+                }}
+              >
+                Hủy
+              </Button>
+              <Button
+                isLoading={importMutation.isPending}
+                disabled={importPreview.inserted + importPreview.updated === 0}
+                onClick={() => importMutation.mutate()}
+              >
+                Xác nhận nhập
+              </Button>
             </div>
           </div>
         )}

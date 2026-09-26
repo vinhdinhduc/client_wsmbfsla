@@ -27,14 +27,6 @@ export function PackageFilterBar({ packages, simId }: { packages: Package[]; sim
   const simReferenceId = Number(simId);
   const [query, setQuery] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
-  const [compareIds, setCompareIds] = useState<number[]>([]);
-  const [compareError, setCompareError] = useState('');
-  const toggleCompare = (id: number) => {
-    if (compareIds.includes(id)) { setCompareIds(compareIds.filter((value) => value !== id)); setCompareError(''); return; }
-    if (compareIds.length >= 3) { setCompareError('Chỉ có thể so sánh tối đa 3 gói.'); return; }
-    setCompareIds([...compareIds, id]); setCompareError('');
-  };
-
   const visiblePackages = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return filtered.filter((pkg) => {
@@ -144,19 +136,15 @@ export function PackageFilterBar({ packages, simId }: { packages: Package[]; sim
               key={pkg.id}
               pkg={pkg}
               onSelect={simId ? () => selectPackage(pkg) : undefined}
-              isCompared={compareIds.includes(pkg.id)}
-              onCompare={() => toggleCompare(pkg.id)}
             />
           ))
         )}
       </div>
-      {compareError && <p role="alert">{compareError}</p>}
-      {compareIds.length > 0 && <div className={styles.compareWrap}><h2>So sánh gói cước ({compareIds.length}/3)</h2><div className={styles.compareGrid}>{compareIds.map((id) => { const pkg = packages.find((item) => item.id === id); return pkg && <article key={id}><h3>{pkg.name}</h3><p>{formatPrice(pkg.price)}</p><p>Data: {pkg.data_desc || '—'}</p><p>Thoại: {pkg.call_desc || '—'}</p><p>SMS: {pkg.sms_desc || '—'}</p><button type="button" onClick={() => toggleCompare(id)}>Bỏ so sánh</button></article>; })}</div></div>}
     </div>
   );
 }
 
-function PackageShowcaseCard({ pkg, onSelect, isCompared, onCompare }: { pkg: Package; onSelect?: () => void; isCompared: boolean; onCompare: () => void }) {
+function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () => void }) {
   const { addItem, isInCart } = useCart();
   const key = `goi_cuoc-${pkg.id}`;
   const inCart = isInCart(key);
@@ -167,7 +155,16 @@ function PackageShowcaseCard({ pkg, onSelect, isCompared, onCompare }: { pkg: Pa
 
   return (
     <article className={styles.packageCard}>
-      {pkg.image_url && <Image className={styles.packageImage} src={assetUrl(pkg.image_url)!} alt={pkg.name} width={400} height={225} sizes="(max-width: 600px) 100vw, 33vw" />}
+      {pkg.image_url && (
+        <Image
+          className={styles.packageImage}
+          src={assetUrl(pkg.image_url)!}
+          alt={pkg.name}
+          width={400}
+          height={225}
+          sizes="(max-width: 600px) 100vw, 33vw"
+        />
+      )}
       <div className={styles.packageName}>{pkg.name}</div>
       <div className={styles.packageContent}>
         {pkg.badges?.length ? <p>{pkg.badges.join(' · ').toUpperCase()}</p> : null}
@@ -199,8 +196,15 @@ function PackageShowcaseCard({ pkg, onSelect, isCompared, onCompare }: { pkg: Pa
         >
           {inCart ? 'Đã thêm' : 'ĐĂNG KÝ'}
         </button>
-        <button type="button" onClick={onCompare} aria-pressed={isCompared}>{isCompared ? 'Đã chọn so sánh' : 'So sánh'}</button>
-        {pkg.sms_syntax && <button type="button" onClick={() => navigator.clipboard.writeText(pkg.sms_syntax!)}>Sao chép cú pháp SMS</button>}
+        {pkg.sms_syntax && (
+          <button
+            className={styles.smsButton}
+            type="button"
+            onClick={() => navigator.clipboard.writeText(pkg.sms_syntax!)}
+          >
+            Sao chép cú pháp SMS
+          </button>
+        )}
         <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.detailLink}>
           Xem chi tiết <span>›</span>
         </Link>

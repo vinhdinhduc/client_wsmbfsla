@@ -39,7 +39,9 @@ export default async function ContactPage() {
               <span>
                 Hotline
                 <br />
-                <strong>{settings.hotline ?? '18001090'}</strong>
+                <a href={`tel:${settings.hotline ?? '18001090'}`}>
+                  <strong>{settings.hotline ?? '18001090'}</strong>
+                </a>
               </span>
             </p>
             <p>
@@ -47,7 +49,13 @@ export default async function ContactPage() {
               <span>
                 Email
                 <br />
-                <strong>{settings.contact_email ?? settings.footer_email ?? 'sonla@mobifone.vn'}</strong>
+                <a
+                  href={`mailto:${settings.contact_email ?? settings.footer_email ?? 'sonla@mobifone.vn'}`}
+                >
+                  <strong>
+                    {settings.contact_email ?? settings.footer_email ?? 'sonla@mobifone.vn'}
+                  </strong>
+                </a>
               </span>
             </p>
             <p>
@@ -55,7 +63,11 @@ export default async function ContactPage() {
               <span>
                 Địa chỉ
                 <br />
-                <strong>{settings.contact_address ?? settings.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}</strong>
+                <strong>
+                  {settings.contact_address ??
+                    settings.footer_address ??
+                    'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
+                </strong>
               </span>
             </p>
             <p>
@@ -63,7 +75,11 @@ export default async function ContactPage() {
               <span>
                 Thời gian làm việc
                 <br />
-                <strong>{settings.working_hours ?? settings.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}</strong>
+                <strong>
+                  {settings.working_hours ??
+                    settings.footer_working_hours ??
+                    'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
+                </strong>
               </span>
             </p>
           </div>

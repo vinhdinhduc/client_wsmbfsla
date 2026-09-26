@@ -25,6 +25,49 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const isPublicPath = PUBLIC_ADMIN_PATHS.includes(pathname);
 
   useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const sidebar = document.getElementById('admin-navigation');
+    const content = document.getElementById('admin-content');
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    content?.setAttribute('inert', '');
+    const focusable = () =>
+      Array.from(
+        sidebar?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [],
+      ).filter((el) => el.getClientRects().length);
+    focusable()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+      if (event.key === 'Tab') {
+        const items = focusable();
+        const first = items[0],
+          last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    const media = window.matchMedia('(min-width: 1024px)');
+    const onResize = () => {
+      if (media.matches) setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    media.addEventListener('change', onResize);
+    return () => {
+      document.body.style.overflow = overflow;
+      content?.removeAttribute('inert');
+      window.removeEventListener('keydown', onKey);
+      media.removeEventListener('change', onResize);
+      previous?.focus();
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     if (isLoading || isPublicPath) return;
     if (!isAuthenticated) {
       router.replace(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
@@ -47,12 +90,24 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={styles.layout}>
+      {isMobileMenuOpen && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="Đóng menu"
+          className={styles.overlay}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
       <AdminSidebar
         isMobileMenuOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
-      <div className={styles.content}>
-        <AdminHeader onMenuToggle={() => setIsMobileMenuOpen((isOpen) => !isOpen)} />
+      <div id="admin-content" className={styles.content}>
+        <AdminHeader
+          menuOpen={isMobileMenuOpen}
+          onMenuToggle={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+        />
         <main className={styles.main}>{children}</main>
       </div>
     </div>

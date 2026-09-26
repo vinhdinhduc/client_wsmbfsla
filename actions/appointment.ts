@@ -22,6 +22,7 @@ export interface AppointmentActionState {
   status: 'idle' | 'success' | 'error';
   message?: string;
   fieldErrors?: Partial<Record<keyof z.infer<typeof appointmentSchema>, string>>;
+  appointment?: StoreAppointment;
 }
 
 export async function submitAppointmentAction(
@@ -47,13 +48,14 @@ export async function submitAppointmentAction(
   }
 
   try {
-    await apiFetch<StoreAppointment>('/public/appointments', {
+    const appointment = await apiFetch<StoreAppointment>('/public/appointments', {
       method: 'POST',
       body: { ...parsed.data, note: parsed.data.note || null },
     });
     return {
       status: 'success',
       message: 'Đặt lịch thành công. Nhân viên sẽ đón tiếp bạn tại cửa hàng.',
+      appointment,
     };
   } catch (err) {
     return {

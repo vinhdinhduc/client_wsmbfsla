@@ -14,7 +14,10 @@ export default function RateLimitsPage() {
   const [drafts, setDrafts] = useState<Record<string, Partial<RatePolicy>>>({});
   const [cidr, setCidr] = useState(''); const [kind, setKind] = useState<'allow' | 'block'>('allow'); const [reason, setReason] = useState('');
   const run = useMutation({ mutationFn: async (task: () => Promise<unknown>) => task(), onSuccess: () => { client.invalidateQueries({ queryKey: ['rate-limits'] }); client.invalidateQueries({ queryKey: ['rate-limits-stats'] }); showToast('Đã lưu cấu hình'); }, onError: (error: Error) => showToast(error.message, 'error') });
-  const save = (policy: RatePolicy) => run.mutate(() => rateLimitsApi.save(policy.key, { ...policy, ...drafts[policy.key] }));
+  const save = (policy: RatePolicy) => {
+    const current = { ...policy, ...drafts[policy.key] };
+    run.mutate(() => rateLimitsApi.save(policy.key, { ...current, enabled: Boolean(current.enabled) }));
+  };
   const set = (key: string, value: Partial<RatePolicy>) => setDrafts((old) => ({ ...old, [key]: { ...old[key], ...value } }));
   const addRule = (event: FormEvent) => { event.preventDefault(); run.mutate(() => rateLimitsApi.addRule({ cidr, kind, reason })); setCidr(''); setReason(''); };
   return <main className={styles.page}><header><h1>Bảo mật & giới hạn tốc độ</h1><p>Chính sách cập nhật trên máy chủ trong tối đa 30 giây.</p><button type="button" onClick={() => run.mutate(rateLimitsApi.reset)}>Khôi phục mặc định</button></header>

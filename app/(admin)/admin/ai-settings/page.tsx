@@ -27,6 +27,9 @@ export default function AiSettingsPage() {
   const { data } = useQuery({ queryKey: ['ai-settings'], queryFn: aiApi.getSettings });
   const [form, setForm] = useState(defaults);
   const [apiKey, setApiKey] = useState('');
+  const [playground, setPlayground] = useState('');
+  const [reply, setReply] = useState('');
+  const stats = useQuery({ queryKey: ['ai-stats'], queryFn: aiApi.stats });
   useEffect(() => {
     if (data) setForm(data);
   }, [data]);
@@ -36,6 +39,7 @@ export default function AiSettingsPage() {
       setForm(result);
       setApiKey('');
       queryClient.invalidateQueries({ queryKey: ['ai-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['public-settings'] });
       showToast('Đã lưu cấu hình AI');
     },
     onError: (error: Error) => showToast(error.message, 'error'),
@@ -50,8 +54,15 @@ export default function AiSettingsPage() {
     onSuccess: (result) => showToast(result.message),
     onError: (error: Error) => showToast(error.message, 'error'),
   });
-  const update = <K extends keyof AiSettings>(key: K, value: AiSettings[K]) =>
+  const update = <K extends keyof AiSettings>(key: K, value: AiSettings[K]) => {
+    test.reset();
     setForm((previous) => ({ ...previous, [key]: value }));
+  };
+  const preview = useMutation({
+    mutationFn: () => aiApi.playground(playground.trim()),
+    onSuccess: (result) => setReply(result.reply),
+    onError: (error: Error) => showToast(error.message, 'error'),
+  });
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Cấu hình AI Chatbot</h1>
@@ -59,11 +70,30 @@ export default function AiSettingsPage() {
         RAG giúp trợ lý trả lời dựa trên dữ liệu thật của chi nhánh.
       </p>
       <div className={styles.panel}>
+        <section>
+          <h2>Thống kê 30 ngày</h2>
+          <p>
+            {stats.data?.conversations || 0} hội thoại · {stats.data?.input_tokens || 0} token vào ·{' '}
+            {stats.data?.output_tokens || 0} token ra · chi phí ước tính $
+            {Number(stats.data?.estimated_cost || 0).toFixed(4)} · độ trễ TB{' '}
+            {Math.round(Number(stats.data?.avg_latency_ms || 0))} ms
+          </p>
+        </section>
         <label>
           Nhà cung cấp
           <select
             value={form.provider}
-            onChange={(event) => update('provider', event.target.value as AiSettings['provider'])}
+            onChange={(event) => {
+              test.reset();
+              setApiKey('');
+              setForm((previous) => ({
+                ...previous,
+                provider: event.target.value as AiSettings['provider'],
+                model: '',
+                has_api_key: false,
+                api_key_masked: null,
+              }));
+            }}
           >
             <option value="anthropic">Anthropic</option>
             <option value="openai">OpenAI</option>
@@ -72,7 +102,11 @@ export default function AiSettingsPage() {
         </label>
         <label>
           Model
-          <input value={form.model} onChange={(event) => update('model', event.target.value)} />
+          <input
+            placeholder="Nhập tên model từ tài khoản nhà cung cấp"
+            value={form.model}
+            onChange={(event) => update('model', event.target.value)}
+          />
         </label>
         <label>
           API key mới
@@ -80,8 +114,17 @@ export default function AiSettingsPage() {
             type="password"
             value={apiKey}
             placeholder={form.api_key_masked ?? 'Chưa cấu hình'}
-            onChange={(event) => setApiKey(event.target.value)}
+            autoComplete="off"
+            onChange={(event) => {
+              test.reset();
+              setApiKey(event.target.value);
+            }}
           />
+          <small>
+            {form.has_api_key
+              ? 'Đã có API key. Để trống nếu giữ nguyên; bấm Kiểm tra kết nối để xác nhận key còn hoạt động.'
+              : 'Nhập API key của nhà cung cấp, kiểm tra kết nối rồi lưu cấu hình.'}
+          </small>
         </label>
         <div className={styles.grid}>
           <label>
@@ -140,13 +183,53 @@ export default function AiSettingsPage() {
           Sử dụng dữ liệu RAG
         </label>
         <div className={styles.actions}>
-          <Button variant="outline" isLoading={test.isPending} onClick={() => test.mutate()}>
+          <Button
+            variant="outline"
+            disabled={!form.model.trim()}
+            isLoading={test.isPending}
+            onClick={() => test.mutate()}
+          >
             Kiểm tra kết nối
           </Button>
-          <Button isLoading={save.isPending} onClick={() => save.mutate()}>
+          <Button
+            disabled={!form.model.trim() || !form.system_prompt.trim()}
+            isLoading={save.isPending}
+            onClick={() => save.mutate()}
+          >
             Lưu cấu hình
           </Button>
         </div>
+        {test.isSuccess && <p role="status">✓ {test.data.message}</p>}
+        {test.isError && (
+          <p role="alert" style={{ color: 'var(--color-danger)' }}>
+            {test.error.message}
+          </p>
+        )}
+        <section>
+          <h2>Thử hội thoại</h2>
+          <p>Lưu cấu hình trước khi gửi câu hỏi thử.</p>
+          <textarea
+            aria-label="Câu hỏi thử chatbot"
+            maxLength={2000}
+            rows={3}
+            value={playground}
+            onChange={(event) => setPlayground(event.target.value)}
+            placeholder="Nhập câu hỏi cho trợ lý AI"
+          />
+          <Button
+            variant="outline"
+            isLoading={preview.isPending}
+            disabled={!playground.trim()}
+            onClick={() => preview.mutate()}
+          >
+            Gửi thử
+          </Button>
+          {reply && (
+            <p style={{ whiteSpace: 'pre-wrap' }} role="status">
+              {reply}
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );

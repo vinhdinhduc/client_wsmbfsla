@@ -56,4 +56,6 @@ export const aiApi = {
     apiFetch<AiChatLog[]>('/admin/ai-chat-logs', { params: { flagged } }),
   updateLog: (id: number, body: { flagged_for_review?: boolean; was_helpful?: boolean | null }) =>
     apiFetch<AiChatLog>(`/admin/ai-chat-logs/${id}`, { method: 'PUT', body }),
+  stats: () => apiFetch<{ conversations:number;input_tokens:number;output_tokens:number;estimated_cost:number;avg_latency_ms:number;flagged:number }>('/admin/ai-stats'),
+  playground: (message:string) => apiFetch<{reply:string}>('/admin/ai-playground',{method:'POST',body:{message}}),
 };

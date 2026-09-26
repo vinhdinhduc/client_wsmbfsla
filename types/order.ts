@@ -54,7 +54,7 @@ export interface SubmitCartPayload {
   recaptcha_token: string;
 }
 
-export type ContactStatus = 'moi' | 'da_xu_ly';
+export type ContactStatus = 'moi' | 'dang_xu_ly' | 'da_phan_hoi';
 
 export interface ContactMessage {
   id: number;
@@ -63,5 +63,8 @@ export interface ContactMessage {
   email: string;
   message: string;
   status: ContactStatus;
+  code?: string | null;
+  topic?: string | null;
+  store_id?: number | null;
   created_at: string;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Trash2 } from 'lucide-react';
+import { CartProductIcon } from '@/components/shared/CartProductIcon';
 import { formatPrice, toPriceNumber } from '@/lib/format';
 import type { CartItemRowData } from '../_types/cartItem';
 import styles from './CartItemRow.module.scss';
@@ -27,8 +28,11 @@ export function CartItemRow({
   return (
     <div className={styles.row}>
       <div className={styles.meta}>
-        <p className={styles.type}>{TYPE_LABEL[item.type]}</p>
-        <p className={styles.name}>{item.name}</p>
+        <CartProductIcon type={item.type} />
+        <div>
+          <p className={styles.type}>{TYPE_LABEL[item.type]}</p>
+          <p className={styles.name}>{item.name}</p>
+        </div>
       </div>
       <span className={styles.subscription}>{item.type === 'sim' ? 'Trả sau' : 'Gói cước'}</span>
       <span className={styles.setupFee}>{formatPrice(setupFee)}</span>

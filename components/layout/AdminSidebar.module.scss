@@ -14,8 +14,8 @@
     transform 220ms ease,
     background-color 200ms ease;
   transform: translateX(-100%);
-  @media (min-width: $breakpoint-sm) {
-    position: sticky;
+  @media (min-width: $breakpoint-lg) {
+    position: fixed;
     transform: none;
   }
 }
@@ -65,7 +65,7 @@
   color: var(--color-neutral-500);
   background: transparent;
   cursor: pointer;
-  @media (min-width: $breakpoint-sm) {
+  @media (min-width: $breakpoint-lg) {
     display: none;
   }
   svg {
@@ -197,20 +197,24 @@
     background: var(--color-neutral-100);
   }
 }
-@media (max-width: 639px) {
-  .sidebar::after {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    width: 100vw;
-    background: rgb(15 23 42 / 35%);
-    content: '';
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 220ms ease;
-  }
-  .mobileOpen::after {
-    opacity: 1;
-    pointer-events: auto;
+
+.sidebar {
+  height: 100dvh;
+  max-width: calc(100% - 2rem);
+  visibility: hidden;
+}
+.mobileOpen {
+  visibility: visible;
+}
+.brand {
+  flex-shrink: 0;
+}
+.closeButton {
+  min-width: 2.75rem;
+  height: 2.75rem;
+}
+@media (min-width: 1024px) {
+  .sidebar {
+    visibility: visible;
   }
 }

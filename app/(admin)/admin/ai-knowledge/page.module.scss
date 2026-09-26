@@ -10,6 +10,7 @@
   color: var(--color-neutral-900);
 }
 .layout {
+  margin-top: 1.25rem;
   display: grid;
   grid-template-columns: minmax(18rem, 0.8fr) 1.2fr;
   gap: 1.25rem;

@@ -20,7 +20,12 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
   const [query, setQuery] = useState(initial.q ?? '');
   const [selectedType, setSelectedType] = useState(initial.type ?? 'postpaid');
 
-  useEffect(() => { setSelectedType(initial.type ?? 'postpaid'); }, [initial.type]);
+  useEffect(() => {
+    setSelectedType(initial.type ?? 'postpaid');
+  }, [initial.type]);
+  useEffect(() => {
+    setQuery(initial.q ?? '');
+  }, [initial.q]);
 
   function selectType(type: 'prepaid' | 'postpaid') {
     setSelectedType(type);

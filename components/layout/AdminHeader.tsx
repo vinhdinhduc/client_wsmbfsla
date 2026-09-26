@@ -18,7 +18,13 @@ const ROLE_LABEL: Record<string, string> = {
   nhan_vien: 'Nhân viên',
 };
 
-export function AdminHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
+export function AdminHeader({
+  onMenuToggle,
+  menuOpen,
+}: {
+  onMenuToggle: () => void;
+  menuOpen: boolean;
+}) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
@@ -49,6 +55,8 @@ export function AdminHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
           className={styles.menuButton}
           onClick={onMenuToggle}
           aria-label="Mở menu"
+          aria-expanded={menuOpen}
+          aria-controls="admin-navigation"
         >
           <Menu />
         </button>
@@ -82,6 +90,7 @@ export function AdminHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
           type="button"
           onClick={handleLogout}
           disabled={isLoggingOut}
+          aria-label="Đăng xuất"
           className={styles.logout}
         >
           <LogOut className={styles.logoutIcon} />

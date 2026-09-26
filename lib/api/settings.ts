@@ -46,6 +46,9 @@ export interface PublicSettings {
   contact_widget_enabled?: string;
   ga4_id?: string;
   fb_pixel_id?: string;
+  about_blocks?: string;
+  announcement_text?: string; announcement_url?: string; announcement_starts_at?: string; announcement_ends_at?: string;
+  promo_popup_enabled?: string; promo_popup_title?: string; promo_popup_content?: string; promo_popup_url?: string;
 }
 
 export const settingsApi = {

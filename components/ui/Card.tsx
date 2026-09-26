@@ -179,7 +179,11 @@ export function SimCard({ sim }: { sim: SimNumber }) {
 export function NewsCard({ news }: { news: News }) {
   return (
     <Card href={`/tin-tuc/${news.slug}`}>
-      <CardThumbnail src={news.thumbnail} alt={news.title} />
+      <CardThumbnail
+        key={news.cover_url || news.thumbnail}
+        src={news.cover_url || news.thumbnail}
+        alt={news.cover_alt || news.title}
+      />
       <div className={styles.content}>
         <Badge tone="accent">{CATEGORY_LABEL[news.category] ?? news.category}</Badge>
         <h3 className={styles.cardTitleClamp}>{news.title}</h3>
@@ -223,7 +227,15 @@ export function StoreCard({
     lng?: number;
     phone: string;
     opening_hours: string | null;
-    staff?: Array<{ id: number; full_name: string; job_title: string | null; avatar_url: string | null; public_phone: string; public_zalo: string | null; on_duty: boolean }>;
+    staff?: Array<{
+      id: number;
+      full_name: string;
+      job_title: string | null;
+      avatar_url: string | null;
+      public_phone: string;
+      public_zalo: string | null;
+      on_duty: boolean;
+    }>;
   };
   onSelect?: () => void;
   distanceKm?: number;
@@ -234,27 +246,73 @@ export function StoreCard({
       <h3 className={styles.cardTitle}>{store.name}</h3>
       <p className={styles.storeAddress}>
         <MapPin className={styles.storeIcon} />
-        {store.full_address ?? (store.district ? `${store.address}, ${store.district}` : store.address)}
+        {store.full_address ??
+          (store.district ? `${store.address}, ${store.district}` : store.address)}
       </p>
       <p className={styles.muted}>Hotline: {store.phone}</p>
-      {distanceKm !== undefined && <p className={styles.muted}>Cách bạn {distanceKm.toLocaleString('vi-VN', { maximumFractionDigits: 1 })} km</p>}
+      {distanceKm !== undefined && (
+        <p className={styles.muted}>
+          Cách bạn {distanceKm.toLocaleString('vi-VN', { maximumFractionDigits: 1 })} km
+        </p>
+      )}
       {store.open_now !== null && store.open_now !== undefined && (
-        <Badge tone={store.open_now ? 'success' : 'warning'}>{store.open_now ? 'Đang mở cửa' : 'Đã đóng cửa'}</Badge>
+        <Badge tone={store.open_now ? 'success' : 'warning'}>
+          {store.open_now ? 'Đang mở cửa' : 'Đã đóng cửa'}
+        </Badge>
       )}
       {store.opening_hours && <p className={styles.muted}>Giờ mở cửa: {store.opening_hours}</p>}
       {store.staff?.map((member) => (
         <div key={member.id} className={styles.storeStaff}>
-          {member.avatar_url ? <Image src={member.avatar_url} alt="" width={36} height={36} unoptimized className={styles.staffAvatar} /> : <span className={styles.staffAvatarFallback} aria-hidden="true">{member.full_name.charAt(0)}</span>}
-          <span><strong>{member.full_name}</strong>{member.job_title && <small> · {member.job_title}</small>}{member.on_duty && <Badge tone="success">Đang trực</Badge>}</span>
-          <a href={`tel:${member.public_phone}`} aria-label={`Gọi ${member.full_name}`}>Gọi</a>
-          {member.public_zalo && <a href={`https://zalo.me/${member.public_zalo}`} target="_blank" rel="noopener noreferrer" aria-label={`Zalo ${member.full_name}`}>Zalo</a>}
+          {member.avatar_url ? (
+            <Image
+              src={member.avatar_url}
+              alt=""
+              width={36}
+              height={36}
+              unoptimized
+              className={styles.staffAvatar}
+            />
+          ) : (
+            <span className={styles.staffAvatarFallback} aria-hidden="true">
+              {member.full_name.charAt(0)}
+            </span>
+          )}
+          <span>
+            <strong>{member.full_name}</strong>
+            {member.job_title && <small> · {member.job_title}</small>}
+            {member.on_duty && <Badge tone="success">Đang trực</Badge>}
+          </span>
+          <a href={`tel:${member.public_phone}`} aria-label={`Gọi ${member.full_name}`}>
+            Gọi
+          </a>
+          {member.public_zalo && (
+            <a
+              href={`https://zalo.me/${member.public_zalo}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Zalo ${member.full_name}`}
+            >
+              Zalo
+            </a>
+          )}
         </div>
       ))}
       <Link href={`/dat-lich?storeId=${store.id}`} className={styles.storeAction}>
         Đặt lịch đến cửa hàng
       </Link>
-      {onSelect && <button type="button" className={styles.storeAction} onClick={onSelect}>Xem trên bản đồ</button>}
-      <a className={styles.storeAction} href={`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`} target="_blank" rel="noopener noreferrer">Chỉ đường</a>
+      {onSelect && (
+        <button type="button" className={styles.storeAction} onClick={onSelect}>
+          Xem trên bản đồ
+        </button>
+      )}
+      <a
+        className={styles.storeAction}
+        href={`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Chỉ đường
+      </a>
     </div>
   );
 }

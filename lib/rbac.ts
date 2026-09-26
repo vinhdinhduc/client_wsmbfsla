@@ -15,6 +15,8 @@ import {
   CalendarDays,
   Settings,
   ScrollText,
+  BriefcaseBusiness,
+  AppWindow,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -46,6 +48,8 @@ export const ADMIN_MENU: AdminMenuItem[] = [
     roles: ['admin', 'chuyen_vien', 'giao_dich_vien', 'nhan_vien'],
   },
   { href: '/admin/news', label: 'Tin tức', icon: Newspaper, roles: ['admin', 'chuyen_vien'] },
+  { href: '/admin/jobs', label: 'Tuyển dụng', icon: BriefcaseBusiness, roles: ['admin', 'chuyen_vien'] },
+  { href: '/admin/utilities', label: 'Tiện ích', icon: AppWindow, roles: ['admin', 'chuyen_vien'] },
   { href: '/admin/packages', label: 'Gói cước', icon: Package, roles: ['admin', 'chuyen_vien'] },
   { href: '/admin/sims', label: 'Kho sim số', icon: Smartphone, roles: ['admin', 'chuyen_vien'] },
   {
@@ -94,6 +98,8 @@ export const ADMIN_ROUTE_ROLES: Array<{ prefix: string; roles: UserRole[] }> = [
   { prefix: '/admin/settings', roles: ['admin'] },
   { prefix: '/admin/audit-logs', roles: ['admin'] },
   { prefix: '/admin/news', roles: ['admin', 'chuyen_vien'] },
+  { prefix: '/admin/jobs', roles: ['admin', 'chuyen_vien'] },
+  { prefix: '/admin/utilities', roles: ['admin', 'chuyen_vien'] },
   { prefix: '/admin/packages', roles: ['admin', 'chuyen_vien'] },
   { prefix: '/admin/sims', roles: ['admin', 'chuyen_vien'] },
   { prefix: '/admin/solutions', roles: ['admin', 'chuyen_vien'] },
