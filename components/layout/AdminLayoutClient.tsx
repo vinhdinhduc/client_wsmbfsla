@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminHeader } from '@/components/layout/AdminHeader';
+import { AdminBreadcrumb } from '@/components/layout/AdminBreadcrumb';
 import { isRouteAllowedForRole } from '@/lib/rbac';
 import styles from './AdminLayoutClient.module.scss';
 
@@ -108,7 +109,10 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
           menuOpen={isMobileMenuOpen}
           onMenuToggle={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
         />
-        <main className={styles.main}>{children}</main>
+        <main className={styles.main}>
+          <AdminBreadcrumb />
+          {children}
+        </main>
       </div>
     </div>
   );

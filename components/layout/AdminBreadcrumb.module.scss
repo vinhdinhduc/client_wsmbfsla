@@ -1,0 +1,19 @@
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 1rem 0;
+  color: var(--color-neutral-500);
+  font-size: 0.875rem;
+}
+.breadcrumb a {
+  color: var(--color-primary, #008bd2);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+.breadcrumb [aria-current] {
+  color: var(--color-neutral-900);
+}

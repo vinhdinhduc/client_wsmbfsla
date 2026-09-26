@@ -151,6 +151,8 @@ export interface News {
   tags?: string[];
   author_name?: string | null;
   related?: News[];
+  popular?: News[];
+  promotion?: News | null;
 }
 
 export interface Store {

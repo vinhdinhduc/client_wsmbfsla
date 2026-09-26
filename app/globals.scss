@@ -115,7 +115,9 @@ textarea:focus-visible,
   border-radius: var(--radius-sm);
   transform: translateY(-160%);
 }
-.skip-link:focus { transform: translateY(0); }
+.skip-link:focus {
+  transform: translateY(0);
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 220ms;
@@ -165,4 +167,20 @@ dialog {
   border-radius: 50%;
   background: var(--color-primary);
   box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+}
+
+body:has([data-contact-widget]) {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+@media (max-width: 767px) {
+  [data-contact-widget]::before {
+    content: '';
+    position: fixed;
+    inset: auto 0 0;
+    height: calc(72px + env(safe-area-inset-bottom));
+    background: var(--color-surface);
+    border-top: 1px solid var(--border);
+    z-index: -1;
+    pointer-events: none;
+  }
 }

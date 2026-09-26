@@ -8,6 +8,59 @@ import { useAuth } from '@/hooks/useAuth';
 import { dashboardApi, DashboardPoint } from '@/lib/api/dashboard';
 import styles from './page.module.scss';
 
+const LABELS: Record<string, string> = {
+  moi: 'Mới',
+  dang_xu_ly: 'Đang xử lý',
+  hoan_thanh: 'Hoàn thành',
+  huy: 'Đã hủy',
+  da_xac_nhan: 'Đã xác nhận',
+  da_phan_hoi: 'Đã phản hồi',
+  vang_mat: 'Vắng mặt',
+  available: 'Còn hàng',
+  reserved: 'Đang giữ chỗ',
+  sold: 'Đã bán',
+  hidden: 'Đã ẩn',
+  prepaid: 'Trả trước',
+  postpaid: 'Trả sau',
+  sim: 'SIM',
+  goi_cuoc: 'Gói cước',
+  solution: 'Giải pháp',
+  solution_plan: 'Gói giải pháp',
+  device: 'Thiết bị',
+  thuong: 'SIM thường',
+  tu_quy: 'Tứ quý',
+  ngu_quy: 'Ngũ quý',
+  luc_quy: 'Lục quý',
+  tam_hoa: 'Tam hoa',
+  loc_phat: 'Lộc phát',
+  phat_loc: 'Phát lộc',
+  than_tai: 'Thần tài',
+  ong_dia: 'Ông địa',
+  taxi: 'Taxi',
+  tien_len: 'Tiến lên',
+  nam_sinh: 'Năm sinh',
+  lap: 'Số lặp',
+  ganh: 'Số gánh',
+  create: 'Tạo mới',
+  update: 'Cập nhật',
+  delete: 'Xóa',
+  login: 'Đăng nhập',
+  news: 'Tin tức',
+  sims: 'Kho SIM',
+  packages: 'Gói cước',
+  users: 'Người dùng',
+  registrations: 'Đăng ký',
+  contacts: 'Liên hệ',
+  appointments: 'Lịch hẹn',
+  settings: 'Cài đặt',
+};
+const vietnameseLabel = (label = '') =>
+  label
+    .split(' / ')
+    .map((part) => LABELS[part] ?? part)
+    .join(' / ');
+const displayDate = (date = '') =>
+  /^\d{4}-\d{2}-\d{2}$/.test(date) ? date.split('-').reverse().join('/') : date;
 const vn = new Intl.NumberFormat('vi-VN');
 const localDay = (date: Date) =>
   new Intl.DateTimeFormat('en-CA', {
@@ -18,7 +71,20 @@ const localDay = (date: Date) =>
   }).format(date);
 const shift = (days: number) => localDay(new Date(Date.now() + days * 86400000));
 
-function Chart({ title, kind, data }: { title: string; kind: string; data: DashboardPoint[] }) {
+function Chart({
+  title,
+  kind,
+  data: sourceData,
+}: {
+  title: string;
+  kind: string;
+  data: DashboardPoint[];
+}) {
+  const data = sourceData.map((point) => ({
+    ...point,
+    label: vietnameseLabel(point.label),
+    date: displayDate(point.date),
+  }));
   const max = Math.max(1, ...data.map((point) => Number(point.value)));
   const points = data
     .map(
@@ -46,7 +112,7 @@ function Chart({ title, kind, data }: { title: string; kind: string; data: Dashb
       <div className={styles.chartHeading}>
         <h2>{title}</h2>
         <button onClick={download} type="button">
-          CSV
+          Tải CSV
         </button>
       </div>
       {data.length === 0 || data.every((point) => Number(point.value) === 0) ? (
@@ -259,7 +325,7 @@ export default function AdminDashboardPage() {
                   <h2>Hoạt động gần đây</h2>
                   {dashboard.data.activity.map((item, index) => (
                     <p key={index} className={styles.row}>
-                      {item.module} · {item.action}
+                      {vietnameseLabel(item.module)} · {vietnameseLabel(item.action)}
                       <span>{new Date(item.created_at).toLocaleString('vi-VN')}</span>
                     </p>
                   ))}

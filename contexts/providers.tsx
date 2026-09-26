@@ -6,6 +6,7 @@ import { AuthProvider } from './AuthContext';
 import { CartProvider } from './CartContext';
 import { ThemeProvider } from './ThemeContext';
 import { ToastProvider } from '@/components/ui/Toast';
+import { RouteLoadingProvider } from '@/components/RouteLoadingProvider';
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -26,7 +27,9 @@ export function Providers({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <RouteLoadingProvider>{children}</RouteLoadingProvider>
+            </ToastProvider>
           </CartProvider>
         </AuthProvider>
       </ThemeProvider>

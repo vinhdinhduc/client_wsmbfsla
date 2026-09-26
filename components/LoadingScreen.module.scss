@@ -1,0 +1,84 @@
+.screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 24px;
+  background: #1a1a1a;
+  color: #fff;
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
+
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+}
+
+.inline {
+  position: relative;
+  width: 100%;
+  min-height: 240px;
+}
+
+.leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  width: min(280px, 100%);
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: pulse 1800ms ease-in-out infinite;
+}
+
+.caption {
+  position: absolute;
+  top: calc(100% + 20px);
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.dots {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: 4px;
+
+  span { width: 0.35em; }
+  span:nth-child(2) { animation: secondDot 1050ms step-end infinite; }
+  span:nth-child(3) { animation: thirdDot 1050ms step-end infinite; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes secondDot {
+  0%, 100% { opacity: 0; }
+  33.333% { opacity: 1; }
+}
+
+@keyframes thirdDot {
+  0%, 100% { opacity: 0; }
+  66.666% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen { transition: none; }
+  .logo, .dots span:nth-child(n) { animation: none; }
+}

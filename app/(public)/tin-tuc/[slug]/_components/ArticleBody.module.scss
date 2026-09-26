@@ -50,3 +50,50 @@
     color: var(--color-neutral-500);
   }
 }
+
+.date {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.date span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.date svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+.cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.content {
+  margin-top: 24px;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.content :global(p),
+.content :global(li) {
+  color: var(--text-primary);
+}
+.content :global(iframe),
+.content :global(video) {
+  max-width: 100%;
+}
+.content :global(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.content :global(pre) {
+  max-width: 100%;
+  overflow-x: auto;
+}

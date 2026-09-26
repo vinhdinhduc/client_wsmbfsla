@@ -6,6 +6,7 @@ import { aiApi, AiKnowledgeEntry } from '@/lib/api/ai';
 import { Button } from '@/components/ui/Button';
 import { FilterBar } from '@/components/ui/FilterBar';
 import { useToast } from '@/components/ui/Toast';
+import { KnowledgeImport } from './KnowledgeImport';
 import styles from './page.module.scss';
 
 const empty: { title: string; content: string; tags: string; status: 'active' | 'inactive' } = {
@@ -125,6 +126,7 @@ export default function AiKnowledgePage() {
             <option value="inactive">Tạm tắt</option>
           </select>
           <div className={styles.actions}>
+            {!editing && <KnowledgeImport />}
             <Button
               type="button"
               variant="outline"

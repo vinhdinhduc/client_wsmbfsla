@@ -63,3 +63,60 @@
     grid-template-columns: 1fr;
   }
 }
+
+.actions {
+  flex-wrap: wrap;
+}
+.panel,
+.layout > * {
+  min-width: 0;
+}
+.importPreview {
+  flex-basis: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+.importPreview progress {
+  width: 100%;
+  accent-color: #008bd2;
+}
+.previewTable {
+  overflow: auto;
+  max-height: 28rem;
+  margin-bottom: 1rem;
+}
+.previewTable table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85rem;
+}
+.previewTable th,
+.previewTable td {
+  text-align: left;
+  padding: 0.65rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
+}
+.previewTable th:first-child,
+.previewTable td:first-child {
+  min-width: 3rem;
+}
+.previewTable input[type='checkbox'] {
+  width: auto;
+  accent-color: #008bd2;
+}
+.previewContent {
+  max-height: 8rem;
+  overflow: auto;
+  min-width: 12rem;
+  white-space: pre-wrap;
+}
+@media (max-width: 64rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

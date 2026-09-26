@@ -1,0 +1,67 @@
+.share {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.share a,
+.share button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--public-muted-surface);
+  color: var(--color-primary);
+  transition:
+    transform 150ms,
+    box-shadow 150ms;
+}
+.share .facebook {
+  background: #1877f2;
+  color: white;
+  border-color: transparent;
+}
+.share .zalo {
+  background: #e4f3ff;
+  color: #0068d9;
+  border-color: #b6dcff;
+}
+.share a:hover,
+.share button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.share :is(a, button, input):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.status {
+  flex-basis: 100%;
+  font-size: 0.875rem;
+  color: var(--color-neutral-500);
+}
+.status:empty {
+  display: none;
+}
+.fallback {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .share a,
+  .share button {
+    transition: none;
+    transform: none;
+  }
+}

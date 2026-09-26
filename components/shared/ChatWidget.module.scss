@@ -371,7 +371,9 @@
   font-weight: 700;
 }
 @media (max-width: 639px) {
-  .dutyStaff { display: none; }
+  .dutyStaff {
+    display: none;
+  }
 }
 
 .dutyStaffContent {
@@ -532,5 +534,73 @@
     box-shadow:
       var(--shadow-md),
       0 0 0 0.625rem rgb(22 163 74 / 0%);
+  }
+}
+
+/* Keep contact names readable; compact the fixed controls on narrow screens. */
+.wrapper {
+  bottom: max(16px, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.wrapper > * {
+  pointer-events: auto;
+}
+.dutyStaff {
+  max-width: 248px;
+}
+.dutyStaffName {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.contactMessage {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow-wrap: anywhere;
+}
+.chatHint {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .wrapper {
+    right: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 8px;
+    max-width: calc(100vw - 24px);
+  }
+  .panel {
+    flex-basis: 100%;
+    width: calc(100vw - 24px);
+    height: min(34rem, calc(100dvh - 100px));
+    margin: 0;
+  }
+  .contactActions {
+    min-height: 0;
+    margin: 0;
+  }
+  .contactButtons {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .launcher,
+  .contactButton {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+  .dutyStaff,
+  .chatHintAnchor {
+    display: none;
+  }
+  .chatLauncherArea {
+    margin: 0;
   }
 }

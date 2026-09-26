@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: min(20rem, calc(100vw - 3rem));
   @media (min-width: 640px) {
     right: 1.5rem;
     top: 1.5rem;
@@ -17,7 +18,7 @@
 .toast {
   pointer-events: auto;
   display: flex;
-  width: 20rem;
+  width: 100%;
   align-items: flex-start;
   gap: 0.5rem;
   padding: 0.75rem;
@@ -46,6 +47,8 @@
 }
 .message {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: 0.875rem;
   color: var(--color-neutral-900);

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { newsApi } from '@/lib/api/news';
 import { NewsCard } from '@/components/ui/Card';
@@ -19,7 +20,16 @@ const CATEGORY_TABS: Array<{ value: NewsCategory | 'all'; label: string }> = [
 const PAGE_SIZE = 9;
 
 export function NewsFilterList({ initialData }: { initialData: PaginatedResult<News> }) {
-  const [category, setCategory] = useState<NewsCategory | 'all'>('all');
+  const searchParams = useSearchParams();
+  const requested = searchParams.get('category');
+  const initialCategory = CATEGORY_TABS.some((tab) => tab.value === requested)
+    ? (requested as NewsCategory | 'all')
+    : 'all';
+  const [category, setCategory] = useState<NewsCategory | 'all'>(initialCategory);
+  useEffect(() => {
+    setCategory(initialCategory);
+    setPage(1);
+  }, [initialCategory]);
   const [page, setPage] = useState(1);
 
   const { data } = useQuery({

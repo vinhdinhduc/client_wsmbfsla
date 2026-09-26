@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { settingsApi, SettingGroup } from '@/lib/api/settings';
 import { Tabs } from '@/components/ui/Tabs';
@@ -100,16 +100,6 @@ const SECTIONS: Record<string, Section> = {
       { key: 'promo_popup_url', label: 'Liên kết popup', type: 'url' },
     ],
   },
-  chatbot: {
-    group: 'ai',
-    label: 'AI Chatbot',
-    description: 'Bật/tắt trợ lý và giới hạn sử dụng.',
-    fields: [
-      { key: 'ai_chatbot_enabled', label: 'Bật AI Chatbot', type: 'checkbox' },
-      { key: 'ai_system_prompt', label: 'System prompt', type: 'textarea' },
-      { key: 'ai_daily_limit', label: 'Giới hạn câu hỏi/ngày', type: 'number' },
-    ],
-  },
   analytics: {
     group: 'analytics',
     label: 'Đo lường',
@@ -129,6 +119,10 @@ const TABS: Array<{ value: SettingGroup; label: string }> = [
 
 export default function AdminSettingsPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  useEffect(() => {
+    if (searchParams.get('section') === 'chatbot') router.replace('/admin/ai-settings');
+  }, [searchParams, router]);
   const sectionKey = searchParams.get('section');
   const selectedSection = sectionKey && SECTIONS[sectionKey] ? SECTIONS[sectionKey] : undefined;
   const [tab, setTab] = useState<SettingGroup>(selectedSection?.group ?? 'general');
@@ -174,7 +168,13 @@ export default function AdminSettingsPage() {
         {selectedSection && <p className={styles.description}>{selectedSection.description}</p>}
       </div>
       {!selectedSection && (
-        <Tabs tabs={TABS} value={tab} onChange={(value) => setTab(value as SettingGroup)} />
+        <Tabs
+          tabs={TABS}
+          value={tab}
+          onChange={(value) =>
+            value === 'ai' ? router.push('/admin/ai-settings') : setTab(value as SettingGroup)
+          }
+        />
       )}
       <div className={styles.panel}>
         {fields.map((field) => {

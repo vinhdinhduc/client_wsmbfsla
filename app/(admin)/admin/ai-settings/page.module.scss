@@ -64,3 +64,117 @@
     flex-direction: column;
   }
 }
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.stat {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.stat svg {
+  color: var(--color-primary, #008bd2);
+}
+.stat strong {
+  font-size: 1.7rem;
+  overflow-wrap: anywhere;
+}
+.stat small {
+  color: var(--color-neutral-500);
+}
+.panel + .panel {
+  margin-top: 1.5rem;
+}
+.chat {
+  max-height: 26rem;
+  min-height: 10rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+.userMessage,
+.aiMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  max-width: 90%;
+}
+.userMessage {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.userMessage svg,
+.aiMessage svg {
+  flex-shrink: 0;
+  margin-top: 0.6rem;
+}
+.userMessage p,
+.aiMessage p {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.userMessage p {
+  background: #006eae;
+  color: white;
+}
+.panel input[type='range'],
+.check input {
+  accent-color: #008bd2;
+}
+@media (max-width: 60rem) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.heading input[role='switch'] {
+  appearance: none;
+  width: 2.75rem;
+  height: 1.5rem;
+  border-radius: 1rem;
+  background: var(--color-neutral-500);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.heading input[role='switch']::after {
+  content: '';
+  position: absolute;
+  width: 1.1rem;
+  height: 1.1rem;
+  top: 0.2rem;
+  left: 0.2rem;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.15s;
+}
+.heading input[role='switch']:checked {
+  background: #008bd2;
+}
+.heading input[role='switch']:checked::after {
+  transform: translateX(1.25rem);
+}
+.heading input[role='switch']:focus-visible {
+  outline: 2px solid #008bd2;
+  outline-offset: 3px;
+}

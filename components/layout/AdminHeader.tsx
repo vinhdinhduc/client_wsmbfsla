@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
-import { LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react';
+import { Menu, Moon, Sun, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -31,9 +31,18 @@ export function AdminHeader({
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const settingsTitle: Record<string, string> = {
+    '/admin/ai-settings': 'AI Chatbot',
+    '/admin/ai-knowledge': 'Dữ liệu tri thức AI',
+    '/admin/ai-chat-logs': 'Lịch sử hội thoại',
+    '/admin/email': 'Email',
+    '/admin/rate-limits': 'Bảo mật & giới hạn',
+  };
   const pageTitle =
+    settingsTitle[pathname] ??
     ADMIN_MENU.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
-      ?.label ?? 'Tổng quan';
+      ?.label ??
+    'Tổng quan';
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -93,8 +102,7 @@ export function AdminHeader({
           aria-label="Đăng xuất"
           className={styles.logout}
         >
-          <LogOut className={styles.logoutIcon} />
-          <span className={styles.logoutLabel}>Đăng xuất</span>
+          <span>Đăng xuất</span>
         </button>
       </div>
     </header>
