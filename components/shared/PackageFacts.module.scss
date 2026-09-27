@@ -1,0 +1,27 @@
+.badges,
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.badges:empty,
+.facts:empty {
+  display: none;
+}
+.facts {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.facts svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}

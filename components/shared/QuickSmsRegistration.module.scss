@@ -1,0 +1,40 @@
+.box {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--public-muted-surface);
+}
+.box h2 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+.box p,
+.box span {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+.box code {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: all;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.box button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+  background: var(--bg-card);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.box svg {
+  width: 1rem;
+  height: 1rem;
+}

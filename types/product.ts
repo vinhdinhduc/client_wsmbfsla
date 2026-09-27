@@ -50,6 +50,7 @@ export interface SimNumber {
   activation_fee: number;
   needs_review: boolean;
   bundle_note: string | null;
+  committed_monthly_fee?: number | null;
   commitment_months: number | null;
   status: SimStatus;
   created_at: string;

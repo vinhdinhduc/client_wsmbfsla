@@ -94,6 +94,7 @@
   background: var(--color-primary);
 }
 .packageGrid {
+  align-items: stretch;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
@@ -101,6 +102,9 @@
   margin-inline: auto;
 }
 .packageCard {
+  height: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   min-height: 22rem;
   flex-direction: column;
@@ -138,6 +142,7 @@
   line-height: 1.2;
 }
 .packageBody p {
+  flex: 1;
   min-height: 3.3rem;
   margin: 0;
   padding-top: 0.75rem;
@@ -408,4 +413,81 @@
   .simGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.packageSection,
+.simSection {
+  background: var(--public-section);
+  padding-block: 2rem;
+}
+.simSection {
+  border-top: 1px solid var(--border);
+}
+.packageTabs {
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.packageHeadline {
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+.simGrid {
+  grid-auto-flow: row;
+  align-items: stretch;
+}
+.simCard {
+  flex-direction: column;
+  align-items: stretch;
+}
+.simInfo {
+  flex: 1;
+}
+.simInfo span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+.simInfo .simPrice {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.simAttributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.simAttributes span {
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--bg-card));
+  color: var(--color-primary);
+}
+.addSim {
+  width: auto;
+  height: auto;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.simTab:hover:not(.simTabActive) {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--bg-card));
+  color: var(--color-primary);
+}
+.simTab:focus-visible,
+.packageTab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.empty {
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--public-muted-surface);
+}
+.empty > svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-primary);
 }

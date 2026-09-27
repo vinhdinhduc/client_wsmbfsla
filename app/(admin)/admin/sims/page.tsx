@@ -22,6 +22,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import styles from '../admin-shared.module.scss';
+import buttonStyles from '@/components/ui/Button.module.scss';
 
 const CATALOG_OPTIONS = [
   { value: 'so_dep', label: 'Số đẹp' },
@@ -72,6 +73,10 @@ const simSchema = z.object({
   catalog: z.enum(['so_dep', 'phong_thuy', 'nam_sinh', 'tra_truoc', 'sim_data', 'esim']),
   sim_type: z.enum(['tam_hoa', 'tu_quy', 'phat_loc', 'than_tai', 'thuong']),
   bundle_note: z.string().max(255).optional().or(z.literal('')),
+  committed_monthly_fee: z.preprocess(
+    (value) => (value === '' ? null : value),
+    z.coerce.number().int().min(0).max(999999999999).nullable().optional(),
+  ),
   commitment_months: z.coerce.number().int().min(0).max(36).optional(),
   status: z.enum(['available', 'reserved', 'sold', 'hidden']),
 });
@@ -101,6 +106,7 @@ export default function AdminSimsPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
+  const [monthlyFeeOption, setMonthlyFeeOption] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
   const [exportScope, setExportScope] = useState<'filtered' | 'all'>('filtered');
   const [exportColumns, setExportColumns] = useState(EXPORT_COLUMNS.map((column) => column.value));
@@ -139,6 +145,7 @@ export default function AdminSimsPage() {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<SimSchemaValues>({ resolver: zodResolver(simSchema) });
   const selectedSubscriptionType = watch('subscription_type', 'postpaid');
@@ -159,12 +166,14 @@ export default function AdminSimsPage() {
   }, [debouncedSearch]);
 
   function openCreate() {
+    setMonthlyFeeOption('');
     reset({
       phone_number: '',
       subscription_type: 'postpaid',
       catalog: 'so_dep',
       sim_type: 'thuong',
       bundle_note: '',
+      committed_monthly_fee: null,
       commitment_months: 0,
       status: 'available',
     });
@@ -172,12 +181,17 @@ export default function AdminSimsPage() {
   }
 
   function openEdit(item: SimNumber) {
+    const fee = item.committed_monthly_fee;
+    setMonthlyFeeOption(
+      fee == null ? '' : [150000, 300000].includes(Number(fee)) ? String(fee) : 'other',
+    );
     reset({
       phone_number: item.phone_number,
       subscription_type: item.subscription_type,
       catalog: item.catalog,
       sim_type: item.sim_type,
       bundle_note: item.bundle_note ?? '',
+      committed_monthly_fee: item.committed_monthly_fee ?? null,
       commitment_months: item.commitment_months ?? 0,
       status: item.status,
     });
@@ -297,6 +311,8 @@ export default function AdminSimsPage() {
     saveMutation.mutate({
       ...values,
       bundle_note: values.bundle_note || null,
+      committed_monthly_fee:
+        values.subscription_type === 'postpaid' ? (values.committed_monthly_fee ?? null) : null,
       commitment_months: values.commitment_months ?? null,
     });
   }
@@ -424,6 +440,7 @@ export default function AdminSimsPage() {
             <Upload className={styles.icon} /> Import Excel
           </Button>
           <select
+            className={`${buttonStyles.button} ${buttonStyles.outline} ${buttonStyles.md}`}
             aria-label="Xử lý số sim trùng khi import"
             value={importMode}
             onChange={(event) => {
@@ -437,6 +454,7 @@ export default function AdminSimsPage() {
           </select>
           <Button
             variant="outline"
+            title="File cũ: tách 150.000 24 tháng thành committed_monthly_fee = 150000 và commitment_months = 24. Để trống nếu không cam kết; phí hòa mạng là phí một lần."
             isLoading={templateMutation.isPending}
             onClick={() => templateMutation.mutate()}
           >
@@ -618,13 +636,52 @@ export default function AdminSimsPage() {
               value={formatPrice(activationFees[selectedSubscriptionType])}
               readOnly
             />
-            <TextField
-              type="number"
-              label="Cam kết (tháng)"
-              error={errors.commitment_months?.message}
-              {...register('commitment_months')}
-            />
           </div>
+          {selectedSubscriptionType === 'postpaid' && (
+            <div className={styles.grid2}>
+              <SelectField
+                label="Mức cước cam kết tối thiểu/tháng"
+                value={monthlyFeeOption}
+                options={[
+                  { value: '', label: 'Không cam kết' },
+                  { value: '150000', label: '150.000đ' },
+                  { value: '300000', label: '300.000đ' },
+                  { value: 'other', label: 'Khác' },
+                ]}
+                onChange={(event) => {
+                  const option = event.target.value;
+                  setMonthlyFeeOption(option);
+                  setValue(
+                    'committed_monthly_fee',
+                    option === '' || option === 'other' ? null : Number(option),
+                    { shouldValidate: true, shouldDirty: true },
+                  );
+                }}
+              />
+              {monthlyFeeOption === 'other' && (
+                <TextField
+                  type="number"
+                  min={0}
+                  step={1}
+                  label="Mức cước tùy chỉnh (đ/tháng)"
+                  error={errors.committed_monthly_fee?.message}
+                  {...register('committed_monthly_fee')}
+                />
+              )}
+              <TextField
+                type="number"
+                min={0}
+                max={36}
+                step={1}
+                onKeyDown={(event) => {
+                  if (event.key === '-') event.preventDefault();
+                }}
+                label="Cam kết (tháng)"
+                error={errors.commitment_months?.message}
+                {...register('commitment_months')}
+              />
+            </div>
+          )}
           <TextField
             label="Ghi chú gói cước kèm theo"
             error={errors.bundle_note?.message}

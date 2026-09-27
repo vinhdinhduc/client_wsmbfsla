@@ -38,8 +38,14 @@ const INITIAL_STATE: RegistrationActionState = { status: 'idle' };
 function SubmitButton({ consent }: { consent: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="lg" className={styles.submitWidth} isLoading={pending} disabled={!consent}>
-      Gửi đăng ký
+    <Button
+      type="submit"
+      size="lg"
+      className={styles.submitWidth}
+      isLoading={pending}
+      disabled={!consent}
+    >
+      Tiếp tục
     </Button>
   );
 }
@@ -148,7 +154,13 @@ function CartPageContent() {
       formData.set('recaptcha_token', token);
       formData.set('items', serializeCartItemsForSubmit(items));
       if (!idempotencyKeyRef.current) {
-        idempotencyKeyRef.current = globalThis.crypto?.randomUUID?.() || (globalThis.crypto?.getRandomValues ? Array.from(globalThis.crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('') : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`);
+        idempotencyKeyRef.current =
+          globalThis.crypto?.randomUUID?.() ||
+          (globalThis.crypto?.getRandomValues
+            ? Array.from(globalThis.crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+                byte.toString(16).padStart(2, '0'),
+              ).join('')
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`);
       }
       formData.set('idempotency_key', idempotencyKeyRef.current);
       for (const key of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']) {
@@ -203,8 +215,20 @@ function CartPageContent() {
       {state.status === 'success' ? (
         <div className={styles.successState}>
           <p className={styles.successMessage}>{state.message}</p>
-          {state.registrationCode && <p>Mã đăng ký: <strong>{state.registrationCode}</strong>. Vui lòng lưu mã để tra cứu tình trạng.</p>}
-          {state.registrationCode && <Link href={`/tra-cuu?code=${encodeURIComponent(state.registrationCode)}`} className={styles.link}>Tra cứu tình trạng và tải phiếu</Link>}
+          {state.registrationCode && (
+            <p>
+              Mã đăng ký: <strong>{state.registrationCode}</strong>. Vui lòng lưu mã để tra cứu tình
+              trạng.
+            </p>
+          )}
+          {state.registrationCode && (
+            <Link
+              href={`/tra-cuu?code=${encodeURIComponent(state.registrationCode)}`}
+              className={styles.link}
+            >
+              Tra cứu tình trạng và tải phiếu
+            </Link>
+          )}
           <Link href="/" className={styles.link}>
             Quay về trang chủ
           </Link>
@@ -219,76 +243,116 @@ function CartPageContent() {
       ) : (
         <div className={step === 'product' ? styles.productStep : styles.grid}>
           <div className={styles.cartBox}>
-            <h2 className={styles.sectionTitle}>
-              {step === 'product' ? `Giỏ hàng (${simItems.length} sản phẩm)` : 'Sản phẩm đã chọn'}
-            </h2>
-            {step === 'product' && (
-              <div className={styles.cartHeader} aria-hidden="true">
-                <span>Sản phẩm</span>
-                <span>Thuê bao</span>
-                <span>Phí hòa mạng</span>
-                <span>Giá gói cước</span>
-                <span>Thành tiền</span>
-              </div>
-            )}
-            <div className={styles.items}>
-              {simItems.map((item, index) => (
-                <CartItemRow
-                  key={item.key}
-                  item={item}
-                  packageItem={getPackageForSim(item.reference_id, index)}
-                  onRemove={removeItem}
+            {step === 'customer' ? (
+              <>
+                <div className={styles.customerCartHeading}>
+                  <h2 className={styles.sectionTitle}>Sản phẩm đã chọn</h2>
+                  <Link href="/gio-hang?step=product">Chỉnh sửa</Link>
+                </div>
+                <details className={styles.selectedProducts}>
+                  <summary>
+                    {simItems.length} SIM · {packageItems.length} gói cước <span>Xem chi tiết</span>
+                  </summary>
+                  <div className={styles.selectedList}>
+                    {cartLines.map(({ sim, packageItem }) => (
+                      <div key={sim.key} className={styles.selectedItem}>
+                        <Smartphone aria-hidden="true" />
+                        <div>
+                          <strong>{sim.name}</strong>
+                          <p>{packageItem ? packageItem.name : 'Chỉ mua SIM'}</p>
+                        </div>
+                        <strong>
+                          {formatPrice(
+                            toPriceNumber(sim.price) + toPriceNumber(packageItem?.price),
+                          )}
+                        </strong>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+                <OrderSummary
+                  simCount={simItems.length}
+                  simTotal={simTotal}
+                  packageTotal={packageTotal}
+                  totalPrice={displayedTotal}
                 />
-              ))}
-            </div>
-            <div className={styles.summaryRow}>
-              <span>Tạm tính</span>
-              <span className={styles.summaryPrice}>{formatPrice(displayedTotal)}</span>
-            </div>
-            {step === 'product' && (
-              <div className={styles.cartActions}>
-                <Button
-                  type="button"
-                  size="lg"
-                  className={styles.addNumberButton}
-                  onClick={() => router.push('/sim-so-dep')}
-                >
-                  <Plus /> Thêm số khác
-                </Button>
-                <Button
-                  type="button"
-                  size="lg"
-                  className={styles.submitWidth}
-                  onClick={() => router.push('/gio-hang?step=customer')}
-                >
-                  Tiếp tục
-                </Button>
-              </div>
-            )}
-            {step === 'product' && (
-              <div className={styles.benefits}>
-                <div>
-                  <ShieldCheck />
-                  <span>
-                    <b>SIM chính chủ</b>
-                    <small>Đăng ký nhanh chóng</small>
-                  </span>
+              </>
+            ) : (
+              <>
+                <h2 className={styles.sectionTitle}>
+                  {step === 'product'
+                    ? `Giỏ hàng (${simItems.length} sản phẩm)`
+                    : 'Sản phẩm đã chọn'}
+                </h2>
+                {step === 'product' && (
+                  <div className={styles.cartHeader} aria-hidden="true">
+                    <span>Sản phẩm</span>
+                    <span>Thuê bao</span>
+                    <span>Phí hòa mạng</span>
+                    <span>Giá gói cước</span>
+                    <span>Thành tiền</span>
+                  </div>
+                )}
+                <div className={styles.items}>
+                  {simItems.map((item, index) => (
+                    <CartItemRow
+                      key={item.key}
+                      item={item}
+                      packageItem={getPackageForSim(item.reference_id, index)}
+                      onRemove={removeItem}
+                    />
+                  ))}
                 </div>
-                <div>
-                  <Clock3 />
-                  <span>
-                    <b>Giữ số 48 giờ</b>
-                    <small>Hoàn tiền nếu không hài lòng</small>
-                  </span>
+                <div className={styles.summaryRow}>
+                  <span>Tạm tính</span>
+                  <span className={styles.summaryPrice}>{formatPrice(displayedTotal)}</span>
                 </div>
-                <div>
-                  <LockKeyhole />
-                  <span>
-                    <b>Bảo mật thông tin</b>
-                    <small>Thông tin được bảo mật tuyệt đối</small>
-                  </span>
-                </div>
-              </div>
+                {step === 'product' && (
+                  <div className={styles.cartActions}>
+                    <Button
+                      type="button"
+                      size="lg"
+                      className={styles.addNumberButton}
+                      onClick={() => router.push('/sim-so-dep')}
+                    >
+                      <Plus /> Thêm số khác
+                    </Button>
+                    <Button
+                      type="button"
+                      size="lg"
+                      className={styles.submitWidth}
+                      onClick={() => router.push('/gio-hang?step=customer')}
+                    >
+                      Tiếp tục
+                    </Button>
+                  </div>
+                )}
+                {step === 'product' && (
+                  <div className={styles.benefits}>
+                    <div>
+                      <ShieldCheck />
+                      <span>
+                        <b>SIM chính chủ</b>
+                        <small>Đăng ký nhanh chóng</small>
+                      </span>
+                    </div>
+                    <div>
+                      <Clock3 />
+                      <span>
+                        <b>Giữ số 48 giờ</b>
+                        <small>Hoàn tiền nếu không hài lòng</small>
+                      </span>
+                    </div>
+                    <div>
+                      <LockKeyhole />
+                      <span>
+                        <b>Bảo mật thông tin</b>
+                        <small>Thông tin được bảo mật tuyệt đối</small>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -305,120 +369,180 @@ function CartPageContent() {
             <>
               <form action={handleAction} className={styles.formBox}>
                 <h2 className={styles.sectionTitle}>Thông tin đăng ký</h2>
+                <p className={styles.formIntro}>
+                  Vui lòng điền thông tin để hoàn tất đăng ký. Các trường có dấu{' '}
+                  <span className={styles.requiredMark}>*</span> là bắt buộc.
+                </p>
                 <div className={styles.form}>
-                  <TextField
-                    name="customer_name"
-                    label="Họ tên"
-                    placeholder="Nguyễn Văn A"
-                    required
-                    error={state.fieldErrors?.customer_name}
-                  />
-                  <TextField
-                    name="phone"
-                    label="Số điện thoại"
-                    placeholder="09xxxxxxxx"
-                    required
-                    error={state.fieldErrors?.phone}
-                  />
-                  <TextField
-                    name="email"
-                    type="email"
-                    label="Email"
-                    placeholder="email@example.com"
-                    error={state.fieldErrors?.email}
-                  />
-                  <label>Loại khách hàng <select name="customer_type" defaultValue="individual"><option value="individual">Cá nhân</option><option value="business">Doanh nghiệp</option></select></label>
-                  <fieldset className={styles.choiceGroup}>
-                    <legend>Hình thức nhận hàng</legend>
-                    <label>
-                      <input
-                        type="radio"
-                        name="delivery_method"
-                        value="address"
-                        checked={deliveryMethod === 'address'}
-                        onChange={() => setDeliveryMethod('address')}
-                      />
-                      Nhận tại địa chỉ yêu cầu
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="delivery_method"
-                        value="store"
-                        checked={deliveryMethod === 'store'}
-                        onChange={() => setDeliveryMethod('store')}
-                      />
-                      Nhận tại cửa hàng
-                    </label>
-                  </fieldset>
-                  {deliveryMethod === 'address' ? (
-                    <>
-                      <SonLaAddressFields />
+                  <section className={styles.formSection} aria-labelledby="contact-heading">
+                    <h3 id="contact-heading" className={styles.groupTitle}>
+                      Thông tin liên hệ
+                    </h3>
+                    <div className={styles.contactGrid}>
                       <TextField
-                        name="delivery_address"
-                        label="Địa chỉ nhận hàng"
-                        placeholder="Số nhà, đường, bản/tổ"
+                        name="customer_name"
+                        label="Họ tên"
+                        placeholder="Nguyễn Văn A"
                         required
-                        error={state.fieldErrors?.delivery_address}
+                        error={state.fieldErrors?.customer_name}
                       />
-                    </>
-                  ) : (
-                    <label className={styles.addressField}>
-                      <span>
-                        Cửa hàng nhận SIM <b className={styles.requiredMark}>*</b>
-                      </span>
-                      <select name="delivery_store" required disabled={storesLoading}>
-                        <option value="">
-                          {storesLoading ? 'Đang tải cửa hàng...' : 'Chọn cửa hàng MobiFone Sơn La'}
-                        </option>
-                        {stores.map((store) => (
-                          <option key={store.id} value={store.name}>
-                            {store.name} - {store.address}
+                      <TextField
+                        name="phone"
+                        label="Số điện thoại"
+                        placeholder="09xxxxxxxx"
+                        required
+                        error={state.fieldErrors?.phone}
+                      />
+                      <TextField
+                        name="email"
+                        type="email"
+                        label="Email"
+                        placeholder="email@example.com"
+                        error={state.fieldErrors?.email}
+                      />
+                      <label className={styles.addressField}>
+                        <span>Loại khách hàng</span>
+                        <select name="customer_type" defaultValue="individual">
+                          <option value="individual">Cá nhân</option>
+                          <option value="business">Doanh nghiệp</option>
+                        </select>
+                      </label>
+                    </div>
+                  </section>
+                  <section className={styles.formSection} aria-labelledby="delivery-heading">
+                    <h3 id="delivery-heading" className={styles.groupTitle}>
+                      Địa chỉ nhận hàng
+                    </h3>
+                    <fieldset className={styles.choiceGroup}>
+                      <legend>Hình thức nhận hàng</legend>
+                      <label>
+                        <input
+                          type="radio"
+                          name="delivery_method"
+                          value="address"
+                          checked={deliveryMethod === 'address'}
+                          onChange={() => setDeliveryMethod('address')}
+                        />
+                        Nhận tại địa chỉ yêu cầu
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="delivery_method"
+                          value="store"
+                          checked={deliveryMethod === 'store'}
+                          onChange={() => setDeliveryMethod('store')}
+                        />
+                        Nhận tại cửa hàng
+                      </label>
+                    </fieldset>
+                    {deliveryMethod === 'address' ? (
+                      <>
+                        <SonLaAddressFields />
+                        <TextField
+                          name="delivery_address"
+                          label="Địa chỉ nhận hàng"
+                          placeholder="Số nhà, đường, bản/tổ"
+                          required
+                          error={state.fieldErrors?.delivery_address}
+                        />
+                      </>
+                    ) : (
+                      <label className={styles.addressField}>
+                        <span>
+                          Cửa hàng nhận SIM <b className={styles.requiredMark}>*</b>
+                        </span>
+                        <select name="delivery_store" required disabled={storesLoading}>
+                          <option value="">
+                            {storesLoading
+                              ? 'Đang tải cửa hàng...'
+                              : 'Chọn cửa hàng MobiFone Sơn La'}
                           </option>
-                        ))}
-                      </select>
-                    </label>
-                  )}
-                  <fieldset className={styles.choiceGroup}>
-                    <legend>Loại SIM</legend>
-                    <label>
-                      <input
-                        type="radio"
-                        name="sim_type"
-                        value="physical"
-                        checked={simType === 'physical'}
-                        onChange={() => setSimType('physical')}
-                      />
-                      SIM vật lý
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="sim_type"
-                        value="esim"
-                        checked={simType === 'esim'}
-                        onChange={() => setSimType('esim')}
-                      />
-                      eSIM
-                    </label>
-                  </fieldset>
-                  <TextareaField name="note" label="Ghi chú" placeholder="Ghi chú thêm (nếu có)" />
-                  <TermsConsent checked={consent} onChange={setConsent} error={state.fieldErrors?.agreed_terms} />
-                  <input name="website" tabIndex={-1} autoComplete="off" className={styles.honeypot} aria-hidden="true" />
+                          {stores.map((store) => (
+                            <option key={store.id} value={store.name}>
+                              {store.name} - {store.address}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                  </section>
+                  <section className={styles.formSection} aria-labelledby="sim-heading">
+                    <h3 id="sim-heading" className={styles.groupTitle}>
+                      Tùy chọn SIM
+                    </h3>
+                    <fieldset className={styles.choiceGroup}>
+                      <legend>Loại SIM</legend>
+                      <label>
+                        <input
+                          type="radio"
+                          name="sim_type"
+                          value="physical"
+                          checked={simType === 'physical'}
+                          onChange={() => setSimType('physical')}
+                        />
+                        SIM vật lý
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="sim_type"
+                          value="esim"
+                          checked={simType === 'esim'}
+                          onChange={() => setSimType('esim')}
+                        />
+                        eSIM
+                      </label>
+                    </fieldset>
+                    <TextareaField
+                      name="note"
+                      label="Ghi chú"
+                      placeholder="Ghi chú thêm (nếu có)"
+                    />
+                  </section>
+                  <div className={styles.terms}>
+                    <TermsConsent
+                      checked={consent}
+                      onChange={setConsent}
+                      error={state.fieldErrors?.agreed_terms}
+                    />
+                  </div>
+                  <input
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className={styles.honeypot}
+                    aria-hidden="true"
+                  />
                   <input ref={tokenInputRef} type="hidden" name="recaptcha_token" />
                   <p className={styles.notice}>
                     Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách bảo mật và Điều
                     khoản dịch vụ của Google.
                   </p>
-                  <SubmitButton consent={consent} />
+                  <div className={styles.customerActions}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.push('/gio-hang?step=product')}
+                    >
+                      Quay lại
+                    </Button>
+                    <div className={styles.continueAction}>
+                      <div className={styles.validSubmit}>
+                        <SubmitButton consent={consent} />
+                      </div>
+                      <Button
+                        type="button"
+                        size="lg"
+                        disabled
+                        className={`${styles.submitWidth} ${styles.invalidSubmit}`}
+                      >
+                        Tiếp tục
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </form>
-              <OrderSummary
-                simCount={simItems.length}
-                simTotal={simTotal}
-                packageTotal={packageTotal}
-                totalPrice={displayedTotal}
-              />
             </>
           )}
         </div>

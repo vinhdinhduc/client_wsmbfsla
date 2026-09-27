@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -145,7 +146,8 @@ export default function ForgotPasswordPage() {
         <ol className={styles.steps} aria-label="Các bước đặt lại mật khẩu">
           {['Tài khoản', 'Xác thực OTP', 'Mật khẩu mới'].map((label, index) => (
             <li key={label} aria-current={step === index + 1 ? 'step' : undefined}>
-              {index + 1}. {label}
+              <span className={styles.stepNumber}>{index + 1}</span>
+              <span>{label}</span>
             </li>
           ))}
         </ol>
@@ -169,6 +171,7 @@ export default function ForgotPasswordPage() {
                   required
                   maxLength={100}
                   autoComplete="username"
+                  placeholder="email@example.com hoặc tên đăng nhập"
                   value={identifier}
                   onChange={(event) => setIdentifier(event.target.value)}
                 />
@@ -263,6 +266,7 @@ export default function ForgotPasswordPage() {
             )}
             <Button
               type="submit"
+              className={styles.submitButton}
               isLoading={busy}
               disabled={
                 step === 1
@@ -293,6 +297,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
         <Link href="/admin/login" className={styles.back}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Quay về trang đăng nhập
         </Link>
       </div>

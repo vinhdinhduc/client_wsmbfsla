@@ -8,6 +8,7 @@ export interface SimFormValues {
   sim_type: SimType;
   price?: number | null;
   bundle_note?: string | null;
+  committed_monthly_fee?: number | null;
   commitment_months?: number | null;
   status: SimStatus;
 }

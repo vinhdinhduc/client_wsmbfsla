@@ -1,5 +1,6 @@
 'use client';
 
+import { SimPurchaseButton } from '@/components/shared/SimPurchaseButton';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
@@ -86,7 +87,9 @@ export function PackageCard({ pkg, onSelect }: { pkg: Package; onSelect?: () => 
             <Badge tone="primary">{CATEGORY_LABEL[pkg.group_type] ?? pkg.group_type}</Badge>
           </div>
           <h3 className={styles.cardTitle}>{pkg.name}</h3>
-          {pkg.headline_desc && <p className={styles.muted}>{pkg.headline_desc}</p>}
+          {pkg.headline_desc && (
+            <p className={cn(styles.muted, styles.description)}>{pkg.headline_desc}</p>
+          )}
           <p className={styles.price}>
             {formatPrice(pkg.price)}
             <span className={styles.priceUnit}>
@@ -134,9 +137,6 @@ const SIM_TYPE_LABEL: Record<string, string> = {
 };
 
 export function SimCard({ sim }: { sim: SimNumber }) {
-  const { addItem, isInCart } = useCart();
-  const key = `sim-${sim.id}`;
-  const inCart = isInCart(key);
   const soldOut = sim.status !== 'available';
 
   return (
@@ -147,30 +147,13 @@ export function SimCard({ sim }: { sim: SimNumber }) {
           <Badge tone={soldOut ? 'danger' : 'success'}>{soldOut ? 'Hết hàng' : 'Còn hàng'}</Badge>
         </div>
         <p className={styles.phoneNumber}>{sim.phone_number}</p>
-        {sim.bundle_note && <p className={styles.muted}>{sim.bundle_note}</p>}
+        {sim.bundle_note && (
+          <p className={cn(styles.muted, styles.description)}>{sim.bundle_note}</p>
+        )}
         <p className={styles.price}>{formatPrice(sim.activation_fee)}</p>
       </Link>
       <div className={styles.action}>
-        <Button
-          size="sm"
-          variant={inCart ? 'outline' : 'primary'}
-          className={styles.fullWidth}
-          disabled={inCart || soldOut}
-          onClick={(e) => {
-            e.preventDefault();
-            addItem({
-              key,
-              type: 'sim',
-              reference_id: sim.id,
-              name: sim.phone_number,
-              price: sim.activation_fee,
-              image: null,
-            });
-          }}
-        >
-          <ShoppingCart className={styles.actionIcon} />
-          {soldOut ? 'Hết hàng' : inCart ? 'Đã có trong giỏ' : 'Thêm vào giỏ'}
-        </Button>
+        <SimPurchaseButton sim={sim} className={styles.fullWidth}>Đăng ký mua</SimPurchaseButton>
       </div>
     </Card>
   );
@@ -187,7 +170,9 @@ export function NewsCard({ news }: { news: News }) {
       <div className={styles.content}>
         <Badge tone="accent">{CATEGORY_LABEL[news.category] ?? news.category}</Badge>
         <h3 className={styles.cardTitleClamp}>{news.title}</h3>
-        {news.summary && <p className={styles.mutedClamp}>{news.summary}</p>}
+        {news.summary && (
+          <p className={cn(styles.mutedClamp, styles.description)}>{news.summary}</p>
+        )}
         {news.published_at && <p className={styles.muted}>{formatDate(news.published_at)}</p>}
       </div>
     </Card>
@@ -204,7 +189,9 @@ export function SolutionCard({ solution }: { solution: Solution }) {
           <Badge tone="primary">{CATEGORY_LABEL[solution.category] ?? solution.category}</Badge>
         </div>
         <h3 className={styles.cardTitleClamp}>{solution.name}</h3>
-        {solution.summary && <p className={styles.mutedClamp}>{solution.summary}</p>}
+        {solution.summary && (
+          <p className={cn(styles.mutedClamp, styles.description)}>{solution.summary}</p>
+        )}
       </div>
     </Card>
   );

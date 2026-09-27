@@ -9,27 +9,40 @@
 .card {
   width: 100%;
   max-width: 510px;
-  padding: 36px;
-  border-radius: 20px;
+  padding: 32px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 12px 50px #0066b31a;
+  box-shadow: 0 8px 32px rgb(0 66 115 / 10%);
   h1 {
     color: #0066b3;
-    margin: 24px 0 20px;
+    margin: 24px 0;
     font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    border: 0;
+    outline: none;
+    box-shadow: none;
   }
 }
 .steps {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 0;
   list-style: none;
-  margin-bottom: 24px;
+  margin: 0 0 24px;
   font-size: 13px;
   li {
     flex: 1;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #e0eaf3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    text-align: center;
+    color: #64748b;
+    padding-bottom: 12px;
+    border-bottom: 4px solid #e0eaf3;
   }
   li[aria-current] {
     border-color: #0066b3;
@@ -39,7 +52,7 @@
 }
 .form {
   display: grid;
-  gap: 18px;
+  gap: 16px;
   label {
     display: grid;
     gap: 8px;
@@ -55,7 +68,8 @@
     font-size: 16px;
   }
   input:focus {
-    outline: 2px solid #008fda;
+    border-color: #0066b3;
+    outline: 2px solid #0066b3;
     outline-offset: 2px;
   }
   fieldset {
@@ -74,7 +88,7 @@
 .otp {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 9px;
+  gap: 8px;
   input {
     text-align: center;
     font-size: 24px;
@@ -86,7 +100,7 @@
   background: #eef7fe;
   border-radius: 8px;
   line-height: 1.65;
-  margin-bottom: 20px;
+  margin: 0 0 16px;
 }
 .error {
   color: #b42318;
@@ -106,23 +120,87 @@
   }
 }
 .back {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   text-align: center;
   color: #0066b3;
   margin-top: 24px;
   text-decoration: underline;
 }
 .brand {
-  display: inline-flex;
-  padding: 14px 18px;
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 16px;
   border-radius: 10px;
   background: #0066b3;
 }
 @media (max-width: 480px) {
   .card {
-    padding: 24px 18px;
+    padding: 24px 16px;
   }
   .otp {
     gap: 6px;
   }
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #edf2f7;
+  font-weight: 700;
+}
+.steps li[aria-current='step'] .stepNumber {
+  color: #fff;
+  background: #0066b3;
+}
+.form p {
+  margin: 0;
+}
+.form input {
+  color: #24364b;
+  background: #fff;
+  &::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+}
+.form .submitButton {
+  min-height: 48px;
+  border-radius: 8px;
+  color: #fff;
+  background: #005a9e;
+  font-weight: 700;
+  opacity: 1;
+  &:hover:not(:disabled) {
+    background: #00477d;
+  }
+  &:active:not(:disabled) {
+    background: #00365f;
+  }
+  &:focus-visible {
+    outline: 2px solid #005a9e;
+    outline-offset: 3px;
+  }
+  &:disabled {
+    background: #52677a;
+    cursor: not-allowed;
+  }
+}
+.back:focus-visible,
+.linkButton:focus-visible {
+  outline: 2px solid #0066b3;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.brand img {
+  max-width: 100%;
+  height: auto;
 }

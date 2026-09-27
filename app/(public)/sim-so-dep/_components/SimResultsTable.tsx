@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { SimCommitment } from '@/components/shared/SimCommitment';
+import { SimPurchaseButton } from '@/components/shared/SimPurchaseButton';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/format';
 import type { SimNumber } from '@/types/product';
 import styles from '../page.module.scss';
 
 export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
-  const { addItem, isInCart } = useCart();
-  const router = useRouter();
+  const { isInCart } = useCart();
 
   return (
     <div className={styles.tableWrap}>
@@ -19,7 +19,7 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
             <th scope="col">STT</th>
             <th scope="col">Số thuê bao</th>
             <th scope="col">Phí hòa mạng</th>
-            <th scope="col">Thời gian cam kết</th>
+            <th scope="col">Cam kết gói cước</th>
             <th scope="col">Thao tác</th>
           </tr>
         </thead>
@@ -35,31 +35,15 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
                     {sim.phone_number}
                   </Link>
                 </td>
-                <td data-label="Phí hòa mạng">{formatPrice(sim.activation_fee)}</td>
+                <td data-label="Phí hòa mạng">{formatPrice(sim.activation_fee)} (một lần)</td>
                 <td data-label="Cam kết">
-                  {sim.commitment_months ? `${sim.commitment_months} tháng` : 'Không cam kết'}
+                  <SimCommitment sim={sim} />
                 </td>
                 <td>
-                  <button
-                    type="button"
+                  <SimPurchaseButton
+                    sim={sim}
                     className={`${styles.chooseButton} ${selected ? styles.chooseButtonSelected : ''}`}
-                    disabled={selected}
-                    onClick={() =>
-                      (() => {
-                        addItem({
-                          key,
-                          type: 'sim',
-                          reference_id: sim.id,
-                          name: sim.phone_number,
-                          price: sim.activation_fee,
-                          image: null,
-                        });
-                        router.push(`/goi-cuoc?sim_id=${sim.id}`);
-                      })()
-                    }
-                  >
-                    {selected ? 'Đã chọn' : 'Chọn số'}
-                  </button>
+                  />
                 </td>
               </tr>
             );

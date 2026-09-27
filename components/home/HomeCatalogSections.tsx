@@ -2,17 +2,31 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, Flame, Grid2X2, Plus, Search, Smartphone } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronDown,
+  Flame,
+  Grid2X2,
+  PackageOpen,
+  Search,
+  Smartphone,
+} from 'lucide-react';
+import { SimCommitment } from '@/components/shared/SimCommitment';
+import { SimPurchaseButton } from '@/components/shared/SimPurchaseButton';
 import { useCart } from '@/hooks/useCart';
+import { PackageBadges, PackageFacts } from '@/components/shared/PackageFacts';
+import { packageDuration } from '@/lib/package-display';
 import { formatPrice } from '@/lib/format';
 import type { Package, PackageGroupType, SimNumber } from '@/types/product';
 import styles from './HomeCatalogSections.module.scss';
 
-const PACKAGE_TABS: Array<{ value: PackageGroupType; label: string; icon: typeof Flame }> = [
-  { value: 'hot', label: 'Gói Hot', icon: Flame },
-  { value: 'tra_truoc', label: 'Trả trước', icon: Smartphone },
-  { value: 'tra_sau', label: 'Trả sau', icon: Smartphone },
-];
+const PACKAGE_TABS: Array<{ value: PackageGroupType | 'all'; label: string; icon: typeof Flame }> =
+  [
+    { value: 'all', label: 'Tất cả', icon: Grid2X2 },
+    { value: 'hot', label: 'Gói Hot', icon: Flame },
+    { value: 'tra_truoc', label: 'Trả trước', icon: Smartphone },
+    { value: 'tra_sau', label: 'Trả sau', icon: Smartphone },
+  ];
 
 const SIM_TAGS = [
   { value: '', label: 'Tất cả sim số' },
@@ -39,8 +53,18 @@ export function HomeCatalogSections({
 }
 
 function PackageShowcase({ packages }: { packages: Package[] }) {
-  const [group, setGroup] = useState<PackageGroupType>('hot');
-  const filtered = packages.filter((pkg) => pkg.group_type === group).slice(0, 3);
+  const [group, setGroup] = useState<PackageGroupType | 'all'>('all');
+  const filtered = packages
+    .filter(
+      (pkg) =>
+        group === 'all' ||
+        (group === 'hot'
+          ? pkg.badges?.includes('hot')
+          : pkg.subscription_type && group !== 'wifi_5g'
+            ? pkg.subscription_type === (group === 'tra_truoc' ? 'prepaid' : 'postpaid')
+            : pkg.group_type === group),
+    )
+    .slice(0, 3);
 
   return (
     <section className={styles.packageSection}>
@@ -73,7 +97,13 @@ function PackageShowcase({ packages }: { packages: Package[] }) {
           <PackageShowcaseCard key={pkg.id} pkg={pkg} />
         ))}
       </div>
-      {filtered.length === 0 && <p className={styles.empty}>Chưa có gói cước trong nhóm này.</p>}
+      <div hidden={filtered.length > 0} className={styles.empty}>
+        <PackageOpen aria-hidden="true" />
+        <p>Nhóm này hiện chưa có gói cước. Bạn hãy khám phá các gói khác nhé!</p>
+        <Link href="/goi-cuoc" className={styles.viewAll}>
+          Xem tất cả gói cước <ArrowRight />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -86,17 +116,13 @@ function PackageShowcaseCard({ pkg }: { pkg: Package }) {
     <article className={styles.packageCard}>
       <div className={styles.packageName}>{pkg.name}</div>
       <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageBody}>
-        <strong className={styles.packageHeadline}>
-          {pkg.data_desc ?? pkg.headline_desc ?? 'Ưu đãi data tốc độ cao'}
-        </strong>
-        <p>
-          {[pkg.call_desc, pkg.sms_desc].filter(Boolean).join('; ') || 'Kết nối tiện lợi mỗi ngày'}
-        </p>
+        <PackageBadges pkg={pkg} />
+        {pkg.headline_desc?.trim() && (
+          <strong className={styles.packageHeadline}>{pkg.headline_desc}</strong>
+        )}
+        <PackageFacts pkg={pkg} />
         <div className={styles.packagePrice}>
-          {formatPrice(pkg.price)}{' '}
-          <span>
-            / {pkg.duration_value} {pkg.duration_unit}
-          </span>
+          {formatPrice(pkg.price)} <span>/ {packageDuration(pkg)}</span>
         </div>
       </Link>
       <button
@@ -223,30 +249,29 @@ function SimShowcase({ sims }: { sims: SimNumber[] }) {
 }
 
 function SimShowcaseCard({ sim }: { sim: SimNumber }) {
-  const { addItem } = useCart();
   return (
     <article className={styles.simCard}>
       <Link href={`/sim-so-dep/${sim.id}`} className={styles.simInfo}>
         <strong>{sim.phone_number}</strong>
-        <span>{sim.bundle_note ?? 'Không cam kết'}</span>
+        <span className={styles.simPrice}>
+          Phí hòa mạng: {formatPrice(sim.activation_fee)} (một lần)
+        </span>
+        <SimCommitment sim={sim} />
+        {sim.bundle_note?.trim() && (
+          <div className={styles.simAttributes}>
+            {sim.bundle_note
+              .split(/[;\r\n]+/)
+              .map((note) => note.trim())
+              .filter(Boolean)
+              .map((note, index) => (
+                <span key={index}>{note}</span>
+              ))}
+          </div>
+        )}
       </Link>
-      <button
-        type="button"
-        className={styles.addSim}
-        aria-label={`Chọn số ${sim.phone_number}`}
-        onClick={() =>
-          addItem({
-            key: `sim-${sim.id}`,
-            type: 'sim',
-            reference_id: sim.id,
-            name: sim.phone_number,
-            price: sim.price,
-            image: null,
-          })
-        }
-      >
-        <Plus />
-      </button>
+      <SimPurchaseButton sim={sim} className={styles.addSim} label={`Chọn số ${sim.phone_number}`}>
+        Chọn số này
+      </SimPurchaseButton>
     </article>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { LockKeyhole } from 'lucide-react';
 import styles from '../page.module.scss';
 
 interface Ward {
@@ -53,9 +54,13 @@ export function SonLaAddressFields() {
           <span>
             Tỉnh/Thành phố <b className={styles.requiredMark}>*</b>
           </span>
-          <select value="Sơn La" disabled>
-            <option value="Sơn La">Sơn La</option>
-          </select>
+          <span className={styles.lockedField}>
+            <LockKeyhole aria-hidden="true" />
+            <select value="Sơn La" disabled>
+              <option value="Sơn La">Sơn La</option>
+            </select>
+          </span>
+          <small>Cố định tại Sơn La</small>
         </label>
       </div>
       <label className={styles.addressField}>

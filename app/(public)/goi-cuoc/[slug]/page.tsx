@@ -5,6 +5,9 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { AddToCartButton } from '@/components/shared/AddToCartButton';
 import { formatPrice } from '@/lib/format';
 import { buildMetadata } from '@/lib/metadata';
+import { PackageBadges } from '@/components/shared/PackageFacts';
+import { QuickSmsRegistration } from '@/components/shared/QuickSmsRegistration';
+import { packageDuration, packageGroupLabel } from '@/lib/package-display';
 import { Badge } from '@/components/ui/Badge';
 import { PackageDetailTabs } from './_components/PackageDetailTabs';
 import styles from './page.module.scss';
@@ -54,8 +57,8 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
       <div className={styles.detailLayout}>
         <div className={styles.mainColumn}>
           <div className={styles.headerRow}>
-            {pkg.group_type === 'hot' && <Badge tone="accent">HOT</Badge>}
-            <Badge tone="primary">{pkg.group_type.replace('_', ' ')}</Badge>
+            <PackageBadges pkg={pkg} />
+            <Badge tone="primary">{packageGroupLabel(pkg)}</Badge>
           </div>
           <h1 className={styles.title}>{pkg.name}</h1>
           {pkg.headline_desc && <p className={styles.summary}>{pkg.headline_desc}</p>}
@@ -65,9 +68,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
         <aside className={styles.aside}>
           <p className={styles.price}>
             {formatPrice(pkg.price)}
-            <span className={styles.priceSuffix}>
-              /{pkg.duration_value} {pkg.duration_unit}
-            </span>
+            <span className={styles.priceSuffix}>/{packageDuration(pkg)}</span>
           </p>
           <AddToCartButton
             className={styles.addButton}
@@ -80,6 +81,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
               image: null,
             }}
           />
+          {pkg.sms_syntax?.trim() && <QuickSmsRegistration syntax={pkg.sms_syntax} />}
         </aside>
       </div>
     </div>

@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 import { simsApi } from '@/lib/api/sims';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
-import { AddToCartButton } from '@/components/shared/AddToCartButton';
+import { SimCommitment } from '@/components/shared/SimCommitment';
+import { SimPurchaseButton } from '@/components/shared/SimPurchaseButton';
 import { formatPrice } from '@/lib/format';
 import { buildMetadata } from '@/lib/metadata';
 import styles from './page.module.scss';
@@ -18,7 +19,11 @@ const SIM_TYPE_LABEL: Record<string, string> = {
   thuong: 'Thường',
 };
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
   try {
     const sim = await simsApi.getPublicById(Number(id));
@@ -51,23 +56,12 @@ export default async function SimDetailPage({ params }: { params: Promise<{ id: 
         </div>
         <h1 className={styles.title}>{sim.phone_number}</h1>
         {sim.bundle_note && <p className={styles.note}>{sim.bundle_note}</p>}
-        {sim.commitment_months && (
-          <p className={styles.commitment}>Cam kết sử dụng: {sim.commitment_months} tháng</p>
-        )}
-        <p className={styles.price}>{formatPrice(sim.activation_fee)}</p>
+        <p className={styles.price}>Phí hòa mạng: {formatPrice(sim.activation_fee)} (một lần)</p>
+        <SimCommitment sim={sim} />
 
-        <AddToCartButton
-          className={styles.addButton}
-          disabled={soldOut}
-          item={{
-            key: `sim-${sim.id}`,
-            type: 'sim',
-            reference_id: sim.id,
-            name: sim.phone_number,
-            price: sim.activation_fee,
-            image: null,
-          }}
-        />
+        <SimPurchaseButton sim={sim} className={styles.addButton}>
+          Đăng ký mua
+        </SimPurchaseButton>
         {soldOut && (
           <p className={styles.outOfStock}>Số này hiện đã hết hàng, vui lòng chọn số khác.</p>
         )}

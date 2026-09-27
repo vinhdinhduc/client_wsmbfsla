@@ -46,6 +46,7 @@
 .gridFour,
 .gridThree {
   display: grid;
+  align-items: stretch;
   grid-template-columns: 1fr;
   gap: 1rem;
 }

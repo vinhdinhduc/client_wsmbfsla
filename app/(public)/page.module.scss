@@ -70,6 +70,7 @@
 .grid4,
 .grid3 {
   display: grid;
+  align-items: stretch;
   grid-template-columns: 1fr;
   gap: 1rem;
   @include breakpoint(sm) {

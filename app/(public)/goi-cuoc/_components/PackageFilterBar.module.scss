@@ -9,6 +9,7 @@
 }
 .searchBox {
   display: grid;
+  align-items: stretch;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem;
   width: min(calc(100% - 2rem), 54rem);
@@ -156,6 +157,7 @@
 }
 .grid {
   display: grid;
+  align-items: stretch;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   @media (min-width: 640px) {
@@ -166,6 +168,9 @@
   }
 }
 .packageCard {
+  height: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   min-height: 19.75rem;
   flex-direction: column;
@@ -211,6 +216,7 @@
   line-height: 1.15;
 }
 .packageLink p {
+  flex: 1;
   min-height: 3.6rem;
   margin: 0;
   padding: 0.7rem 0;
@@ -273,6 +279,7 @@
   color: var(--color-neutral-500);
 }
 .packageImage {
+  flex-shrink: 0;
   display: block;
   width: 100%;
   height: auto;

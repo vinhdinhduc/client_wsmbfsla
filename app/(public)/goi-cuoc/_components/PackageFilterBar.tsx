@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { PackageBadges, PackageFacts } from '@/components/shared/PackageFacts';
+import { packageDuration } from '@/lib/package-display';
 import Image from 'next/image';
 import { Package } from '@/types/product';
 import { FormEvent, useMemo, useState } from 'react';
@@ -148,10 +150,6 @@ function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () =>
   const { addItem, isInCart } = useCart();
   const key = `goi_cuoc-${pkg.id}`;
   const inCart = isInCart(key);
-  const highlight = pkg.data_desc ?? pkg.headline_desc ?? 'Ưu đãi data tốc độ cao';
-  const details =
-    [pkg.call_desc, pkg.sms_desc, pkg.speed_desc].filter(Boolean).join('; ') ||
-    'Kết nối tiện lợi mỗi ngày';
 
   return (
     <article className={styles.packageCard}>
@@ -167,15 +165,14 @@ function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () =>
       )}
       <div className={styles.packageName}>{pkg.name}</div>
       <div className={styles.packageContent}>
-        {pkg.badges?.length ? <p>{pkg.badges.join(' · ').toUpperCase()}</p> : null}
+        <PackageBadges pkg={pkg} />
         <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageLink}>
-          <strong className={styles.packageHighlight}>{highlight}</strong>
-          <p>{details}</p>
+          {pkg.headline_desc?.trim() && (
+            <strong className={styles.packageHighlight}>{pkg.headline_desc}</strong>
+          )}
+          <PackageFacts pkg={pkg} />
           <div className={styles.packagePrice}>
-            {formatPrice(pkg.price)}{' '}
-            <span>
-              / {pkg.duration_value} {pkg.duration_unit}
-            </span>
+            {formatPrice(pkg.price)} <span>/ {packageDuration(pkg)}</span>
           </div>
         </Link>
         <button
