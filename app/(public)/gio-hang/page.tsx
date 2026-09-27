@@ -1,4 +1,5 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 
 import { Suspense, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
@@ -34,10 +35,10 @@ import styles from './page.module.scss';
 
 const INITIAL_STATE: RegistrationActionState = { status: 'idle' };
 
-function SubmitButton() {
+function SubmitButton({ consent }: { consent: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="lg" className={styles.submitWidth} isLoading={pending}>
+    <Button type="submit" size="lg" className={styles.submitWidth} isLoading={pending} disabled={!consent}>
       Gửi đăng ký
     </Button>
   );
@@ -90,6 +91,7 @@ function CartPageContent() {
   const { items, removeItem, clearCart } = useCart();
   const { getToken } = useRecaptcha();
   const { showToast } = useToast();
+  const [consent, setConsent] = useState(false);
   const [state, formAction] = useFormState(submitRegistrationAction, INITIAL_STATE);
   const tokenInputRef = useRef<HTMLInputElement>(null);
   const idempotencyKeyRef = useRef<string>('');
@@ -401,15 +403,14 @@ function CartPageContent() {
                     </label>
                   </fieldset>
                   <TextareaField name="note" label="Ghi chú" placeholder="Ghi chú thêm (nếu có)" />
-                  <label><input type="checkbox" name="consent" required /> Tôi đồng ý với <Link href="/dieu-khoan-su-dung">điều khoản sử dụng</Link> và <Link href="/chinh-sach-bao-mat">chính sách bảo mật</Link>.</label>
-                  {state.fieldErrors?.consent && <p role="alert">{state.fieldErrors.consent}</p>}
+                  <TermsConsent checked={consent} onChange={setConsent} error={state.fieldErrors?.agreed_terms} />
                   <input name="website" tabIndex={-1} autoComplete="off" className={styles.honeypot} aria-hidden="true" />
                   <input ref={tokenInputRef} type="hidden" name="recaptcha_token" />
                   <p className={styles.notice}>
                     Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách bảo mật và Điều
                     khoản dịch vụ của Google.
                   </p>
-                  <SubmitButton />
+                  <SubmitButton consent={consent} />
                 </div>
               </form>
               <OrderSummary

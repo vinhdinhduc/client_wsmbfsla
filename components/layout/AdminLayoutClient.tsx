@@ -10,7 +10,7 @@ import { AdminBreadcrumb } from '@/components/layout/AdminBreadcrumb';
 import { isRouteAllowedForRole } from '@/lib/rbac';
 import styles from './AdminLayoutClient.module.scss';
 
-const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/403'];
+const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/forgot-password', '/admin/403'];
 
 /**
  * AdminLayout - 'use client', kiem tra role (muc 13 dau bai). middleware.ts da

@@ -1,4 +1,5 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -64,6 +65,7 @@ export function ChatWidget() {
   });
   const [isOpen, setIsOpen] = useState(false);
   const [showChatIntro, setShowChatIntro] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -146,7 +148,7 @@ export function ChatWidget() {
   }, [messages, isOpen]);
 
   const sendMessage = useMutation({
-    mutationFn: (message: string) => chatbotApi.sendMessage(sessionRef.current, message),
+    mutationFn: (message: string) => chatbotApi.sendMessage(sessionRef.current, message, consent),
     onSuccess: (result, question) => {
       setMessages((prev) => [
         ...prev,
@@ -183,7 +185,7 @@ export function ChatWidget() {
 
   function submitQuestion(question: string) {
     const trimmed = question.trim();
-    if (!trimmed || trimmed.length > 2000 || sendingRef.current || !hydrated) return;
+    if (!consent || !trimmed || trimmed.length > 2000 || sendingRef.current || !hydrated) return;
     sendingRef.current = true;
     setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: 'user', text: trimmed }]);
     setInput('');
@@ -262,7 +264,7 @@ export function ChatWidget() {
                         <button
                           type="button"
                           key={question}
-                          disabled={sendMessage.isPending || !hydrated}
+                          disabled={sendMessage.isPending || !hydrated || !consent}
                           onClick={() => submitQuestion(question)}
                         >
                           {question}
@@ -332,6 +334,7 @@ export function ChatWidget() {
                   )}
                 </div>
 
+                <div style={{ padding: '8px 16px', borderTop: '1px solid #dceaf5' }}><TermsConsent checked={consent} onChange={setConsent} /></div>
                 <form onSubmit={handleSubmit} className={styles.form}>
                   <input
                     ref={inputRef}
@@ -344,7 +347,7 @@ export function ChatWidget() {
                   />
                   <button
                     type="submit"
-                    disabled={sendMessage.isPending || !input.trim() || !hydrated}
+                    disabled={sendMessage.isPending || !input.trim() || !hydrated || !consent}
                     aria-label="Gửi"
                     className={styles.sendButton}
                   >

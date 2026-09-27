@@ -1,10 +1,12 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 import styles from '@/styles/service-pages.module.scss';
 import { Button } from '@/components/ui/Button';
 import { FormEvent, useState } from 'react';
 import { jobsApi } from '@/lib/api/jobs';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 export function JobApplyForm({ jobId }: { jobId?: number }) {
+  const [consent, setConsent] = useState(false);
   const [state, setState] = useState('');
   const [pending, setPending] = useState(false);
   const { getToken } = useRecaptcha();
@@ -20,6 +22,7 @@ export function JobApplyForm({ jobId }: { jobId?: number }) {
       const result = await jobsApi.apply(form);
       setState(`Đã nhận hồ sơ. Mã: ${result.code}`);
       element.reset();
+      setConsent(false);
     } catch (error) {
       setState((error as Error).message);
     } finally {
@@ -71,17 +74,15 @@ export function JobApplyForm({ jobId }: { jobId?: number }) {
         CV PDF/DOCX tối đa 5MB
         <input name="cv" type="file" accept=".pdf,.docx" required />
       </label>
-      <label className={styles.consent}>
-        <input name="consent" value="true" type="checkbox" required /> Đồng ý xử lý dữ liệu ứng
-        tuyển
-      </label>
+
       <input
         name="website"
         tabIndex={-1}
         aria-hidden="true"
         style={{ position: 'absolute', left: -10000 }}
       />
-      <Button type="submit" isLoading={pending}>
+      <TermsConsent checked={consent} onChange={setConsent} value="true" />
+      <Button type="submit" isLoading={pending} disabled={!consent}>
         Gửi hồ sơ ứng tuyển
       </Button>
       {state && (

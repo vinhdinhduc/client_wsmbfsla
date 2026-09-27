@@ -1,6 +1,7 @@
 import type { UserRole } from '@/types/user';
 import {
   Gauge,
+  RadioTower,
   Newspaper,
   Package,
   Smartphone,
@@ -41,6 +42,7 @@ export interface AdminSettingsItem {
  * that su van nam o backend (moi request van gui kem JWT, backend tu loc).
  */
 export const ADMIN_MENU: AdminMenuItem[] = [
+
   {
     href: '/admin/dashboard',
     label: 'Tổng quan',
@@ -80,6 +82,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/newsletter', label: 'Newsletter', icon: Send, roles: ['admin', 'chuyen_vien'] },
   { href: '/admin/users', label: 'Tài khoản', icon: Users, roles: ['admin'] },
   { href: '/admin/shifts', label: 'Ca trực', icon: CalendarClock, roles: ['admin'] },
+  { href: '/admin/stations', label: 'Trạm BTS', icon: RadioTower, roles: ['admin'] },
   {
     href: '/admin/appointments',
     label: 'Lịch hẹn',
@@ -92,6 +95,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
 
 /** Danh sach prefix route + vai tro duoc phep, dung boi middleware.ts (khong dung JSX nen tach rieng). */
 export const ADMIN_ROUTE_ROLES: Array<{ prefix: string; roles: UserRole[] }> = [
+  { prefix: '/admin/stations', roles: ['admin'] },
   { prefix: '/admin/users', roles: ['admin'] },
   { prefix: '/admin/shifts', roles: ['admin'] },
   { prefix: '/admin/appointments', roles: ['admin', 'chuyen_vien', 'giao_dich_vien'] },

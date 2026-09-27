@@ -1,4 +1,5 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -6,7 +7,7 @@ import { storesApi } from '@/lib/api/stores';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useToast } from '@/components/ui/Toast';
 import { Button } from '@/components/ui/Button';
-import { TextField, TextareaField, SelectField, CheckboxField } from '@/components/ui/FormField';
+import { TextField, TextareaField, SelectField } from '@/components/ui/FormField';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { submitContactAction, ContactActionState } from '@/actions/contact';
 import styles from './ContactForm.module.scss';
@@ -133,13 +134,6 @@ export function ContactForm() {
         error={state.fieldErrors?.message}
       />
       <small className={styles.counter}>{length}/1.000 ký tự</small>
-      <CheckboxField
-        label="Tôi đồng ý cho MobiFone Sơn La xử lý dữ liệu để phản hồi yêu cầu."
-        name="consent"
-        required
-        checked={consent}
-        onChange={(event) => setConsent(event.target.checked)}
-      />
       <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px' }}>
         <label>
           Website
@@ -151,6 +145,7 @@ export function ContactForm() {
         Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách bảo mật và Điều khoản dịch vụ
         của Google.
       </p>
+      <TermsConsent checked={consent} onChange={setConsent} error={state.fieldErrors?.agreed_terms} />
       <SubmitButton consent={consent} />
     </form>
   );

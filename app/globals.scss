@@ -184,3 +184,7 @@ body:has([data-contact-widget]) {
     pointer-events: none;
   }
 }
+
+@media print {
+  body:has([data-legal-document]) > * { visibility: hidden; }
+}

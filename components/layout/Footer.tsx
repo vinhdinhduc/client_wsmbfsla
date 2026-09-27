@@ -1,4 +1,5 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import styles from './Footer.module.scss';
 
 export function Footer() {
+  const [consent, setConsent] = useState(false);
   const [email, setEmail] = useState('');
   const { data: dutyStaff } = useCurrentDutyStaff();
   const { data: settings } = useQuery({
@@ -23,17 +25,18 @@ export function Footer() {
   const { showToast } = useToast();
 
   const subscribe = useMutation({
-    mutationFn: (value: string) => newsletterApi.subscribe(value),
+    mutationFn: (value: string) => newsletterApi.subscribe(value, consent),
     onSuccess: () => {
-      showToast('Đăng ký nhận ưu đãi thành công!');
+      showToast('Vui lòng kiểm tra email để xác nhận đăng ký nhận ưu đãi.');
       setEmail('');
+      setConsent(false);
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !consent) return;
     subscribe.mutate(email.trim());
   }
 
@@ -122,7 +125,8 @@ export function Footer() {
               placeholder="Email của bạn"
               className={styles.footer__input}
             />
-            <Button type="submit" size="sm" isLoading={subscribe.isPending}>
+            <TermsConsent checked={consent} onChange={setConsent} />
+            <Button type="submit" size="sm" isLoading={subscribe.isPending} disabled={!consent}>
               Đăng ký
             </Button>
           </form>

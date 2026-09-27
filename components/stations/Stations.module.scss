@@ -1,0 +1,359 @@
+.dashboard {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  color: var(--text-primary);
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 3vw, 30px);
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+  p {
+    line-height: 1.6;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  input,
+  select,
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0066b3;
+    flex-shrink: 0;
+  }
+  button {
+    cursor: pointer;
+    min-height: 40px;
+  }
+  button:hover:not(:disabled) {
+    border-color: var(--color-primary);
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  :is(input, button, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+  .primary {
+    background: #0066b3;
+    color: #fff;
+    border-color: #0066b3;
+  }
+  .danger {
+    color: var(--color-danger);
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.5;
+  }
+}
+
+.header,
+.actions,
+.pagination {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.header {
+  justify-content: space-between;
+}
+.header p,
+.muted {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.panel,
+.card {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  min-width: 0;
+}
+.panel {
+  display: grid;
+  gap: 14px;
+  max-height: 780px;
+  overflow-y: auto;
+}
+.panel h2 {
+  margin: 0;
+}
+.panel p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.statusFilter {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.statusFilter summary {
+  cursor: pointer;
+  font-size: 14px;
+}
+.statusFilter label {
+  margin-top: 10px;
+}
+.toggles,
+.addressForm {
+  display: grid;
+  gap: 12px;
+}
+.toggles {
+  border-block: 1px solid var(--border);
+  padding-block: 16px;
+}
+.swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 40%);
+}
+.mapSection {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.mapWrap {
+  position: relative;
+}
+.map,
+.mapPlaceholder {
+  width: 100%;
+  height: clamp(440px, 70vh, 720px);
+  background: #c8d4dc;
+  z-index: 0;
+}
+.mapPlaceholder {
+  display: grid;
+  place-items: center;
+  color: #1a1a1a;
+}
+.map :global(.leaflet-popup-content-wrapper),
+.map :global(.leaflet-popup-tip) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+.map :global(.leaflet-control-zoom a) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px;
+  font-size: 13px;
+}
+.legend span,
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.marker {
+  background: transparent;
+  border: 0;
+}
+.marker span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 3px solid white;
+  box-shadow: 0 2px 7px #0008;
+}
+.locationMarker {
+  display: grid;
+  place-items: center;
+  background: #0066b3;
+  border: 3px solid white;
+  color: white;
+  border-radius: 50%;
+  font-size: 24px;
+  box-shadow: 0 2px 8px #0008;
+}
+.popup {
+  min-width: 190px;
+  overflow-wrap: anywhere;
+}
+.popup strong {
+  display: block;
+  font-size: 15px;
+}
+.popup p {
+  margin: 8px 0;
+  font-size: 13px;
+}
+.tileError {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 450;
+  max-width: 75%;
+  padding: 8px;
+  background: var(--bg-card);
+  font-size: 12px;
+}
+.results {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.results button {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.results span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.notice,
+.error {
+  padding: 12px 16px;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.notice {
+  background: rgb(22 163 74 / 10%);
+}
+.error {
+  background: rgb(239 68 68 / 10%);
+  color: var(--color-danger);
+}
+.formAnchor {
+  scroll-margin-top: 100px;
+}
+.formAnchor:empty {
+  display: none;
+}
+.form {
+  display: grid;
+  gap: 16px;
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.wide {
+  grid-column: 1 / -1;
+}
+.tableWrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+.tableWrap th,
+.tableWrap td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tableWrap th {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.dashboard .textButton {
+  padding: 0;
+  border: 0;
+  color: var(--color-primary);
+  background: transparent;
+  white-space: nowrap;
+}
+.pagination {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .mapSection {
+    order: -1;
+  }
+  .panel {
+    max-height: none;
+  }
+  .map,
+  .mapPlaceholder {
+    height: clamp(340px, 55vh, 560px);
+  }
+}
+@media (max-width: 540px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .panel,
+  .card {
+    padding: 14px;
+  }
+  .header {
+    align-items: stretch;
+  }
+  .header .actions {
+    width: 100%;
+  }
+  .header .actions button {
+    flex: 1 1 auto;
+  }
+}

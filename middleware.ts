@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isRouteAllowedForRole } from '@/lib/rbac';
 import type { UserRole } from '@/types/user';
 
-const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/403'];
+const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/forgot-password', '/admin/403'];
 
 interface DecodedJwtPayload {
   role?: UserRole;

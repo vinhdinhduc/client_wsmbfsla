@@ -1,4 +1,5 @@
 'use client';
+import { TermsConsent } from '@/components/shared/TermsConsent';
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -14,10 +15,10 @@ import styles from './AppointmentForm.module.scss';
 
 const INITIAL_STATE: AppointmentActionState = { status: 'idle' };
 
-function SubmitButton() {
+function SubmitButton({ consent }: { consent: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="lg" isLoading={pending}>
+    <Button type="submit" size="lg" isLoading={pending} disabled={!consent}>
       Xác nhận đặt lịch
     </Button>
   );
@@ -26,6 +27,7 @@ function SubmitButton() {
 export function AppointmentForm({ stores }: { stores: Store[] }) {
   const [state, formAction] = useFormState(submitAppointmentAction, INITIAL_STATE);
   const { showToast } = useToast();
+  const [consent, setConsent] = useState(false);
   const [storeId, setStoreId] = useState('');
   const [date, setDate] = useState('');
   const slots = useQuery({
@@ -119,7 +121,8 @@ export function AppointmentForm({ stores }: { stores: Store[] }) {
         rows={4}
         error={state.fieldErrors?.note}
       />
-      <SubmitButton />
+      <TermsConsent checked={consent} onChange={setConsent} error={state.fieldErrors?.agreed_terms} />
+      <SubmitButton consent={consent} />
     </form>
   );
 }

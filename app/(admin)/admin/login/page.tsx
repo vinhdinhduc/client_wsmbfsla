@@ -107,7 +107,7 @@ function AdminLoginForm() {
               type="button"
               className={styles.forgotPassword}
               onClick={() =>
-                showToast('Vui lòng liên hệ quản trị viên để đặt lại mật khẩu.', 'error')
+                router.push('/admin/forgot-password')
               }
             >
               Quên mật khẩu?

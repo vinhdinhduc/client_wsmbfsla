@@ -1,0 +1,33 @@
+.consent {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  width: 100%;
+  grid-column: 1 / -1;
+  label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start;
+    gap: 0.65rem;
+    cursor: pointer;
+  }
+  input {
+    flex: 0 0 18px;
+    width: 18px !important;
+    height: 18px;
+    margin-top: 0.3rem;
+    accent-color: #0066b3;
+  }
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #008fda;
+    outline-offset: 3px;
+  }
+  p {
+    color: #b42318;
+  }
+}

@@ -9,8 +9,8 @@ export interface NewsletterSubscriber {
 }
 
 export const newsletterApi = {
-  subscribe: (email: string) =>
-    apiFetch<NewsletterSubscriber>('/public/newsletter/subscribe', { method: 'POST', body: { email } }),
+  subscribe: (email: string, agreed_terms: boolean) =>
+    apiFetch<NewsletterSubscriber>('/public/newsletter/subscribe', { method: 'POST', body: { email, agreed_terms } }),
   confirm: (token: string) => apiFetch<NewsletterSubscriber>('/public/newsletter/confirm', { params: { token }, cache: 'no-store' }),
   unsubscribe: (token: string) => apiFetch<NewsletterSubscriber>('/public/newsletter/unsubscribe', { params: { token }, cache: 'no-store' }),
 

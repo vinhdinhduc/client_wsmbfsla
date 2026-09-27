@@ -15,7 +15,7 @@ const contactFormSchema = z.object({
   topic: z.enum(['package','sim','solution','support','other']),
   store_id: z.coerce.number().int().positive().optional(),
   message: z.string().min(1, 'Vui lòng nhập nội dung').max(1000, 'Nội dung tối đa 1.000 ký tự'),
-  consent: z.literal('on', { errorMap: () => ({ message: 'Cần đồng ý xử lý dữ liệu' }) }).transform(() => true as const),
+  agreed_terms: z.literal('on', { errorMap: () => ({ message: 'Cần đồng ý xử lý dữ liệu' }) }).transform(() => true as const),
   website: z.string().max(100).optional().default(''),
   recaptcha_token: z.string().min(1, 'Thiếu recaptcha token, vui lòng thử lại'),
 });
@@ -42,7 +42,7 @@ export async function submitContactAction(
     topic: String(formData.get('topic') ?? ''),
     store_id: formData.get('store_id') ? Number(formData.get('store_id')) : undefined,
     message: String(formData.get('message') ?? ''),
-    consent: String(formData.get('consent') ?? ''),
+    agreed_terms: String(formData.get('agreed_terms') ?? ''),
     website: String(formData.get('website') ?? ''),
     recaptcha_token: String(formData.get('recaptcha_token') ?? ''),
   };

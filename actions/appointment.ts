@@ -5,6 +5,7 @@ import { apiFetch, ApiError } from '@/lib/api/client';
 import { StoreAppointment } from '@/types/appointment';
 
 const appointmentSchema = z.object({
+  agreed_terms: z.literal(true, { errorMap: () => ({ message: 'Vui lòng đồng ý điều khoản và chính sách bảo mật' }) }),
   customer_name: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
   phone: z
     .string()
@@ -30,6 +31,7 @@ export async function submitAppointmentAction(
   formData: FormData,
 ): Promise<AppointmentActionState> {
   const parsed = appointmentSchema.safeParse({
+    agreed_terms: formData.get('agreed_terms') === 'on',
     customer_name: String(formData.get('customer_name') ?? ''),
     phone: String(formData.get('phone') ?? ''),
     email: String(formData.get('email') ?? ''),

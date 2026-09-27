@@ -11,10 +11,10 @@ export interface ChatAnswer {
 }
 
 export const chatbotApi = {
-  sendMessage: (sessionId: string, message: string) =>
+  sendMessage: (sessionId: string, message: string, agreed_terms: boolean) =>
     apiFetch<ChatAnswer>('/chat', {
       method: 'POST',
-      body: { session_id: sessionId, message },
+      body: { session_id: sessionId, message, agreed_terms },
       cache: 'no-store',
     }),
 };

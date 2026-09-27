@@ -18,7 +18,7 @@ const submitCartSchema = z.object({
     .regex(/^[0-9+]+$/, 'Số điện thoại không hợp lệ'),
   email: z.union([z.string().email('Email không hợp lệ').max(150), z.literal('')]),
   customer_type: z.enum(['individual', 'business']),
-  consent: z.literal(true, { errorMap: () => ({ message: 'Cần đồng ý điều khoản' }) }),
+  agreed_terms: z.literal(true, { errorMap: () => ({ message: 'Cần đồng ý điều khoản' }) }),
   website: z.string().max(100).default(''),
   source_utm: z.record(z.string().max(100)).optional(),
   note: z.string().optional().nullable(),
@@ -43,7 +43,7 @@ const submitCartSchema = z.object({
 export interface RegistrationActionState {
   status: 'idle' | 'success' | 'error';
   message?: string;
-  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'email' | 'note' | 'items' | 'province' | 'ward' | 'delivery_address' | 'delivery_store' | 'consent', string>>;
+  fieldErrors?: Partial<Record<'customer_name' | 'phone' | 'email' | 'note' | 'items' | 'province' | 'ward' | 'delivery_address' | 'delivery_store' | 'agreed_terms', string>>;
   registrationId?: number;
   registrationCode?: string;
 }
@@ -69,7 +69,7 @@ export async function submitRegistrationAction(
     phone: String(formData.get('phone') ?? ''),
     email: String(formData.get('email') ?? ''),
     customer_type: String(formData.get('customer_type') ?? 'individual'),
-    consent: formData.get('consent') === 'on',
+    agreed_terms: formData.get('agreed_terms') === 'on',
     website: String(formData.get('website') ?? ''),
     source_utm: Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].map((key) => [key, String(formData.get(key) || '')]).filter(([, value]) => value)),
     note: formData.get('note') ? String(formData.get('note')) : null,

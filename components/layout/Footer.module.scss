@@ -84,12 +84,15 @@
   }
   &__form {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
     margin-top: 0.75rem;
   }
   &__input {
     min-width: 0;
-    flex: 1;
+    flex: none;
+    width: 100%;
+    min-height: 2.5rem;
     height: 2.5rem;
     padding: 0 0.75rem;
     color: #fff;
