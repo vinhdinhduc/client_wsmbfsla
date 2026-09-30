@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { aiApi, AiSettings } from '@/lib/api/ai';
+import { aiApi, AiSettings, AiPrice } from '@/lib/api/ai';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import {
@@ -27,6 +27,8 @@ const defaults: AiSettings = {
   enabled: true,
   has_api_key: false,
   api_key_masked: null,
+  api_key_error: null,
+  prices: [],
 };
 
 export default function AiSettingsPage() {
@@ -38,6 +40,7 @@ export default function AiSettingsPage() {
   });
   const [form, setForm] = useState(defaults);
   const [apiKey, setApiKey] = useState('');
+  const [pricesText, setPricesText] = useState('[]');
   const [playground, setPlayground] = useState('');
   const [advanced, setAdvanced] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([]);
@@ -47,10 +50,22 @@ export default function AiSettingsPage() {
   }, [messages]);
   const stats = useQuery({ queryKey: ['ai-stats'], queryFn: aiApi.stats, enabled: advanced });
   useEffect(() => {
-    if (data) setForm(data);
+    if (data) {
+      setForm(data);
+      setPricesText(JSON.stringify(data.prices ?? [], null, 2));
+    }
   }, [data]);
   const save = useMutation({
-    mutationFn: () => aiApi.updateSettings({ ...form, api_key: apiKey || undefined }),
+    mutationFn: () => {
+      let prices: AiPrice[];
+      try {
+        prices = JSON.parse(pricesText);
+        if (!Array.isArray(prices)) throw new Error();
+      } catch {
+        throw new Error('Bảng giá phải là một mảng JSON hợp lệ.');
+      }
+      return aiApi.updateSettings({ ...form, prices, api_key: apiKey || undefined });
+    },
     onSuccess: (result) => {
       setForm(result);
       setApiKey('');
@@ -100,6 +115,14 @@ export default function AiSettingsPage() {
           Chế độ nâng cao
         </label>
       </div>
+      {form.api_key_error && (
+        <p role="alert">
+          {form.api_key_error}{' '}
+          <button type="button" onClick={() => setAdvanced(true)}>
+            Mở cấu hình API key
+          </button>
+        </p>
+      )}
       <form
         className={styles.panel}
         onSubmit={(event) => {
@@ -175,6 +198,24 @@ export default function AiSettingsPage() {
                   ))}
                 </div>
               )}
+              <p>
+                Usage và chi phí tính từ các lần gọi sau khi nâng cấp, gồm retry và kiểm tra kết
+                nối.
+              </p>
+              {!!Number(stats.data?.usage_missing) && (
+                <p role="status">
+                  {stats.data?.usage_missing} lần gọi chưa có usage từ nhà cung cấp.
+                </p>
+              )}
+              {!!Number(stats.data?.cost_missing) && (
+                <p role="status">
+                  {stats.data?.cost_missing} lần gọi chưa tính được chi phí do thiếu usage hoặc bảng
+                  giá.
+                </p>
+              )}
+              {!!Number(stats.data?.failed_calls) && (
+                <p>Số lần gọi lỗi: {stats.data?.failed_calls}</p>
+              )}
             </section>
             <label>
               Nhà cung cấp
@@ -189,6 +230,7 @@ export default function AiSettingsPage() {
                     model: '',
                     has_api_key: false,
                     api_key_masked: null,
+                    api_key_error: null,
                   }));
                 }}
               >
@@ -222,7 +264,22 @@ export default function AiSettingsPage() {
               <small>
                 {form.has_api_key
                   ? 'Đã có API key. Để trống nếu giữ nguyên; bấm Kiểm tra kết nối để xác nhận key còn hoạt động.'
-                  : 'Nhập API key của nhà cung cấp, kiểm tra kết nối rồi lưu cấu hình.'}
+                  : 'Nhập API key của nhà cung cấp. Bạn có thể lưu mà không kiểm tra kết nối.'}
+              </small>
+            </label>
+            <label>
+              Bảng giá theo provider/model (USD trên 1 triệu token)
+              <textarea
+                aria-label="Bảng giá AI"
+                rows={7}
+                value={pricesText}
+                onChange={(event) => setPricesText(event.target.value)}
+                spellCheck={false}
+              />
+              <small>
+                {
+                  'Mỗi dòng giá: {"provider":"anthropic","model":"tên-model","input_per_million":0,"output_per_million":0}. Nhập giá từ tài khoản nhà cung cấp; [] nghĩa là chưa cấu hình giá.'
+                }
               </small>
             </label>
             <div className={styles.grid}>
@@ -290,6 +347,10 @@ export default function AiSettingsPage() {
             Lưu cấu hình
           </Button>
         </div>
+        <p>
+          Lưu cấu hình chỉ kiểm tra định dạng. Kiểm tra kết nối là tùy chọn và có thể phát sinh phí
+          từ nhà cung cấp.
+        </p>
         {test.isSuccess && <p role="status">✓ {test.data.message}</p>}
         {test.isError && (
           <p role="alert" style={{ color: 'var(--color-danger)' }}>

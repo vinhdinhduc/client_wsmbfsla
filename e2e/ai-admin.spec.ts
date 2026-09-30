@@ -130,13 +130,11 @@ test('xlsx and csv preview, duplicates, row selection and template', async ({ pa
     ]),
     'Data',
   );
-  await page
-    .getByLabel('File tri thức')
-    .setInputFiles({
-      name: 'test.xlsx',
-      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      buffer: XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }),
-    });
+  await page.getByLabel('File tri thức').setInputFiles({
+    name: 'test.xlsx',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }),
+  });
   await expect(page.getByLabel('Chọn dòng 1: Có sẵn')).not.toBeChecked();
   await expect(page.getByLabel('Chọn dòng 4: Sai')).toBeDisabled();
   await page.getByLabel('Chọn dòng 3: Bỏ qua').uncheck();
@@ -144,14 +142,82 @@ test('xlsx and csv preview, duplicates, row selection and template', async ({ pa
   await expect(page.getByText('Đã lưu', { exact: true })).toBeVisible();
   expect(saved).toEqual(['Mới']);
   await page.getByRole('button', { name: 'Đóng xem trước' }).click();
-  await page
-    .getByLabel('File tri thức')
-    .setInputFiles({
-      name: 'test.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(
-        '\ufeffTiêu đề,Nội dung,Tags,Trạng thái\nCSV mới,"Nội dung, có dấu phẩy",tag,active',
-      ),
-    });
+  await page.getByLabel('File tri thức').setInputFiles({
+    name: 'test.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(
+      '\ufeffTiêu đề,Nội dung,Tags,Trạng thái\nCSV mới,"Nội dung, có dấu phẩy",tag,active',
+    ),
+  });
   await expect(page.getByLabel('Chọn dòng 1: CSV mới')).toBeChecked();
+});
+
+test('unreadable key can be replaced and saved without a connection check', async ({ page }) => {
+  await page.route('**/api/**/admin/ai-settings', (route) =>
+    route.fulfill({
+      json: {
+        success: true,
+        data:
+          route.request().method() === 'PUT'
+            ? config
+            : {
+                ...config,
+                has_api_key: false,
+                api_key_masked: null,
+                api_key_error: 'Key không đọc được, cần nhập lại API key',
+                prices: [],
+              },
+      },
+    }),
+  );
+  let checks = 0;
+  await page.route('**/api/**/admin/ai-settings/test-connection', (route) => {
+    checks += 1;
+    return route.abort();
+  });
+  await page.goto('/admin/ai-settings');
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('Key không đọc được');
+  await page.getByRole('button', { name: 'Mở cấu hình API key' }).click();
+  await page.getByLabel('API key mới').fill('replacement-key');
+  const saved = page.waitForRequest(
+    (request) => request.method() === 'PUT' && request.url().endsWith('/admin/ai-settings'),
+  );
+  await page.getByRole('button', { name: 'Lưu cấu hình' }).click();
+  expect((await saved).postDataJSON().api_key).toBe('replacement-key');
+  await expect(page.getByLabel('API key mới')).toHaveValue('');
+  expect(checks).toBe(0);
+});
+
+test('tests unsaved credentials and allows saving after a failed connection', async ({ page }) => {
+  let draft: unknown;
+  await page.route('**/api/**/admin/ai-settings/test-connection', (route) => {
+    draft = route.request().postDataJSON();
+    return route.fulfill({
+      status: 400,
+      json: { success: false, message: 'API key không hợp lệ' },
+    });
+  });
+  await page.goto('/admin/ai-settings');
+  await page.getByRole('switch').check();
+  await page.getByRole('combobox', { name: 'Nhà cung cấp' }).selectOption('gemini');
+  await page.getByLabel('Model', { exact: true }).fill('draft-model');
+  await page.getByLabel('API key mới').fill('draft-key');
+  await page.getByRole('button', { name: 'Kiểm tra kết nối', exact: true }).click();
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'API key không hợp lệ' }).first(),
+  ).toBeVisible();
+  expect(draft).toEqual({ provider: 'gemini', model: 'draft-model', api_key: 'draft-key' });
+  const prices = [
+    { provider: 'gemini', model: 'draft-model', input_per_million: 1, output_per_million: 2 },
+  ];
+  await page.getByLabel('Bảng giá AI', { exact: true }).fill(JSON.stringify(prices));
+  const saved = page.waitForRequest(
+    (request) => request.method() === 'PUT' && request.url().endsWith('/admin/ai-settings'),
+  );
+  await page.getByRole('button', { name: 'Lưu cấu hình' }).click();
+  expect((await saved).postDataJSON()).toMatchObject({
+    provider: 'gemini',
+    model: 'draft-model',
+    prices,
+  });
 });

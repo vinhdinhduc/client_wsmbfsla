@@ -1,5 +1,12 @@
 import { apiFetch } from './client';
 
+export interface AiPrice {
+  provider: 'openai' | 'anthropic' | 'gemini';
+  model: string;
+  input_per_million: number;
+  output_per_million: number;
+}
+
 export interface AiSettings {
   provider: 'openai' | 'anthropic' | 'gemini';
   model: string;
@@ -12,6 +19,8 @@ export interface AiSettings {
   enabled: boolean;
   has_api_key: boolean;
   api_key_masked: string | null;
+  api_key_error?: string | null;
+  prices?: AiPrice[];
 }
 
 export interface AiKnowledgeEntry {
@@ -56,6 +65,19 @@ export const aiApi = {
     apiFetch<AiChatLog[]>('/admin/ai-chat-logs', { params: { flagged } }),
   updateLog: (id: number, body: { flagged_for_review?: boolean; was_helpful?: boolean | null }) =>
     apiFetch<AiChatLog>(`/admin/ai-chat-logs/${id}`, { method: 'PUT', body }),
-  stats: () => apiFetch<{ conversations:number;input_tokens:number;output_tokens:number;estimated_cost:number;avg_latency_ms:number;flagged:number }>('/admin/ai-stats'),
-  playground: (message:string) => apiFetch<{reply:string}>('/admin/ai-playground',{method:'POST',body:{message}}),
+  stats: () =>
+    apiFetch<{
+      conversations: number;
+      input_tokens: number;
+      output_tokens: number;
+      estimated_cost: number;
+      avg_latency_ms: number;
+      flagged: number;
+      provider_calls: number;
+      failed_calls: number;
+      usage_missing: number;
+      cost_missing: number;
+    }>('/admin/ai-stats'),
+  playground: (message: string) =>
+    apiFetch<{ reply: string }>('/admin/ai-playground', { method: 'POST', body: { message } }),
 };
