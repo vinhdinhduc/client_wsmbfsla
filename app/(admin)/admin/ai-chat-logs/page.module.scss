@@ -1,40 +1,733 @@
-@use '../../../../styles/variables' as *;
 .page {
-  width: min(100%, 80rem);
+  width: min(100%, 90rem);
   margin: 0 auto;
-  padding: 2rem 1rem 4rem;
+  padding: 1.5rem 1rem 3rem;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.page *,
+.thread *,
+.deleteForm * {
+  box-sizing: border-box;
 }
 .header {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 .title {
   margin: 0;
   font-family: var(--font-heading);
-  color: var(--color-neutral-900);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
 }
 .header p {
-  color: var(--color-neutral-500);
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+.headerActions,
+.cardActions,
+.contactLine,
+.logMeta,
+.drawerMeta,
+.dialogActions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.headerActions button {
+  white-space: nowrap;
+}
+.notice {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 0.85rem;
+}
+.overview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.stat {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-card);
+}
+.stat span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 0.65rem;
+}
+.stat strong {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.sparkline {
+  color: var(--color-primary);
+  width: 100%;
+  height: 2.3rem;
+  overflow: visible;
+}
+.retention,
+.keyboardHint {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+.retention a,
+.faq a,
+.knowledgeLink,
+.cardActions a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+.faq {
+  margin: 1.25rem 0;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+.faq h2 {
+  font-size: 1rem;
+  margin: 0 0 0.85rem;
+}
+.faqList {
+  display: grid;
+  gap: 0.7rem;
+}
+.faqList > div {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.85rem;
+}
+.faqList p {
+  flex: 1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.faqList span {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.faqList a {
+  white-space: nowrap;
+}
+.workspace {
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.tabs button {
+  padding: 0.85rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.tabs button[aria-selected='true'] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
+}
+.tabs button span {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.4rem;
+  background: var(--bg-main);
+  border-radius: 1rem;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem;
+}
+.search {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  padding-left: 0.65rem;
+  flex: 1;
+  min-width: 12rem;
+  color: var(--text-secondary);
+}
+.search input {
+  min-width: 0;
+  width: 100%;
+  border: 0 !important;
+  background: transparent !important;
+}
+.page input:not([type='checkbox']),
+.page select,
+.thread input,
+.thread select,
+.thread textarea,
+.deleteForm input,
+.deleteForm select {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.6rem;
+  font: inherit;
+  font-size: 0.82rem;
+  max-width: 100%;
+}
+.page input[type='checkbox'] {
+  accent-color: var(--color-primary);
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.page button:focus-visible,
+.page a:focus-visible,
+.page input:focus-visible,
+.page select:focus-visible,
+.thread button:focus-visible,
+.thread a:focus-visible,
+.thread select:focus-visible,
+.thread textarea:focus-visible,
+.thread summary:focus-visible,
+.deleteForm input:focus-visible,
+.deleteForm select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.checkLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.dateRange {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 0.85rem 0.85rem;
+}
+.dateRange label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+.viewBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-main);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.viewBar > div {
+  display: flex;
+  gap: 0.5rem;
 }
 .list {
   display: grid;
+}
+.listRow {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  min-width: 0;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border);
 }
-.log {
-  padding: 1.25rem;
+.listRow:last-child {
+  border-bottom: 0;
+}
+.rowOpen {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.rowOpen p {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rowOpen .answerPreview {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+}
+.session {
+  font-family: ui-monospace, monospace;
+}
+.rowBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.badge,
+.warningBadge {
+  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.35rem;
+  background: var(--bg-main);
+  color: var(--text-secondary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+}
+.warningBadge,
+.needs_knowledge {
+  background: color-mix(in srgb, #d99b18 10%, var(--bg-card));
+  color: #926000;
+  border-color: color-mix(in srgb, #d99b18 35%, var(--border));
+}
+.resolved {
+  background: color-mix(in srgb, #16a34a 9%, var(--bg-card));
+  color: #168744;
+  border-color: color-mix(in srgb, #16a34a 30%, var(--border));
+}
+.new {
+  color: var(--color-primary);
+}
+.ignored {
+  color: var(--text-secondary);
+}
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.rowActions button,
+.deleteIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.rowActions button:hover,
+.deleteIcon:hover {
+  background: var(--bg-main);
+}
+.deleteIcon:not(:disabled) {
+  color: #dc2626;
+}
+.rowActions button:disabled,
+.deleteIcon:disabled,
+.textButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+.pagination p {
+  margin: 0;
+}
+.pagination label,
+.pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pagination input {
+  width: 3.9rem;
+}
+.loading {
+  padding: 1.25rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.skeleton {
+  height: 5rem;
+  margin-top: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--bg-main);
+  opacity: 0.65;
+}
+.empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.empty h2 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+.empty p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  z-index: 5;
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
   background: var(--bg-card);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
+  font-size: 0.82rem;
 }
-.log small {
-  color: var(--color-neutral-500);
+.bulkSticky {
+  position: sticky;
+  bottom: 0.7rem;
 }
-.log p {
+.bulkBar > div {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+.textButton {
+  border: 0;
+  padding: 0.2rem 0;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  text-underline-offset: 3px;
+}
+.textButton:hover {
+  text-decoration: underline;
+}
+.undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  margin-top: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+}
+.drawerMeta {
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.85rem;
+}
+.thread {
+  display: grid;
+  gap: 1.2rem;
+  padding-top: 1rem;
+  color: var(--text-primary);
+}
+.threadItem {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.25rem;
+  min-width: 0;
+}
+.logMeta {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.bubbleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.7rem;
+}
+.customerAvatar,
+.botAvatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--bg-main);
+  color: var(--text-secondary);
+}
+.botAvatar {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--bg-card));
+}
+.bubble {
+  min-width: 0;
+  flex: 1;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0 0.7rem 0.7rem 0.7rem;
+  background: var(--bg-main);
+}
+.customerBubble {
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--bg-card));
+}
+.bubble strong {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.messageText {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+  font-size: 0.87rem;
+  margin: 0.35rem 0 0;
+}
+.feedback {
+  margin: 0.4rem 0 0.75rem 2.45rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.contactLine {
+  margin-bottom: 0.65rem;
+}
+.cardActions {
+  font-size: 0.78rem;
+}
+.cardActions .deleteIcon {
+  margin-left: auto;
+}
+.note,
+.technical {
+  margin-top: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+.note summary,
+.technical summary {
+  cursor: pointer;
+  padding: 0.4rem 0;
+}
+.note textarea {
+  width: 100%;
+  margin: 0.5rem 0;
+  resize: vertical;
+}
+.technical dl {
+  margin: 0.65rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.technical dl > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) 2fr;
+  gap: 0.65rem;
+}
+.technical dt {
+  color: var(--text-secondary);
+}
+.technical dd {
+  margin: 0;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+.technical ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.deleteForm {
+  display: grid;
+  gap: 0.85rem;
+  color: var(--text-primary);
+}
+.deleteForm p {
+  margin: 0;
+  font-size: 0.9rem;
   line-height: 1.65;
 }
-.question {
-  color: var(--color-neutral-900);
+.deleteForm label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+.deleteForm > button {
+  justify-self: start;
+}
+.dialogActions {
+  justify-content: flex-end;
+  padding-top: 0.65rem;
+}
+.previewCount {
+  font-weight: 600;
+}
+:global([data-theme='dark']) .warningBadge,
+:global([data-theme='dark']) .needs_knowledge {
+  color: #f5c267;
+}
+:global([data-theme='dark']) .resolved {
+  color: #72d998;
+}
+@media (max-width: 1000px) {
+  .overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .header {
+    flex-direction: column;
+  }
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 1rem 0.6rem 2rem;
+  }
+  .headerActions {
+    width: 100%;
+  }
+  .overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .stat {
+    padding: 0.75rem;
+  }
+  .stat strong {
+    font-size: 1.3rem;
+  }
+  .stat:last-child {
+    grid-column: 1 / -1;
+  }
+  .stat:last-child .sparkline {
+    width: 10rem;
+  }
+  .faqList > div {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.7rem;
+  }
+  .faqList p {
+    flex-basis: 100%;
+  }
+  .toolbar {
+    gap: 0.5rem;
+    padding: 0.65rem;
+  }
+  .search {
+    flex-basis: 100%;
+  }
+  .toolbar > select {
+    flex: 1;
+    min-width: 8rem;
+  }
+  .checkLabel {
+    white-space: normal;
+  }
+  .viewBar {
+    flex-wrap: wrap;
+    padding: 0.65rem;
+  }
+  .viewBar > div {
+    width: 100%;
+  }
+  .viewBar select {
+    flex: 1;
+    min-width: 0;
+  }
+  .listRow {
+    gap: 0.5rem;
+    padding: 0.65rem;
+  }
+  .rowActions {
+    flex-direction: column;
+  }
+  .rowMeta {
+    gap: 0.35rem 0.6rem;
+  }
+  .pagination {
+    gap: 0.85rem;
+    padding: 0.75rem;
+  }
+  .pagination > p {
+    flex-basis: 100%;
+  }
+  .pagination > label {
+    flex-wrap: wrap;
+  }
+  .pagination > div {
+    flex-wrap: wrap;
+  }
+  .bulkBar {
+    padding: 0.75rem;
+    bottom: 0.35rem;
+  }
+  .bulkBar > div {
+    width: 100%;
+  }
+  .bulkBar button {
+    flex-shrink: 0;
+  }
+  .technical dl > div {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+  .cardActions {
+    gap: 0.5rem;
+  }
+  .bubble {
+    padding: 0.6rem 0.7rem;
+  }
+  .messageText {
+    font-size: 0.83rem;
+  }
+  .dateRange {
+    flex-wrap: wrap;
+  }
 }

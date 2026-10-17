@@ -109,7 +109,7 @@ for (const width of [390, 1440]) {
     await page.goto('/chinh-sach-bao-mat');
     await page.getByRole('button', { name: 'Chat với AI', exact: true }).click();
     const chat = page.getByRole('dialog', { name: 'Trợ lý AI MobiFone Sơn La' });
-    await chat.getByRole('checkbox').check();
+    await expect(chat.getByRole('checkbox')).toHaveCount(0);
     await chat.getByRole('button', { name: 'Gói cước nào rẻ?' }).click();
     await expect(chat.getByText(/Bạn cần bao nhiêu data/)).toBeVisible();
     await expect(chat.getByRole('link', { name: 'Gói C90N' })).toHaveAttribute(
@@ -119,9 +119,10 @@ for (const width of [390, 1440]) {
     await expect(chat.getByRole('link', { name: 'Không được hiển thị' })).toHaveCount(0);
     await page.reload();
     await page.getByRole('button', { name: 'Chat với AI', exact: true }).click();
-    await chat.getByRole('checkbox').check();
+    await expect(chat.getByRole('checkbox')).toHaveCount(0);
     await expect(chat.getByText(/Bạn cần bao nhiêu data/)).toBeVisible();
-    await chat.getByRole('button', { name: 'Xóa hội thoại' }).click();
+    await chat.getByRole('button', { name: 'Cuộc trò chuyện mới' }).click();
+    await chat.getByRole('button', { name: 'Xóa và bắt đầu mới' }).click();
     await expect(chat.getByText(/Bạn cần bao nhiêu data/)).toHaveCount(0);
     fail = true;
     await chat.getByRole('textbox', { name: 'Câu hỏi cho trợ lý AI' }).fill('Tư vấn SIM số đẹp');
@@ -158,7 +159,7 @@ test('provider unavailable offers human support and retry without exposing crede
   await page.goto('/chinh-sach-bao-mat');
   await page.getByRole('button', { name: 'Chat với AI', exact: true }).click();
   const chat = page.getByRole('dialog', { name: 'Trợ lý AI MobiFone Sơn La' });
-  await chat.getByRole('checkbox').check();
+  await expect(chat.getByRole('checkbox')).toHaveCount(0);
   await chat.getByRole('button', { name: 'Gói cước nào rẻ?' }).click();
   await expect(chat.getByRole('link', { name: 'Liên hệ nhân viên hỗ trợ' })).toHaveAttribute(
     'href',

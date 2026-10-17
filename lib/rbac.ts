@@ -10,6 +10,7 @@ import {
   ClipboardList,
   Mail,
   GalleryHorizontal,
+  Gift,
   Send,
   Users,
   CalendarClock,
@@ -80,6 +81,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
     roles: ['admin', 'chuyen_vien'],
   },
   { href: '/admin/newsletter', label: 'Newsletter', icon: Send, roles: ['admin', 'chuyen_vien'] },
+  { href: '/admin/promotions', label: 'Hộp quà khuyến mại', icon: Gift, roles: ['admin'] },
   { href: '/admin/users', label: 'Tài khoản', icon: Users, roles: ['admin'] },
   { href: '/admin/shifts', label: 'Ca trực', icon: CalendarClock, roles: ['admin'] },
   { href: '/admin/stations', label: 'Trạm BTS', icon: RadioTower, roles: ['admin'] },
@@ -95,6 +97,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
 
 /** Danh sach prefix route + vai tro duoc phep, dung boi middleware.ts (khong dung JSX nen tach rieng). */
 export const ADMIN_ROUTE_ROLES: Array<{ prefix: string; roles: UserRole[] }> = [
+  { prefix: '/admin/promotions', roles: ['admin'] },
   { prefix: '/admin/stations', roles: ['admin'] },
   { prefix: '/admin/users', roles: ['admin'] },
   { prefix: '/admin/shifts', roles: ['admin'] },

@@ -1,6 +1,7 @@
 .shell {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
+  flex: 1;
   flex-direction: column;
   overflow: hidden;
   background: var(--bg-main);

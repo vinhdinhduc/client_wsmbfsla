@@ -10,10 +10,10 @@ export const appointmentsApi = {
       cache: 'no-store',
     }),
   list: () => apiFetch<StoreAppointment[]>('/admin/appointments'),
-  updateStatus: (id: number, status: AppointmentStatus) =>
+  updateStatus: (id: number, changes: { status: AppointmentStatus; assigned_to?: number | null }) =>
     apiFetch<StoreAppointment>(`/admin/appointments/${id}`, {
       method: 'PATCH',
-      body: { status },
+      body: changes,
     }),
   cancel: (token: string) =>
     apiFetch<{ code: string; status: AppointmentStatus }>('/public/appointments/cancel', {

@@ -5,6 +5,10 @@
   z-index: 40;
   display: flex;
   width: 17rem;
+  height: 100vh;
+  height: 100dvh;
+  max-width: calc(100% - 2rem);
+  visibility: hidden;
   flex-shrink: 0;
   flex-direction: column;
   border-right: 1px solid var(--border);
@@ -17,14 +21,17 @@
   @media (min-width: $breakpoint-lg) {
     position: fixed;
     transform: none;
+    visibility: visible;
   }
 }
 .mobileOpen {
   transform: translateX(0);
+  visibility: visible;
 }
 .brand {
   display: flex;
   height: 4rem;
+  flex-shrink: 0;
   align-items: center;
   gap: $space-2;
   border-bottom: 1px solid var(--border);
@@ -74,7 +81,9 @@
 }
 .nav {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1rem 0.75rem;
 }
 .link {
@@ -168,19 +177,46 @@
   flex-shrink: 0;
 }
 .sidebarFooter {
-  margin: 0 1rem 1.25rem;
-  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin: 0 1rem;
+  padding: 0.875rem 0 calc(1rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border);
   color: var(--color-neutral-500);
   font-size: 0.6875rem;
   line-height: 1.5;
+}
+.footerLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 9rem;
+  max-width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-primary);
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.footerCaption {
+  display: block;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 .homeLink {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
-  margin-bottom: 0.9rem;
+  width: 100%;
+  min-height: 2.75rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.65rem 0.75rem;
@@ -198,23 +234,7 @@
   }
 }
 
-.sidebar {
-  height: 100dvh;
-  max-width: calc(100% - 2rem);
-  visibility: hidden;
-}
-.mobileOpen {
-  visibility: visible;
-}
-.brand {
-  flex-shrink: 0;
-}
 .closeButton {
   min-width: 2.75rem;
   height: 2.75rem;
-}
-@media (min-width: 1024px) {
-  .sidebar {
-    visibility: visible;
-  }
 }

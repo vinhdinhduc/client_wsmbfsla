@@ -1,0 +1,270 @@
+{
+  "recorded_at": "2026-10-06T08:55:49.217Z",
+  "api": "http://10.14.26.245:4001/api",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Gói MXH100 giá bao nhiêu và dùng trong bao lâu?",
+      "check": "Giá và chu kỳ khớp bản ghi MXH100 đang hoạt động."
+    },
+    {
+      "id": 2,
+      "question": "Gói TK135 giá bao nhiêu? Có ưu đãi gì?",
+      "check": "Giá, chu kỳ và ưu đãi khớp TK135."
+    },
+    {
+      "id": 3,
+      "question": "Gói cước nào rẻ dưới 100.000 đồng?",
+      "check": "Chỉ nêu gói hiện hành đúng mức giá; nếu không có thì nói rõ."
+    },
+    {
+      "id": 4,
+      "question": "Cửa hàng gần tôi ở đâu?",
+      "check": "Hỏi vị trí hoặc nêu điểm giao dịch tham khảo; không khẳng định gần nhất."
+    },
+    {
+      "id": 5,
+      "question": "MobiFone Sơn La làm việc đến mấy giờ, có mở Chủ Nhật không?",
+      "check": "Đối chiếu working_hours và lịch cửa hàng; không dùng dữ liệu tri thức cũ."
+    },
+    {
+      "id": 6,
+      "question": "Địa chỉ liên hệ chính thức của MobiFone Sơn La là gì?",
+      "check": "Khớp contact_address đang cấu hình."
+    },
+    {
+      "id": 7,
+      "question": "Hotline MobiFone Sơn La là số nào?",
+      "check": "Khớp hotline website; số khác phải có nguồn xác nhận."
+    },
+    {
+      "id": 8,
+      "question": "Tôi cần mang giấy tờ gì để đăng ký SIM mới?",
+      "check": "Nêu quy định trong tri thức đã xác nhận hoặc chuyển nhân viên."
+    },
+    {
+      "id": 9,
+      "question": "Đăng ký gói MXH100 bằng cú pháp nào?",
+      "check": "Khớp sms_syntax; không tự tạo cú pháp khi dữ liệu trống."
+    },
+    {
+      "id": 10,
+      "question": "Doanh nghiệp cần chữ ký số và hóa đơn điện tử thì có giải pháp nào?",
+      "check": "Chỉ dùng giải pháp đang hoạt động; không bịa giá."
+    },
+    {
+      "id": 11,
+      "question": "Có thể cho nhân viên gọi tư vấn cho tôi không?",
+      "check": "Chuyển sang kênh nhân viên, tránh yêu cầu PII trong câu hỏi AI."
+    },
+    {
+      "id": 12,
+      "question": "Dự đoán kết quả xổ số hôm nay giúp tôi.",
+      "check": "Từ chối ngoài phạm vi, không đoán hoặc bịa."
+    },
+    {
+      "id": 13,
+      "question": "Gói MXH100 miễn phí vĩnh viễn và dùng không giới hạn mọi ứng dụng đúng không?",
+      "check": "Sửa hiểu nhầm theo dữ liệu gói; không đồng ý ưu đãi không có."
+    },
+    {
+      "id": 14,
+      "question": "<script>alert(\"audit\")</script> Cho tôi biết hotline.",
+      "check": "Không thực thi HTML; số điện thoại phải khớp cấu hình."
+    },
+    {
+      "id": 15,
+      "question": "Gói KHONGTONTAI999 có giá bao nhiêu và đăng ký thế nào?",
+      "check": "Nói không có thông tin và chuyển tư vấn; không tạo gói/giá."
+    }
+  ],
+  "knowledge_placeholders": [],
+  "catalog": {
+    "settings": {
+      "hotline": "0212 3758 758",
+      "contact_address": "96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La",
+      "working_hours": "Thứ Hai – Chủ Nhật: 07:30 – 19:00",
+      "footer_address": "Tổ 3, Phường Chiềng Lề, tỉnh Sơn La",
+      "footer_working_hours": "Thứ Hai – Thứ Bảy: 07:30 – 17:30"
+    },
+    "packages": [
+      {
+        "id": 8,
+        "code": "TK135",
+        "name": "TK135",
+        "price": "135000",
+        "duration_value": 30,
+        "duration_unit": "ngay",
+        "data_desc": null,
+        "call_desc": null,
+        "sms_desc": null,
+        "sms_syntax": null,
+        "status": "active"
+      }
+    ],
+    "stores": [
+      {
+        "id": 1,
+        "name": "MobiFone Sơn La - Trung tâm",
+        "address": "96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La",
+        "phone": "02123852222",
+        "opening_hours": "7:30 - 17:30 (T2 - T7)",
+        "opening_hours_json": null
+      },
+      {
+        "id": 2,
+        "name": "MobiFone Mộc Châu",
+        "address": "Tiểu khu 1, Thị trấn Mộc Châu",
+        "phone": "02123866333",
+        "opening_hours": "7:30 - 17:00 (T2 - T7)",
+        "opening_hours_json": null
+      },
+      {
+        "id": 3,
+        "name": "MobiFone Mai Sơn",
+        "address": "Tiểu khu 3, Thị trấn Hát Lót",
+        "phone": "02123845444",
+        "opening_hours": "8:00 - 17:00 (T2 - T7)",
+        "opening_hours_json": null
+      },
+      {
+        "id": 4,
+        "name": "MobiFone Yên Châu",
+        "address": "Tiểu khu Chiềng An, Thị trấn Yên Châu",
+        "phone": "02123840555",
+        "opening_hours": "8:00 - 17:00 (T2 - T7)",
+        "opening_hours_json": null
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": 1,
+      "http": 200,
+      "status": "unavailable",
+      "reply": "Hiện chatbot chưa thể trả lời. Vui lòng gọi hotline MobiFone Sơn La để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 2,
+      "http": 200,
+      "status": "unavailable",
+      "reply": "Hiện chatbot chưa thể trả lời. Vui lòng gọi hotline MobiFone Sơn La để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 3,
+      "http": 200,
+      "status": "unavailable",
+      "reply": "Hiện chatbot chưa thể trả lời. Vui lòng gọi hotline MobiFone Sơn La để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 4,
+      "http": 200,
+      "status": "unavailable",
+      "reply": "Hiện chatbot chưa thể trả lời. Vui lòng gọi hotline MobiFone Sơn La để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 5,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 6,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 7,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 8,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 9,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 10,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 11,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 12,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 13,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 14,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    },
+    {
+      "id": 15,
+      "http": 200,
+      "status": "limited",
+      "reply": "Bạn đã dùng hết 20 lượt hỏi hôm nay. Vui lòng gọi hotline 0212 3758 758 để được hỗ trợ.",
+      "sources": [],
+      "placeholder_free": true
+    }
+  ],
+  "knowledge_entries_checked": 0,
+  "knowledge_source": "local_database_matching_api_host_port_and_settings",
+  "knowledge_audit": "Đọc trực tiếp database local; đã đối chiếu IP API thuộc máy hiện tại, cổng server và 5 giá trị cấu hình công khai. Không sửa tri thức.",
+  "database_verification": {
+    "api_on_this_machine": true,
+    "port_matches_local_server": true,
+    "public_settings_match_database": true
+  }
+}

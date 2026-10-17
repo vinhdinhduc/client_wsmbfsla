@@ -62,7 +62,9 @@ export function Footer() {
           <div className={styles.footer__details}>
             <p className={styles.footer__detail}>
               <MapPin className={styles.footer__detailIcon} />
-              {settings?.contact_address ?? settings?.footer_address ?? 'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
+              {settings?.contact_address ??
+                settings?.footer_address ??
+                'Tổ 3, Phường Chiềng Lề, tỉnh Sơn La'}
             </p>
             <p className={styles.footer__detail}>
               <MapPin className={styles.footer__detailIcon} />
@@ -74,7 +76,9 @@ export function Footer() {
             </p>
             <p className={styles.footer__detail}>
               <Clock3 className={styles.footer__detailIcon} />
-              {settings?.working_hours ?? settings?.footer_working_hours ?? 'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
+              {settings?.working_hours ??
+                settings?.footer_working_hours ??
+                'Thứ Hai – Thứ Bảy: 07:30 – 17:30'}
             </p>
           </div>
         </div>
@@ -126,7 +130,13 @@ export function Footer() {
               className={styles.footer__input}
             />
             <TermsConsent checked={consent} onChange={setConsent} />
-            <Button type="submit" size="sm" isLoading={subscribe.isPending} disabled={!consent}>
+            <Button
+              type="submit"
+              size="md"
+              className={styles.footer__submit}
+              isLoading={subscribe.isPending}
+              disabled={!consent}
+            >
               Đăng ký
             </Button>
           </form>
@@ -142,7 +152,14 @@ export function Footer() {
               aria-label="Facebook MobiFone Sơn La"
               className={styles.footer__socialLink}
             >
-              <svg className={styles.footer__socialIcon} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z" /></svg>
+              <svg
+                className={styles.footer__socialIcon}
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z" />
+              </svg>
             </a>
             {settings?.footer_zalo_url && (
               <a
@@ -163,7 +180,17 @@ export function Footer() {
                 aria-label="YouTube MobiFone Sơn La"
                 className={styles.footer__socialLink}
               >
-                <svg className={styles.footer__socialIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" /><path d="m10 9 5 3-5 3V9z" fill="currentColor" stroke="none" /></svg>
+                <svg
+                  className={styles.footer__socialIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
+                  <rect x="2" y="5" width="20" height="14" rx="4" />
+                  <path d="m10 9 5 3-5 3V9z" fill="currentColor" stroke="none" />
+                </svg>
               </a>
             )}
           </div>

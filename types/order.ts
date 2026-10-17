@@ -31,7 +31,13 @@ export interface RegistrationGroup {
   total_amount?: number;
   customer_type?: 'individual' | 'business';
   store_id?: number | null;
-  events?: Array<{ from_status: RegistrationStatus | null; to_status: RegistrationStatus; actor_id: number | null; note: string | null; created_at: string }>;
+  events?: Array<{
+    from_status: RegistrationStatus | null;
+    to_status: RegistrationStatus;
+    actor_id: number | null;
+    note: string | null;
+    created_at: string;
+  }>;
   customer_name: string;
   phone: string;
   province: string;
@@ -57,11 +63,14 @@ export interface SubmitCartPayload {
 export type ContactStatus = 'moi' | 'dang_xu_ly' | 'da_phan_hoi';
 
 export interface ContactMessage {
+  source?: 'website' | 'chatbot';
   id: number;
   name: string;
   phone: string;
   email: string;
   message: string;
+  assigned_to?: number | null;
+  internal_note?: string | null;
   status: ContactStatus;
   code?: string | null;
   topic?: string | null;

@@ -35,7 +35,7 @@ export function SimResultsTable({ sims }: { sims: SimNumber[] }) {
                     {sim.phone_number}
                   </Link>
                 </td>
-                <td data-label="Phí hòa mạng">{formatPrice(sim.activation_fee)} (một lần)</td>
+                <td data-label="Phí hòa mạng">{formatPrice(sim.activation_fee)}</td>
                 <td data-label="Cam kết">
                   <SimCommitment sim={sim} />
                 </td>

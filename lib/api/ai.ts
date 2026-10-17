@@ -22,6 +22,7 @@ export interface AiSettings {
   api_key_error?: string | null;
   prices?: AiPrice[];
   profiles?: AiProfile[];
+  log_retention_days?: number;
 }
 
 export interface AiProfile {
@@ -108,7 +109,76 @@ export interface AiChatLog {
   ai_response: string;
   flagged_for_review: boolean;
   was_helpful: boolean | null;
+  feedback_comment?: string | null;
   created_at: string;
+  review_status?: AiLogReviewStatus;
+  internal_note?: string | null;
+  knowledge_entry_id?: number | null;
+  question_key?: string;
+  provider?: string | null;
+  model?: string | null;
+  latency_ms?: number | null;
+  is_unanswered?: boolean;
+  has_contact_info?: boolean;
+  diagnostics?: {
+    answer_status?: 'answered' | 'unavailable' | 'restricted';
+    rag_enabled?: boolean;
+    retrieval_mode?: 'keyword';
+    retrieved_count?: number;
+    sources?: Array<{ type: string; id?: number; title: string; href?: string }>;
+    max_score?: number | null;
+    fallback_reason?: string | null;
+  } | null;
+}
+
+export type AiLogReviewStatus = 'new' | 'needs_knowledge' | 'resolved' | 'ignored';
+export type AiLogTab = 'all' | 'unanswered' | 'needs_knowledge' | 'resolved' | 'disliked';
+export interface AiLogFilters {
+  mode?: 'conversations' | 'messages';
+  search?: string;
+  status?: AiLogReviewStatus | '';
+  from?: string;
+  to?: string;
+  unanswered?: boolean;
+  feedback?: 'positive' | 'negative' | '';
+  sort?: 'newest' | 'oldest' | 'frequent';
+  tab?: AiLogTab;
+}
+export interface AiLogConversation {
+  session_id: string;
+  started_at: string;
+  last_at: string;
+  message_count: number;
+  first_question: string;
+  has_unanswered: boolean;
+  has_contact_info: boolean;
+}
+export interface AiLogPage {
+  items: Array<AiChatLog | AiLogConversation>;
+  total: number;
+  page: number;
+  page_size: number;
+  mode: 'conversations' | 'messages';
+  tab_counts: Record<AiLogTab, number>;
+  snapshot_max_id: number;
+  legacy?: boolean;
+}
+export interface AiLogSummary {
+  conversations: number;
+  total_messages: number;
+  answered_rate: number;
+  unanswered: number;
+  dislikes: number;
+  retention_days: number;
+  daily: Array<{ day: string; total: number; unanswered: number }>;
+  faq: Array<{ question_key: string; question: string; count: number; latest_at: string }>;
+}
+export interface AiLogSelection {
+  ids?: number[];
+  session_ids?: string[];
+  filter?: AiLogFilters;
+  snapshot_max_id?: number;
+  cleanup?: { older_than_days?: 30 | 60 | 90; status?: 'resolved'; answered?: boolean; all?: boolean };
 }
 
 export const aiApi = {
@@ -142,7 +212,7 @@ export const aiApi = {
     ),
   listKnowledge: (search?: string) =>
     apiFetch<AiKnowledgeEntry[]>('/admin/ai-knowledge', { params: { search } }),
-  createKnowledge: (body: Pick<AiKnowledgeEntry, 'title' | 'content' | 'tags' | 'status'>) =>
+  createKnowledge: (body: Pick<AiKnowledgeEntry, 'title' | 'content' | 'tags' | 'status'> & { source_log_ids?: number[]; source_question_key?: string }) =>
     apiFetch<AiKnowledgeEntry>('/admin/ai-knowledge', { method: 'POST', body }),
   updateKnowledge: (
     id: number,
@@ -152,7 +222,22 @@ export const aiApi = {
     apiFetch<null>(`/admin/ai-knowledge/${id}`, { method: 'DELETE' }),
   listLogs: (flagged?: boolean) =>
     apiFetch<AiChatLog[]>('/admin/ai-chat-logs', { params: { flagged } }),
-  updateLog: (id: number, body: { flagged_for_review?: boolean; was_helpful?: boolean | null }) =>
+  queryLogs: (filters: AiLogFilters & { page: number; page_size: number }, signal?: AbortSignal) =>
+    apiFetch<AiLogPage | AiChatLog[]>('/admin/ai-chat-logs', { params: { ...filters }, signal }),
+  logSummary: (filters: AiLogFilters, signal?: AbortSignal) =>
+    apiFetch<AiLogSummary>('/admin/ai-chat-logs/summary', { params: { ...filters }, signal }),
+  logSession: (sessionId: string, page = 1, signal?: AbortSignal) =>
+    apiFetch<{ items: AiChatLog[]; total: number; page: number; page_size: number }>(
+      `/admin/ai-chat-logs/sessions/${encodeURIComponent(sessionId)}`, { params: { page, page_size: 100 }, signal }),
+  revealLog: (id: number) => apiFetch<AiChatLog>(`/admin/ai-chat-logs/${id}/reveal`, { method: 'POST' }),
+  bulkLogs: (body: AiLogSelection & { action: 'preview_delete' | 'delete' | 'resolve'; expected_count?: number; confirmation?: string }) =>
+    apiFetch<{ count: number; affected?: number; batch_id?: string; requires_confirmation?: boolean }>('/admin/ai-chat-logs/bulk', { method: 'POST', body }),
+  deleteLog: (id: number) => apiFetch<{ affected: number; batch_id: string }>(`/admin/ai-chat-logs/${id}`, { method: 'DELETE' }),
+  deleteLogSession: (sessionId: string) => apiFetch<{ affected: number; batch_id: string }>(`/admin/ai-chat-logs/sessions/${encodeURIComponent(sessionId)}`, { method: 'DELETE' }),
+  restoreLogs: (batch_id: string) => apiFetch<{ affected: number }>('/admin/ai-chat-logs/restore', { method: 'POST', body: { batch_id } }),
+  exportLogs: (selection: AiLogSelection, format: 'csv' | 'xlsx' = 'csv') =>
+    apiFetch<Blob>('/admin/ai-chat-logs/export', { method: 'POST', body: { ...selection, format } }),
+  updateLog: (id: number, body: { flagged_for_review?: boolean; was_helpful?: boolean | null; review_status?: AiLogReviewStatus; internal_note?: string }) =>
     apiFetch<AiChatLog>(`/admin/ai-chat-logs/${id}`, { method: 'PUT', body }),
   stats: () =>
     apiFetch<{

@@ -1,0 +1,108 @@
+.screen {
+  position: fixed;
+  inset: 0;
+  right: auto;
+  width: 100vw;
+  z-index: 2147483647;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #fff;
+  background: var(--color-primary);
+  touch-action: none;
+  transform: translateY(0);
+  transition: transform 900ms cubic-bezier(0.77, 0, 0.18, 1);
+
+  // The ellipse extends past the viewport and travels with the curtain.
+  &::after {
+    position: absolute;
+    top: calc(100% - 1px);
+    left: -10%;
+    width: 120%;
+    height: clamp(48px, 8vh, 96px);
+    border-radius: 0 0 50% 50%;
+    background: inherit;
+    content: '';
+  }
+}
+
+:global(html[data-initial-loader]) .screen {
+  display: flex;
+}
+
+:global(html[data-initial-loader='opening']) .screen {
+  transform: translateY(calc(-100% - 96px));
+}
+
+.content {
+  width: min(280px, 100%);
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.caption {
+  margin: 1.5rem 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.track {
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 25%);
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: #fff;
+  transform-origin: left;
+  transition: transform 240ms ease-out;
+}
+
+.percent {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.screen[data-phase='complete'] .logo,
+.screen[data-phase='opening'] .logo {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // Override the global reduced-motion reset for the requested 200ms fade.
+  .screen {
+    transform: none !important;
+    transition: opacity 200ms ease !important;
+  }
+
+  :global(html[data-initial-loader='opening']) .screen {
+    opacity: 0;
+  }
+
+  .screen[data-phase] .logo {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .fill {
+    transition: none;
+  }
+}

@@ -32,6 +32,7 @@ export type ApiFetchOptions = {
   /** Query string params - undefined/null se tu dong bi bo qua. */
   params?: Record<string, string | number | boolean | undefined | null>;
   headers?: Record<string, string>;
+  signal?: AbortSignal;
 };
 
 function readTokenFromBrowser(): string | undefined {
@@ -92,8 +93,10 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
       body: requestBody,
       cache,
       next,
+      signal: options.signal,
     });
-  } catch {
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
     throw new ApiError('Không thể kết nối tới máy chủ, vui lòng kiểm tra lại đường truyền mạng', 0);
   }
 

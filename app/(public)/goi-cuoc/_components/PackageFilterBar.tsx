@@ -146,7 +146,7 @@ export function PackageFilterBar({ packages, simId }: { packages: Package[]; sim
   );
 }
 
-function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () => void }) {
+export function PackageShowcaseCard({ pkg, onSelect, preview = false }: { pkg: Package; onSelect?: () => void; preview?: boolean }) {
   const { addItem, isInCart } = useCart();
   const key = `goi_cuoc-${pkg.id}`;
   const inCart = isInCart(key);
@@ -166,7 +166,7 @@ function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () =>
       <div className={styles.packageName}>{pkg.name}</div>
       <div className={styles.packageContent}>
         <PackageBadges pkg={pkg} />
-        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageLink}>
+        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageLink} tabIndex={preview ? -1 : undefined} onClick={preview ? e => e.preventDefault() : undefined}>
           {pkg.headline_desc?.trim() && (
             <strong className={styles.packageHighlight}>{pkg.headline_desc}</strong>
           )}
@@ -178,7 +178,7 @@ function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () =>
         <button
           type="button"
           className={styles.registerButton}
-          disabled={inCart}
+          disabled={preview || inCart}
           onClick={() => {
             if (onSelect) return onSelect();
             addItem({
@@ -191,18 +191,19 @@ function PackageShowcaseCard({ pkg, onSelect }: { pkg: Package; onSelect?: () =>
             });
           }}
         >
-          {inCart ? 'Đã thêm' : 'ĐĂNG KÝ'}
+          {!preview && inCart ? 'Đã thêm' : 'ĐĂNG KÝ'}
         </button>
         {pkg.sms_syntax && (
           <button
             className={styles.smsButton}
             type="button"
+            disabled={preview}
             onClick={() => navigator.clipboard.writeText(pkg.sms_syntax!)}
           >
             Sao chép cú pháp SMS
           </button>
         )}
-        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.detailLink}>
+        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.detailLink} tabIndex={preview ? -1 : undefined} onClick={preview ? e => e.preventDefault() : undefined}>
           Xem chi tiết <span>›</span>
         </Link>
       </div>

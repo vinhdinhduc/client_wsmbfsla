@@ -253,9 +253,7 @@ function SimShowcaseCard({ sim }: { sim: SimNumber }) {
     <article className={styles.simCard}>
       <Link href={`/sim-so-dep/${sim.id}`} className={styles.simInfo}>
         <strong>{sim.phone_number}</strong>
-        <span className={styles.simPrice}>
-          Phí hòa mạng: {formatPrice(sim.activation_fee)} (một lần)
-        </span>
+        <span className={styles.simPrice}>Phí hòa mạng: {formatPrice(sim.activation_fee)}</span>
         <SimCommitment sim={sim} />
         {sim.bundle_note?.trim() && (
           <div className={styles.simAttributes}>

@@ -3,7 +3,10 @@ import { FormEvent, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { jobsApi, Job } from '@/lib/api/jobs';
 import { useToast } from '@/components/ui/Toast';
-import { Pencil, Trash2, Download } from 'lucide-react';
+import { Pencil, Trash2, Download, Eye } from 'lucide-react';
+import { JobContent } from '@/components/jobs/JobContent';
+import { JOB_EMPLOYMENT_LABELS } from '@/lib/jobs-presentation';
+import previewStyles from '@/components/jobs/JobDetail.module.scss';
 import { TextField, SelectField, CheckboxField } from '@/components/ui/FormField';
 import { RichTextEditor } from '@/components/shared/RichTextEditor';
 import { Button } from '@/components/ui/Button';
@@ -38,6 +41,20 @@ export default function JobsAdmin() {
     { showToast } = useToast();
   const [form, setForm] = useState<Partial<Job>>(empty),
     [editing, setEditing] = useState<number>();
+  const [preview, setPreview] = useState(false);
+  async function downloadFile(load: () => Promise<Blob>, filename: string) {
+    try {
+      const blob = await load();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      showToast((error as Error).message, 'error');
+    }
+  }
   const jobs = useQuery({ queryKey: ['admin-jobs'], queryFn: jobsApi.listAdmin });
   const applications = useQuery({ queryKey: ['job-applications'], queryFn: jobsApi.applications });
   const save = useMutation({
@@ -73,6 +90,20 @@ export default function JobsAdmin() {
       >
         <form onSubmit={submit} className={styles.stack}>
           <FormSection title="Thông tin vị trí" columns>
+            <SelectField
+              label="Hình thức làm việc"
+              value={form.employment_type || 'full_time'}
+              onChange={(event) => setForm({ ...form, employment_type: event.target.value })}
+            >
+              {Object.entries(JOB_EMPLOYMENT_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+              {form.employment_type && !JOB_EMPLOYMENT_LABELS[form.employment_type] && (
+                <option value={form.employment_type}>{form.employment_type}</option>
+              )}
+            </SelectField>
             <TextField
               label="Tiêu đề"
               required
@@ -180,6 +211,16 @@ export default function JobsAdmin() {
             </SelectField>
           </FormSection>
           <FormActions>
+            <Button
+              type="button"
+              variant="outline"
+              aria-expanded={preview}
+              aria-controls="job-preview"
+              onClick={() => setPreview(!preview)}
+            >
+              <Eye size={18} aria-hidden="true" />
+              {preview ? 'Đóng xem trước' : 'Xem trước tin'}
+            </Button>
             {editing && (
               <Button
                 type="button"
@@ -198,6 +239,28 @@ export default function JobsAdmin() {
           </FormActions>
         </form>
       </FormCard>
+      {preview && (
+        <div
+          id="job-preview"
+          className={previewStyles.content}
+          aria-label="Xem trước tin tuyển dụng"
+        >
+          <section className={previewStyles.hero}>
+            <p className={previewStyles.eyebrow}>Bản xem trước · Chưa xuất bản</p>
+            <h2>{form.title || 'Tiêu đề vị trí'}</h2>
+            <p>
+              {form.location} · {form.quantity} người ·{' '}
+              {JOB_EMPLOYMENT_LABELS[form.employment_type || ''] || form.employment_type} · Hạn{' '}
+              {form.deadline}
+            </p>
+          </section>
+          <JobContent
+            description={form.description}
+            requirements={form.requirements}
+            benefits={form.benefits}
+          />
+        </div>
+      )}
       <FormCard title="Vị trí" description="Các vị trí đã tạo và trạng thái tuyển dụng.">
         <QueryState
           loading={jobs.isPending}
@@ -225,7 +288,13 @@ export default function JobsAdmin() {
                     label={`Sửa vị trí ${item.title}`}
                     onClick={() => {
                       setEditing(item.id);
-                      setForm(item);
+                      setForm({
+                        ...item,
+                        employment_type:
+                          Object.entries(JOB_EMPLOYMENT_LABELS).find(
+                            ([, label]) => label === item.employment_type,
+                          )?.[0] || item.employment_type,
+                      });
                     }}
                   >
                     <Pencil />
@@ -248,74 +317,75 @@ export default function JobsAdmin() {
           ))}
         </ResponsiveTable>
       </FormCard>
-      <FormCard
-        title="Hồ sơ ứng tuyển"
-        description="Theo dõi trạng thái, tải CV và xuất danh sách hồ sơ."
-        actions={
-          <Button
-            variant="secondary"
-            onClick={async () => {
-              const blob = await jobsApi.exportApplications();
-              const a = document.createElement('a');
-              a.href = URL.createObjectURL(blob);
-              a.download = 'ho-so-ung-tuyen.xlsx';
-              a.click();
-            }}
-          >
-            <Download size={18} aria-hidden="true" /> Xuất Excel
-          </Button>
-        }
-      >
-        <QueryState
-          loading={applications.isPending}
-          error={applications.error}
-          empty={!applications.data?.length}
-          emptyTitle="Chưa có hồ sơ ứng tuyển"
-        />
-        <ResponsiveTable label="Hồ sơ ứng tuyển" headings={['Ứng viên', 'Trạng thái', 'CV']}>
-          {applications.data?.map((item) => (
-            <tr key={item.id}>
-              <td data-label="Ứng viên">
-                <strong>{item.full_name}</strong>
-                <p>
-                  {item.code} · {item.job?.title || 'Nguồn ứng viên'}
-                </p>
-              </td>
-              <td data-label="Trạng thái">
-                <SelectField
-                  label={`Trạng thái hồ sơ ${item.code}`}
-                  value={item.status}
-                  onChange={(e) =>
-                    jobsApi
-                      .updateApplication(item.id, { status: e.target.value as typeof item.status })
-                      .then(() => client.invalidateQueries({ queryKey: ['job-applications'] }))
-                  }
-                >
-                  <option value="new">Mới</option>
-                  <option value="screening">Sơ loại</option>
-                  <option value="interview">Phỏng vấn</option>
-                  <option value="accepted">Đạt</option>
-                  <option value="rejected">Loại</option>
-                </SelectField>
-              </td>
-              <td data-label="CV">
-                <Button
-                  variant="secondary"
-                  onClick={async () => {
-                    const blob = await jobsApi.cv(item.id);
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `cv-${item.code}`;
-                    a.click();
-                  }}
-                >
-                  Tải CV
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </ResponsiveTable>
-      </FormCard>
+      <div id="applications" style={{ scrollMarginTop: '100px' }}>
+        <FormCard
+          title="Hồ sơ ứng tuyển"
+          description="Theo dõi trạng thái, tải CV và xuất danh sách hồ sơ."
+          actions={
+            <Button
+              variant="secondary"
+              onClick={() => downloadFile(jobsApi.exportApplications, 'ho-so-ung-tuyen.xlsx')}
+            >
+              <Download size={18} aria-hidden="true" /> Xuất Excel
+            </Button>
+          }
+        >
+          <QueryState
+            loading={applications.isPending}
+            error={applications.error}
+            empty={!applications.data?.length}
+            emptyTitle="Chưa có hồ sơ ứng tuyển"
+          />
+          <ResponsiveTable label="Hồ sơ ứng tuyển" headings={['Ứng viên', 'Trạng thái', 'CV']}>
+            {applications.data?.map((item) => (
+              <tr key={item.id}>
+                <td data-label="Ứng viên">
+                  <strong>{item.full_name}</strong>
+                  <p>
+                    {item.code} · {item.job?.title || 'Nguồn ứng viên'}
+                  </p>
+                  <p>
+                    {item.phone} · {item.email}
+                  </p>
+                </td>
+                <td data-label="Trạng thái">
+                  <SelectField
+                    label={`Trạng thái hồ sơ ${item.code}`}
+                    value={item.status}
+                    onChange={(e) =>
+                      jobsApi
+                        .updateApplication(item.id, {
+                          status: e.target.value as typeof item.status,
+                        })
+                        .then(() => client.invalidateQueries({ queryKey: ['job-applications'] }))
+                        .catch((error: Error) => showToast(error.message, 'error'))
+                    }
+                  >
+                    <option value="new">Mới</option>
+                    <option value="screening">Sơ loại</option>
+                    <option value="interview">Phỏng vấn</option>
+                    <option value="accepted">Đạt</option>
+                    <option value="rejected">Loại</option>
+                  </SelectField>
+                </td>
+                <td data-label="CV">
+                  <Button
+                    variant="secondary"
+                    onClick={() =>
+                      downloadFile(
+                        () => jobsApi.cv(item.id),
+                        `cv-${item.code}.${item.cv_mime === 'application/pdf' ? 'pdf' : 'docx'}`,
+                      )
+                    }
+                  >
+                    Tải CV
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </ResponsiveTable>
+        </FormCard>
+      </div>
     </div>
   );
 }

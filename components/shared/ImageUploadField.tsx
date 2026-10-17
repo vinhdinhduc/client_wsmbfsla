@@ -5,11 +5,20 @@ import { assetUrl } from '@/lib/assets';
 interface ImageUploadFieldProps {
   id: string;
   label: string;
+  hint?: string;
   value?: string | null;
+  isUploading?: boolean;
   onChange: (file: File | null) => void;
 }
 
-export function ImageUploadField({ id, label, value, onChange }: ImageUploadFieldProps) {
+export function ImageUploadField({
+  id,
+  label,
+  hint,
+  value,
+  isUploading = false,
+  onChange,
+}: ImageUploadFieldProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(resolveImageUrl(value));
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
@@ -44,6 +53,7 @@ export function ImageUploadField({ id, label, value, onChange }: ImageUploadFiel
         id={id}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
+        disabled={isUploading}
         onChange={handleChange}
       />
       {previewUrl && (
@@ -53,7 +63,10 @@ export function ImageUploadField({ id, label, value, onChange }: ImageUploadFiel
           <p className={styles.imagePreviewCaption}>Ảnh xem trước</p>
         </div>
       )}
-      <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
+      <p className={styles.muted}>
+        {isUploading ? 'Đang tải ảnh lên…' : 'JPG, PNG, WEBP hoặc GIF, tối đa 5MB.'}
+      </p>
+      {hint && <p className={styles.muted}>{hint}</p>}
     </div>
   );
 }

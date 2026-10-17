@@ -23,4 +23,8 @@ export const contactsApi = {
 
   updateStatus: (id: number, status: ContactStatus) =>
     apiFetch<ContactMessage>(`/admin/contacts/${id}`, { method: 'PATCH', body: { status } }),
+  update: (
+    id: number,
+    body: { status?: ContactStatus; assigned_to?: number | null; internal_note?: string | null },
+  ) => apiFetch<ContactMessage>(`/admin/contacts/${id}`, { method: 'PATCH', body }),
 };

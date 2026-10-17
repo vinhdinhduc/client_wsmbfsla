@@ -3,6 +3,7 @@ import { Be_Vietnam_Pro, Inter } from 'next/font/google';
 import { Providers } from '@/contexts/providers';
 import { AnalyticsScripts } from '@/components/shared/AnalyticsScripts';
 import { env } from '@/lib/env';
+import { initialLoaderBootstrap } from '@/lib/initial-loader';
 import './globals.scss';
 import 'leaflet/dist/leaflet.css';
 
@@ -32,8 +33,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${inter.variable}`}>
+    <html lang="vi" className={`${beVietnamPro.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: initialLoaderBootstrap(
+              env.NEXT_PUBLIC_INITIAL_LOADER_ENABLED === 'true',
+              env.NEXT_PUBLIC_ADMIN_INITIAL_LOADER_ENABLED === 'true',
+            ),
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'MobiFone Chi nhánh Sơn La', url: env.NEXT_PUBLIC_SITE_URL, logo: `${env.NEXT_PUBLIC_SITE_URL}/logo.png`, contactPoint: { '@type': 'ContactPoint', telephone: '18001090', contactType: 'customer service', areaServed: 'VN' } }).replace(/</g, '\\u003c') }} />
         <Providers>
           {children}

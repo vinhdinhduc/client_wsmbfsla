@@ -3,7 +3,7 @@
 }
 
 .footer {
-  margin-top: 3rem;
+  margin-top: auto;
   color: rgb(255 255 255 / 88%);
   background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
   transition: background 260ms ease;
@@ -88,6 +88,27 @@
     gap: 0.5rem;
     margin-top: 0.75rem;
   }
+  &__submit {
+    width: 100%;
+    min-height: 2.75rem;
+    color: #1a1a1a;
+    background: #ffcf33;
+    font-weight: 700;
+    &:hover:not(:disabled) {
+      color: #1a1a1a;
+      background: #ffda57;
+    }
+    &:disabled {
+      color: #574000;
+      background: #ffe7a0;
+      opacity: 1;
+    }
+    &:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 5px #1a1a1a;
+    }
+  }
   &__input {
     min-width: 0;
     flex: none;
@@ -122,13 +143,13 @@
     color: #fff;
     background: rgb(255 255 255 / 10%);
     border-radius: 50%;
+    transition:
+      transform 160ms ease,
+      background-color 160ms ease;
     &:hover {
       background: rgb(255 255 255 / 22%);
       transform: translateY(-3px);
     }
-    transition:
-      transform 160ms ease,
-      background-color 160ms ease;
   }
   &__socialIcon {
     width: 1rem;

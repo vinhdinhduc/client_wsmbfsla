@@ -1,0 +1,634 @@
+{
+  "recorded_at": "2026-10-06T15:06:11.457Z",
+  "scope": "Configured local database; read-only SELECT + actual buildChatContext; no provider/public chat call.",
+  "pipeline_sha256": "be6641f08050f6bf871a3a0d37cabdf70aadb2260641ce5d9b5f06550a8425d2",
+  "retrieval": {
+    "method": "SQL LIKE OR across normalized tokens; no embedding or similarity scoring",
+    "similarity_threshold": null,
+    "score": null,
+    "per_source_limit": 5,
+    "max_sources": 6,
+    "max_context_characters": 24000,
+    "package_order": "price ASC",
+    "knowledge_order": "updated_at DESC"
+  },
+  "knowledge": {
+    "total": 0,
+    "active": 0,
+    "inactive": 0,
+    "placeholders": []
+  },
+  "packages": [
+    {
+      "id": 7,
+      "code": "XMH100",
+      "name": "MXH100",
+      "price": "100000",
+      "duration_value": 30,
+      "duration_unit": "ngay",
+      "data_desc": null,
+      "call_desc": null,
+      "sms_desc": null,
+      "sms_syntax": null,
+      "conditions": null,
+      "status": "active",
+      "effective_from": null,
+      "effective_to": null,
+      "deleted_at": null
+    },
+    {
+      "id": 8,
+      "code": "TK135",
+      "name": "TK135",
+      "price": "135000",
+      "duration_value": 30,
+      "duration_unit": "ngay",
+      "data_desc": null,
+      "call_desc": null,
+      "sms_desc": null,
+      "sms_syntax": null,
+      "conditions": null,
+      "status": "active",
+      "effective_from": null,
+      "effective_to": null,
+      "deleted_at": null
+    }
+  ],
+  "package_counts": [
+    {
+      "status": "active",
+      "total": 2
+    }
+  ],
+  "current_packages_under_100000": [],
+  "store_counts": [
+    {
+      "status": "active",
+      "total": 4
+    }
+  ],
+  "stores": [
+    {
+      "id": 1,
+      "name": "MobiFone Sơn La - Trung tâm",
+      "full_address": "96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La",
+      "address": "96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La",
+      "district": "Thành phố Sơn La",
+      "opening_hours": "7:30 - 17:30 (T2 - T7)",
+      "opening_hours_json": null,
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "name": "MobiFone Mộc Châu",
+      "full_address": "Tiểu khu 1, Thị trấn Mộc Châu",
+      "address": "Tiểu khu 1, Thị trấn Mộc Châu",
+      "district": "Mộc Châu",
+      "opening_hours": "7:30 - 17:00 (T2 - T7)",
+      "opening_hours_json": null,
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "name": "MobiFone Mai Sơn",
+      "full_address": "Tiểu khu 3, Thị trấn Hát Lót",
+      "address": "Tiểu khu 3, Thị trấn Hát Lót",
+      "district": "Mai Sơn",
+      "opening_hours": "8:00 - 17:00 (T2 - T7)",
+      "opening_hours_json": null,
+      "status": "active"
+    },
+    {
+      "id": 4,
+      "name": "MobiFone Yên Châu",
+      "full_address": "Tiểu khu Chiềng An, Thị trấn Yên Châu",
+      "address": "Tiểu khu Chiềng An, Thị trấn Yên Châu",
+      "district": "Yên Châu",
+      "opening_hours": "8:00 - 17:00 (T2 - T7)",
+      "opening_hours_json": null,
+      "status": "active"
+    }
+  ],
+  "settings": {
+    "hotline": "0212 3758 758",
+    "ai_chatbot_enabled": "true",
+    "ai_system_prompt": "Bạn là trợ lý ảo của MobiFone Chi nhánh Sơn La. Hãy trả lời ngắn gọn, lịch sự và chỉ dựa trên dữ liệu được cung cấp.",
+    "ai_daily_limit": "20",
+    "footer_working_hours": "Thứ Hai – Thứ Bảy: 07:30 – 17:30",
+    "footer_address": "Tổ 3, Phường Chiềng Lề, tỉnh Sơn La",
+    "ai_provider": "gemini",
+    "ai_model": "gemini-2.5-flash",
+    "ai_rag_enabled": "true",
+    "ai_fallback_message": "Hiện chatbot chưa thể trả lời. Vui lòng gọi hotline MobiFone Sơn La để được hỗ trợ.",
+    "contact_address": "96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La",
+    "working_hours": "Thứ Hai – Chủ Nhật: 07:30 – 19:00",
+    "ai_profiles_enabled": "true"
+  },
+  "legacy_key_state": "not_decryptable",
+  "profiles": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "enabled": true,
+      "key_state": "decryptable"
+    }
+  ],
+  "chat_log_counts": [
+    {
+      "total": 28,
+      "conversations": 10,
+      "flagged": "20",
+      "default_fallback": "23",
+      "last_24_hours": "20"
+    }
+  ],
+  "chat_log_columns": [
+    "id",
+    "session_id",
+    "user_message",
+    "ai_response",
+    "ip_address",
+    "created_at",
+    "was_helpful",
+    "flagged_for_review",
+    "input_tokens",
+    "output_tokens",
+    "estimated_cost",
+    "provider",
+    "model",
+    "latency_ms",
+    "agreed_terms_at",
+    "agreed_terms_version",
+    "feedback_comment"
+  ],
+  "resolve_provider_read_only": {
+    "success": true,
+    "model": "gemini-2.5-flash",
+    "provider": "gemini",
+    "prompt_has_hotline": false,
+    "no_provider_chat_invoked": true
+  },
+  "full_model_history_select": {
+    "success": true,
+    "limit": 6
+  },
+  "today_quota": {
+    "day": "2026-10-06",
+    "limit": 20,
+    "ip_groups": [
+      {
+        "groups_total": 1,
+        "highest_count": 20,
+        "groups_at_limit": "1"
+      }
+    ],
+    "session_groups": [
+      {
+        "groups_total": 3,
+        "highest_count": 15,
+        "groups_at_limit": "0"
+      }
+    ]
+  },
+  "widget_migration_applied": true,
+  "provider_call_summary": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "error_code": null,
+      "calls": 1,
+      "first_at": "2026-10-02T06:59:31.000Z",
+      "last_at": "2026-10-02T06:59:31.000Z"
+    }
+  ],
+  "recent_provider_calls": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "latency_ms": 4086,
+      "error_code": null,
+      "created_at": "2026-10-02T06:59:31.000Z"
+    }
+  ],
+  "fallback_by_day": [
+    {
+      "day": "2026-10-06",
+      "logs": 20,
+      "default_fallback": "20",
+      "flagged": "20"
+    },
+    {
+      "day": "2026-10-02",
+      "logs": 1,
+      "default_fallback": "0",
+      "flagged": "0"
+    },
+    {
+      "day": "2026-09-25",
+      "logs": 2,
+      "default_fallback": "2",
+      "flagged": "0"
+    },
+    {
+      "day": "2026-09-18",
+      "logs": 1,
+      "default_fallback": "1",
+      "flagged": "0"
+    }
+  ],
+  "retrieval_results": [
+    {
+      "question": "Gói MXH100 giá bao nhiêu?",
+      "chunk_count": 8,
+      "highest_similarity_score": null,
+      "score_note": "Không có score trong pipeline hiện tại; không tự tạo điểm.",
+      "chunks": [
+        {
+          "title": "Giải pháp: Giải pháp chính quyền số cấp xã, phường",
+          "text": "Giải pháp: Giải pháp chính quyền số cấp xã, phường\nHệ thống eOffice, một cửa điện tử hỗ trợ UBND xử lý văn bản và dịch vụ công trực tuyến.\n Triển khai đồng bộ hệ thống quản lý văn bản điều hành, một cửa điện tử và tổng đài chăm sóc người dân cho các UBND xã, phường trên địa bàn tỉnh Sơn La.  Nền tảng dựa trên bộ sản phẩm MobiFone Smart Office gồm Base Platform (đăng nhập một lần, quản trị, API ký số), eOffice quản lý văn bản, eWork quản lý công việc, Meeting họp trực tuyến và eCabinet quản lý, điều hành cuộc họp. \nTrang: /giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "text": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh\nỨng dụng quản lý bán hàng, hóa đơn điện tử tích hợp SIM data cho hộ kinh doanh cá thể.\n Bộ giải pháp trọn gói gồm thiết bị, phần mềm quản lý bán hàng MobiFone 1POS và gói cước data ưu đãi dành cho hộ kinh doanh, tiểu thương tại các chợ, cửa hàng.  MobiFone 1POS phiên bản 2 do Trung tâm CNTT MobiFone phát triển, giúp tối ưu quy trình bán hàng và phục vụ, kiểm soát tồn kho tự động, quản lý từ xa mọi lúc mọi nơi và xuất hóa đơn điện tử. Giải pháp có hai phiên bản STANDARD và PRO, đã kết nối với Loa thần tài MobiFone. \nTrang: /giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "text": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM\nGiải pháp hỗ trợ chỉnh lý, rà soát và số hóa tài liệu với AI & LLM, phù hợp cho các dự án lưu trữ quy mô lớn.\n Giải pháp hỗ trợ chỉnh lý, số hóa tài liệu từ khâu cấu hình dự án, rà soát OCR, phân loại, đánh số tờ/trang đến xuất mục lục và nhãn hộp, giúp chuyển dữ liệu giấy sang dạng số, lưu trữ tập trung, dễ tra cứu, chia sẻ và quản lý.  Phần mềm do Công ty cổ phần Giải pháp số MobiFone phát triển theo mô hình End-to-End: tiếp nhận tài liệu giấy, nhận dạng (OCR/HTR) và bóc tách Metadata bằng AI, phân loại và lập hồ sơ, đánh số, ký số rồi đóng gói theo chuẩn OAIS. AI và LLM hỗ trợ các công đoạn lặp lại, còn nghiệp vụ cần đánh giá chuyên môn vẫn do lưu trữ viên rà soát và phê duyệt.  Hỗ trợ triển khai On-Premise, Private Cloud hoặc Hybrid Cloud tùy yêu cầu bảo mật và quy mô. Đã triển khai tại TP. Hồ Chí Minh, Quảng Ngãi, Đà Nẵng, Đắk Lắk. \nTrang: /giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chữ ký số MobiFone CA",
+          "text": "Giải pháp: Chữ ký số MobiFone CA\nChữ ký số cho cá nhân, tổ chức và doanh nghiệp với lựa chọn SIM PKI, USB Token và tích hợp hệ thống.\n MobiFone CA giúp cá nhân và tổ chức xác thực, ký số và giao dịch điện tử thuận tiện trên các nền tảng nghiệp vụ.  Liên hệ MobiFone Sơn La để được tư vấn lựa chọn loại chứng thư, thiết bị và chu kỳ phù hợp. \nTrang: /giai-phap-so/chu-ky-so-mobifone-ca",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "text": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice\nPhát hành, quản lý và lưu trữ hóa đơn điện tử, biên lai điện tử, chứng từ khấu trừ thuế TNCN đúng quy định pháp luật.\n MobiFone Invoice là giải pháp giúp doanh nghiệp, hộ kinh doanh phát hành, quản lý và lưu trữ hóa đơn điện tử theo đúng quy định của pháp luật, đáp ứng đầy đủ các thông tư, nghị định của Nhà nước về hóa đơn điện tử.  Giải pháp gồm ba phân hệ: Hóa đơn điện tử, Biên lai điện tử và Chứng từ khấu trừ thuế thu nhập cá nhân, kèm cổng tra cứu hóa đơn cho khách hàng. Dễ dàng tích hợp với phần mềm kế toán và phần mềm quản lý của doanh nghiệp. \nTrang: /giai-phap-so/hoa-don-dien-tu-mobifone-invoice",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "text": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online\nGiảm 50% chu kỳ cước đầu tiên khi đăng ký gói data mới qua website mobifone-sonla.vn.\nTrang: /tin-tuc/uu-dai-50-goi-data-dang-ky-online",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9",
+          "text": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9\nTặng 20% giá trị thẻ nạp cho thuê bao trả trước từ ngày 01/09 đến 03/09.\nTrang: /tin-tuc/khuyen-mai-nap-the-quoc-khanh-2-9",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Lễ ra quân hưởng ứng chuyển đổi số tỉnh Sơn La 2026",
+          "text": "Tin tức: Lễ ra quân hưởng ứng chuyển đổi số tỉnh Sơn La 2026\nMobiFone Sơn La phối hợp cùng Sở Thông tin và Truyền thông tổ chức lễ ra quân hỗ trợ người dân cài đặt VNeID.\nTrang: /tin-tuc/le-ra-quan-chuyen-doi-so-son-la-2026",
+          "score": null
+        }
+      ],
+      "sources": [
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Chữ ký số MobiFone CA",
+          "href": "/giai-phap-so/chu-ky-so-mobifone-ca"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        },
+        {
+          "title": "Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "href": "/tin-tuc/uu-dai-50-goi-data-dang-ky-online"
+        }
+      ]
+    },
+    {
+      "question": "Gói TK135 giá bao nhiêu? Có ưu đãi gì?",
+      "chunk_count": 9,
+      "highest_similarity_score": null,
+      "score_note": "Không có score trong pipeline hiện tại; không tự tạo điểm.",
+      "chunks": [
+        {
+          "title": "Giải pháp: Giải pháp chính quyền số cấp xã, phường",
+          "text": "Giải pháp: Giải pháp chính quyền số cấp xã, phường\nHệ thống eOffice, một cửa điện tử hỗ trợ UBND xử lý văn bản và dịch vụ công trực tuyến.\n Triển khai đồng bộ hệ thống quản lý văn bản điều hành, một cửa điện tử và tổng đài chăm sóc người dân cho các UBND xã, phường trên địa bàn tỉnh Sơn La.  Nền tảng dựa trên bộ sản phẩm MobiFone Smart Office gồm Base Platform (đăng nhập một lần, quản trị, API ký số), eOffice quản lý văn bản, eWork quản lý công việc, Meeting họp trực tuyến và eCabinet quản lý, điều hành cuộc họp. \nTrang: /giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "text": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh\nỨng dụng quản lý bán hàng, hóa đơn điện tử tích hợp SIM data cho hộ kinh doanh cá thể.\n Bộ giải pháp trọn gói gồm thiết bị, phần mềm quản lý bán hàng MobiFone 1POS và gói cước data ưu đãi dành cho hộ kinh doanh, tiểu thương tại các chợ, cửa hàng.  MobiFone 1POS phiên bản 2 do Trung tâm CNTT MobiFone phát triển, giúp tối ưu quy trình bán hàng và phục vụ, kiểm soát tồn kho tự động, quản lý từ xa mọi lúc mọi nơi và xuất hóa đơn điện tử. Giải pháp có hai phiên bản STANDARD và PRO, đã kết nối với Loa thần tài MobiFone. \nTrang: /giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "text": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM\nGiải pháp hỗ trợ chỉnh lý, rà soát và số hóa tài liệu với AI & LLM, phù hợp cho các dự án lưu trữ quy mô lớn.\n Giải pháp hỗ trợ chỉnh lý, số hóa tài liệu từ khâu cấu hình dự án, rà soát OCR, phân loại, đánh số tờ/trang đến xuất mục lục và nhãn hộp, giúp chuyển dữ liệu giấy sang dạng số, lưu trữ tập trung, dễ tra cứu, chia sẻ và quản lý.  Phần mềm do Công ty cổ phần Giải pháp số MobiFone phát triển theo mô hình End-to-End: tiếp nhận tài liệu giấy, nhận dạng (OCR/HTR) và bóc tách Metadata bằng AI, phân loại và lập hồ sơ, đánh số, ký số rồi đóng gói theo chuẩn OAIS. AI và LLM hỗ trợ các công đoạn lặp lại, còn nghiệp vụ cần đánh giá chuyên môn vẫn do lưu trữ viên rà soát và phê duyệt.  Hỗ trợ triển khai On-Premise, Private Cloud hoặc Hybrid Cloud tùy yêu cầu bảo mật và quy mô. Đã triển khai tại TP. Hồ Chí Minh, Quảng Ngãi, Đà Nẵng, Đắk Lắk. \nTrang: /giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chữ ký số MobiFone CA",
+          "text": "Giải pháp: Chữ ký số MobiFone CA\nChữ ký số cho cá nhân, tổ chức và doanh nghiệp với lựa chọn SIM PKI, USB Token và tích hợp hệ thống.\n MobiFone CA giúp cá nhân và tổ chức xác thực, ký số và giao dịch điện tử thuận tiện trên các nền tảng nghiệp vụ.  Liên hệ MobiFone Sơn La để được tư vấn lựa chọn loại chứng thư, thiết bị và chu kỳ phù hợp. \nTrang: /giai-phap-so/chu-ky-so-mobifone-ca",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "text": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice\nPhát hành, quản lý và lưu trữ hóa đơn điện tử, biên lai điện tử, chứng từ khấu trừ thuế TNCN đúng quy định pháp luật.\n MobiFone Invoice là giải pháp giúp doanh nghiệp, hộ kinh doanh phát hành, quản lý và lưu trữ hóa đơn điện tử theo đúng quy định của pháp luật, đáp ứng đầy đủ các thông tư, nghị định của Nhà nước về hóa đơn điện tử.  Giải pháp gồm ba phân hệ: Hóa đơn điện tử, Biên lai điện tử và Chứng từ khấu trừ thuế thu nhập cá nhân, kèm cổng tra cứu hóa đơn cho khách hàng. Dễ dàng tích hợp với phần mềm kế toán và phần mềm quản lý của doanh nghiệp. \nTrang: /giai-phap-so/hoa-don-dien-tu-mobifone-invoice",
+          "score": null
+        },
+        {
+          "title": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "text": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "text": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online\nGiảm 50% chu kỳ cước đầu tiên khi đăng ký gói data mới qua website mobifone-sonla.vn.\nTrang: /tin-tuc/uu-dai-50-goi-data-dang-ky-online",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9",
+          "text": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9\nTặng 20% giá trị thẻ nạp cho thuê bao trả trước từ ngày 01/09 đến 03/09.\nTrang: /tin-tuc/khuyen-mai-nap-the-quoc-khanh-2-9",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Lễ ra quân hưởng ứng chuyển đổi số tỉnh Sơn La 2026",
+          "text": "Tin tức: Lễ ra quân hưởng ứng chuyển đổi số tỉnh Sơn La 2026\nMobiFone Sơn La phối hợp cùng Sở Thông tin và Truyền thông tổ chức lễ ra quân hỗ trợ người dân cài đặt VNeID.\nTrang: /tin-tuc/le-ra-quan-chuyen-doi-so-son-la-2026",
+          "score": null
+        }
+      ],
+      "sources": [
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Chữ ký số MobiFone CA",
+          "href": "/giai-phap-so/chu-ky-so-mobifone-ca"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        }
+      ]
+    },
+    {
+      "question": "Gói cước nào rẻ dưới 100.000đ?",
+      "chunk_count": 8,
+      "highest_similarity_score": null,
+      "score_note": "Không có score trong pipeline hiện tại; không tự tạo điểm.",
+      "chunks": [
+        {
+          "title": "Giải pháp: Giải pháp chính quyền số cấp xã, phường",
+          "text": "Giải pháp: Giải pháp chính quyền số cấp xã, phường\nHệ thống eOffice, một cửa điện tử hỗ trợ UBND xử lý văn bản và dịch vụ công trực tuyến.\n Triển khai đồng bộ hệ thống quản lý văn bản điều hành, một cửa điện tử và tổng đài chăm sóc người dân cho các UBND xã, phường trên địa bàn tỉnh Sơn La.  Nền tảng dựa trên bộ sản phẩm MobiFone Smart Office gồm Base Platform (đăng nhập một lần, quản trị, API ký số), eOffice quản lý văn bản, eWork quản lý công việc, Meeting họp trực tuyến và eCabinet quản lý, điều hành cuộc họp. \nTrang: /giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "text": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh\nỨng dụng quản lý bán hàng, hóa đơn điện tử tích hợp SIM data cho hộ kinh doanh cá thể.\n Bộ giải pháp trọn gói gồm thiết bị, phần mềm quản lý bán hàng MobiFone 1POS và gói cước data ưu đãi dành cho hộ kinh doanh, tiểu thương tại các chợ, cửa hàng.  MobiFone 1POS phiên bản 2 do Trung tâm CNTT MobiFone phát triển, giúp tối ưu quy trình bán hàng và phục vụ, kiểm soát tồn kho tự động, quản lý từ xa mọi lúc mọi nơi và xuất hóa đơn điện tử. Giải pháp có hai phiên bản STANDARD và PRO, đã kết nối với Loa thần tài MobiFone. \nTrang: /giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "text": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM\nGiải pháp hỗ trợ chỉnh lý, rà soát và số hóa tài liệu với AI & LLM, phù hợp cho các dự án lưu trữ quy mô lớn.\n Giải pháp hỗ trợ chỉnh lý, số hóa tài liệu từ khâu cấu hình dự án, rà soát OCR, phân loại, đánh số tờ/trang đến xuất mục lục và nhãn hộp, giúp chuyển dữ liệu giấy sang dạng số, lưu trữ tập trung, dễ tra cứu, chia sẻ và quản lý.  Phần mềm do Công ty cổ phần Giải pháp số MobiFone phát triển theo mô hình End-to-End: tiếp nhận tài liệu giấy, nhận dạng (OCR/HTR) và bóc tách Metadata bằng AI, phân loại và lập hồ sơ, đánh số, ký số rồi đóng gói theo chuẩn OAIS. AI và LLM hỗ trợ các công đoạn lặp lại, còn nghiệp vụ cần đánh giá chuyên môn vẫn do lưu trữ viên rà soát và phê duyệt.  Hỗ trợ triển khai On-Premise, Private Cloud hoặc Hybrid Cloud tùy yêu cầu bảo mật và quy mô. Đã triển khai tại TP. Hồ Chí Minh, Quảng Ngãi, Đà Nẵng, Đắk Lắk. \nTrang: /giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "text": "Giải pháp: Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT\nCung cấp trọn gói, lắp đặt đồng bộ thiết bị CNTT phục vụ chuyển đổi số và hành chính điều hành của UBND xã, phường.\n Dịch vụ cung cấp trọn gói, lắp đặt các trang thiết bị CNTT phục vụ quản trị, quản lý hành chính điều hành các công tác chuyển đổi số và triển khai các công việc theo chức năng nhiệm vụ của UBND xã, phường.  Thiết bị được đồng bộ để đáp ứng nhu cầu làm việc, hội họp, máy chủ và lưu trữ dữ liệu; có thể lựa chọn cấu hình, thiết bị phù hợp với nhu cầu triển khai và hưởng chính sách ưu đãi trọn gói.  Khách hàng tiêu biểu: 126 xã, phường TP. Hà Nội; 168 xã, phường TP. Hồ Chí Minh; Bộ Công an và các đơn vị trực thuộc. \nTrang: /giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Bộ giải pháp chuyển đổi số cho Tài chính - Ngân hàng",
+          "text": "Giải pháp: Bộ giải pháp chuyển đổi số cho Tài chính - Ngân hàng\nBộ giải pháp từ thiết bị CNTT, truyền dẫn, Cloud, an ninh mạng, AI đến thanh toán số và định danh dành cho ngân hàng.\n Bộ giải pháp chuyển đổi số dành cho khách hàng nhóm tài chính - ngân hàng, gồm năm nhóm: trang thiết bị công nghệ thông tin; mạng truyền dẫn và SIM di động; hạ tầng và an ninh mạng; quản trị, điều hành, giao dịch; và các giải pháp đặc thù lĩnh vực tài chính - ngân hàng.  Ngân hàng có thể triển khai độc lập từng giải pháp hoặc kết hợp thành gói tổng thể theo lộ trình nhiều giai đoạn, tùy quy mô, mức độ trưởng thành số và ngân sách. \nTrang: /giai-phap-so/bo-giai-phap-chuyen-doi-so-tai-chinh-ngan-hang",
+          "score": null
+        },
+        {
+          "title": "Gói cước: MXH100 (XMH100) - 100000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/mxh100",
+          "text": "Gói cước: MXH100 (XMH100) - 100000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/mxh100",
+          "score": null
+        },
+        {
+          "title": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "text": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "text": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online\nGiảm 50% chu kỳ cước đầu tiên khi đăng ký gói data mới qua website mobifone-sonla.vn.\nTrang: /tin-tuc/uu-dai-50-goi-data-dang-ky-online",
+          "score": null
+        }
+      ],
+      "sources": [
+        {
+          "title": "Gói cước MXH100",
+          "href": "/goi-cuoc/mxh100"
+        },
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "href": "/giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt"
+        }
+      ]
+    },
+    {
+      "question": "Cửa hàng gần tôi ở đâu?",
+      "chunk_count": 11,
+      "highest_similarity_score": null,
+      "score_note": "Không có score trong pipeline hiện tại; không tự tạo điểm.",
+      "chunks": [
+        {
+          "title": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "text": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh\nỨng dụng quản lý bán hàng, hóa đơn điện tử tích hợp SIM data cho hộ kinh doanh cá thể.\n Bộ giải pháp trọn gói gồm thiết bị, phần mềm quản lý bán hàng MobiFone 1POS và gói cước data ưu đãi dành cho hộ kinh doanh, tiểu thương tại các chợ, cửa hàng.  MobiFone 1POS phiên bản 2 do Trung tâm CNTT MobiFone phát triển, giúp tối ưu quy trình bán hàng và phục vụ, kiểm soát tồn kho tự động, quản lý từ xa mọi lúc mọi nơi và xuất hóa đơn điện tử. Giải pháp có hai phiên bản STANDARD và PRO, đã kết nối với Loa thần tài MobiFone. \nTrang: /giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "text": "Giải pháp: Giải pháp hóa đơn điện tử MobiFone Invoice\nPhát hành, quản lý và lưu trữ hóa đơn điện tử, biên lai điện tử, chứng từ khấu trừ thuế TNCN đúng quy định pháp luật.\n MobiFone Invoice là giải pháp giúp doanh nghiệp, hộ kinh doanh phát hành, quản lý và lưu trữ hóa đơn điện tử theo đúng quy định của pháp luật, đáp ứng đầy đủ các thông tư, nghị định của Nhà nước về hóa đơn điện tử.  Giải pháp gồm ba phân hệ: Hóa đơn điện tử, Biên lai điện tử và Chứng từ khấu trừ thuế thu nhập cá nhân, kèm cổng tra cứu hóa đơn cho khách hàng. Dễ dàng tích hợp với phần mềm kế toán và phần mềm quản lý của doanh nghiệp. \nTrang: /giai-phap-so/hoa-don-dien-tu-mobifone-invoice",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp truyền thanh thông minh và hệ thống nguồn",
+          "text": "Giải pháp: Giải pháp truyền thanh thông minh và hệ thống nguồn\nNền tảng số giúp UBND xã, phường tổ chức, quản lý và truyền tải thông tin chính thống qua Internet, 4G/5G.\n Giải pháp Truyền thanh thông minh và Hệ thống thông tin nguồn là nền tảng số hỗ trợ UBND xã, phường tổ chức, quản lý và truyền tải thông tin chính thống, hiện đại hóa công tác truyền thông cơ sở và tăng cường kết nối giữa chính quyền với người dân.  Truyền dẫn âm thanh trên hạ tầng viễn thông, Internet nên không cần xây dựng trụ ăng-ten, khắc phục tình trạng nhiễu sóng, chất lượng không đồng đều và bị chèn tín hiệu của truyền thanh có dây, truyền thanh FM. Giải pháp gồm thiết bị MIRA (MobiFone Internet Radio Amplifier), ứng dụng di động, hệ thống quản trị biên tập nội dung và hạ tầng cloud.  Khách hàng tiêu biểu: 34 tỉnh, thành phố trên toàn quốc. \nTrang: /giai-phap-so/giai-phap-truyen-thanh-thong-minh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp du lịch thông minh (Smart Travel)",
+          "text": "Giải pháp: Giải pháp du lịch thông minh (Smart Travel)\nỨng dụng thực tế ảo VR360 và thực tế tăng cường AR giúp địa phương số hóa điểm du lịch, di tích, danh lam thắng cảnh.\n Giải pháp du lịch thông minh ứng dụng công nghệ thực tế ảo VR và thực tế tăng cường AR, hỗ trợ địa phương số hóa các điểm du lịch, di tích lịch sử, văn hóa và danh lam thắng cảnh trên môi trường số.  Giải pháp gồm cổng thông tin du lịch số (website và ứng dụng), nền tảng quản trị dữ liệu tập trung, bản đồ số, trợ lý ảo đa ngôn ngữ và nền tảng tạo tour VR360 với trình biên tập hotspot thông tin, hình ảnh, video, âm thanh, xuất bản qua link, mã nhúng hoặc QR code.  Khách hàng tiêu biểu: Vịnh Hạ Long (Quảng Ninh), Đại nội Huế, Bảo tàng Quảng Trị, Bảo tàng số Công an Nhân dân. \nTrang: /giai-phap-so/giai-phap-du-lich-thong-minh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Nền tảng Bình dân học vụ số",
+          "text": "Giải pháp: Nền tảng Bình dân học vụ số\nNền tảng đào tạo trực tuyến mở cho Bộ, ban ngành, doanh nghiệp; nền tảng chính thức đào tạo Bình dân học vụ số quốc gia.\n Bình dân học vụ số là nền tảng đào tạo trực tuyến mở dành cho Bộ, ban ngành và doanh nghiệp, hỗ trợ đào tạo cán bộ công nhân viên chức và mở rộng phổ cập kiến thức tới người dân.  Đào tạo qua học liệu trực tuyến mở, kết hợp lớp live-class, triển khai trên website và ứng dụng. Cung cấp giải pháp SaaS và on-premise, phù hợp đào tạo toàn dân và đào tạo B2G quy mô lớn phục vụ Bộ ngành, đơn vị.  Khách hàng tiêu biểu: X02, X03 - Bộ Công an; Công an các tỉnh, thành phố (Đồng Nai, Đắk Lắk, Huế, Phú Thọ); Sở Khoa học và Công nghệ các tỉnh, thành phố (Quảng Trị, Quảng Ninh, Cà Mau, Đồng Nai); UBND các xã, phường trên toàn quốc. \nTrang: /giai-phap-so/nen-tang-binh-dan-hoc-vu-so",
+          "score": null
+        },
+        {
+          "title": "Cửa hàng: MobiFone Sơn La - Trung tâm, 96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La, Thành phố Sơn La. [số điện thoại đã che]. 7:30 - 17:30 (T2 - T7). Trang: /cua-hang",
+          "text": "Cửa hàng: MobiFone Sơn La - Trung tâm, 96B Đường 3/2, Phường Tô Hiệu, Tỉnh Sơn La, Thành phố Sơn La. [số điện thoại đã che]. 7:30 - 17:30 (T2 - T7). Trang: /cua-hang",
+          "score": null
+        },
+        {
+          "title": "Cửa hàng: MobiFone Mộc Châu, Tiểu khu 1, Thị trấn Mộc Châu, Mộc Châu. [số điện thoại đã che]. 7:30 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "text": "Cửa hàng: MobiFone Mộc Châu, Tiểu khu 1, Thị trấn Mộc Châu, Mộc Châu. [số điện thoại đã che]. 7:30 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "score": null
+        },
+        {
+          "title": "Cửa hàng: MobiFone Mai Sơn, Tiểu khu 3, Thị trấn Hát Lót, Mai Sơn. [số điện thoại đã che]. 8:00 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "text": "Cửa hàng: MobiFone Mai Sơn, Tiểu khu 3, Thị trấn Hát Lót, Mai Sơn. [số điện thoại đã che]. 8:00 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "score": null
+        },
+        {
+          "title": "Cửa hàng: MobiFone Yên Châu, Tiểu khu Chiềng An, Thị trấn Yên Châu, Yên Châu. [số điện thoại đã che]. 8:00 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "text": "Cửa hàng: MobiFone Yên Châu, Tiểu khu Chiềng An, Thị trấn Yên Châu, Yên Châu. [số điện thoại đã che]. 8:00 - 17:00 (T2 - T7). Trang: /cua-hang",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "text": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online\nGiảm 50% chu kỳ cước đầu tiên khi đăng ký gói data mới qua website mobifone-sonla.vn.\nTrang: /tin-tuc/uu-dai-50-goi-data-dang-ky-online",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9",
+          "text": "Tin tức: Khuyến mãi nạp thẻ nhân dịp Quốc khánh 2/9\nTặng 20% giá trị thẻ nạp cho thuê bao trả trước từ ngày 01/09 đến 03/09.\nTrang: /tin-tuc/khuyen-mai-nap-the-quoc-khanh-2-9",
+          "score": null
+        }
+      ],
+      "sources": [
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        },
+        {
+          "title": "Giải pháp truyền thanh thông minh và hệ thống nguồn",
+          "href": "/giai-phap-so/giai-phap-truyen-thanh-thong-minh"
+        },
+        {
+          "title": "Giải pháp du lịch thông minh (Smart Travel)",
+          "href": "/giai-phap-so/giai-phap-du-lich-thong-minh"
+        },
+        {
+          "title": "Nền tảng Bình dân học vụ số",
+          "href": "/giai-phap-so/nen-tang-binh-dan-hoc-vu-so"
+        },
+        {
+          "title": "Địa chỉ và giờ mở cửa",
+          "href": "/cua-hang"
+        }
+      ]
+    },
+    {
+      "question": "Gói cước nào rẻ?",
+      "chunk_count": 8,
+      "highest_similarity_score": null,
+      "score_note": "Không có score trong pipeline hiện tại; không tự tạo điểm.",
+      "chunks": [
+        {
+          "title": "Giải pháp: Giải pháp chính quyền số cấp xã, phường",
+          "text": "Giải pháp: Giải pháp chính quyền số cấp xã, phường\nHệ thống eOffice, một cửa điện tử hỗ trợ UBND xử lý văn bản và dịch vụ công trực tuyến.\n Triển khai đồng bộ hệ thống quản lý văn bản điều hành, một cửa điện tử và tổng đài chăm sóc người dân cho các UBND xã, phường trên địa bàn tỉnh Sơn La.  Nền tảng dựa trên bộ sản phẩm MobiFone Smart Office gồm Base Platform (đăng nhập một lần, quản trị, API ký số), eOffice quản lý văn bản, eWork quản lý công việc, Meeting họp trực tuyến và eCabinet quản lý, điều hành cuộc họp. \nTrang: /giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "text": "Giải pháp: Giải pháp quản lý bán hàng cho hộ kinh doanh\nỨng dụng quản lý bán hàng, hóa đơn điện tử tích hợp SIM data cho hộ kinh doanh cá thể.\n Bộ giải pháp trọn gói gồm thiết bị, phần mềm quản lý bán hàng MobiFone 1POS và gói cước data ưu đãi dành cho hộ kinh doanh, tiểu thương tại các chợ, cửa hàng.  MobiFone 1POS phiên bản 2 do Trung tâm CNTT MobiFone phát triển, giúp tối ưu quy trình bán hàng và phục vụ, kiểm soát tồn kho tự động, quản lý từ xa mọi lúc mọi nơi và xuất hóa đơn điện tử. Giải pháp có hai phiên bản STANDARD và PRO, đã kết nối với Loa thần tài MobiFone. \nTrang: /giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "text": "Giải pháp: Chỉnh lý, Số hóa tài liệu bằng AI & LLM\nGiải pháp hỗ trợ chỉnh lý, rà soát và số hóa tài liệu với AI & LLM, phù hợp cho các dự án lưu trữ quy mô lớn.\n Giải pháp hỗ trợ chỉnh lý, số hóa tài liệu từ khâu cấu hình dự án, rà soát OCR, phân loại, đánh số tờ/trang đến xuất mục lục và nhãn hộp, giúp chuyển dữ liệu giấy sang dạng số, lưu trữ tập trung, dễ tra cứu, chia sẻ và quản lý.  Phần mềm do Công ty cổ phần Giải pháp số MobiFone phát triển theo mô hình End-to-End: tiếp nhận tài liệu giấy, nhận dạng (OCR/HTR) và bóc tách Metadata bằng AI, phân loại và lập hồ sơ, đánh số, ký số rồi đóng gói theo chuẩn OAIS. AI và LLM hỗ trợ các công đoạn lặp lại, còn nghiệp vụ cần đánh giá chuyên môn vẫn do lưu trữ viên rà soát và phê duyệt.  Hỗ trợ triển khai On-Premise, Private Cloud hoặc Hybrid Cloud tùy yêu cầu bảo mật và quy mô. Đã triển khai tại TP. Hồ Chí Minh, Quảng Ngãi, Đà Nẵng, Đắk Lắk. \nTrang: /giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "text": "Giải pháp: Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT\nCung cấp trọn gói, lắp đặt đồng bộ thiết bị CNTT phục vụ chuyển đổi số và hành chính điều hành của UBND xã, phường.\n Dịch vụ cung cấp trọn gói, lắp đặt các trang thiết bị CNTT phục vụ quản trị, quản lý hành chính điều hành các công tác chuyển đổi số và triển khai các công việc theo chức năng nhiệm vụ của UBND xã, phường.  Thiết bị được đồng bộ để đáp ứng nhu cầu làm việc, hội họp, máy chủ và lưu trữ dữ liệu; có thể lựa chọn cấu hình, thiết bị phù hợp với nhu cầu triển khai và hưởng chính sách ưu đãi trọn gói.  Khách hàng tiêu biểu: 126 xã, phường TP. Hà Nội; 168 xã, phường TP. Hồ Chí Minh; Bộ Công an và các đơn vị trực thuộc. \nTrang: /giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt",
+          "score": null
+        },
+        {
+          "title": "Giải pháp: Bộ giải pháp chuyển đổi số cho Tài chính - Ngân hàng",
+          "text": "Giải pháp: Bộ giải pháp chuyển đổi số cho Tài chính - Ngân hàng\nBộ giải pháp từ thiết bị CNTT, truyền dẫn, Cloud, an ninh mạng, AI đến thanh toán số và định danh dành cho ngân hàng.\n Bộ giải pháp chuyển đổi số dành cho khách hàng nhóm tài chính - ngân hàng, gồm năm nhóm: trang thiết bị công nghệ thông tin; mạng truyền dẫn và SIM di động; hạ tầng và an ninh mạng; quản trị, điều hành, giao dịch; và các giải pháp đặc thù lĩnh vực tài chính - ngân hàng.  Ngân hàng có thể triển khai độc lập từng giải pháp hoặc kết hợp thành gói tổng thể theo lộ trình nhiều giai đoạn, tùy quy mô, mức độ trưởng thành số và ngân sách. \nTrang: /giai-phap-so/bo-giai-phap-chuyen-doi-so-tai-chinh-ngan-hang",
+          "score": null
+        },
+        {
+          "title": "Gói cước: MXH100 (XMH100) - 100000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/mxh100",
+          "text": "Gói cước: MXH100 (XMH100) - 100000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/mxh100",
+          "score": null
+        },
+        {
+          "title": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "text": "Gói cước: TK135 (TK135) - 135000 VNĐ/30 ngay. . Điều kiện: Chưa có thông tin. Cú pháp: Chưa có thông tin. Trang: /goi-cuoc/TK135",
+          "score": null
+        },
+        {
+          "title": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "text": "Tin tức: Ưu đãi 50% gói data cho khách hàng đăng ký online\nGiảm 50% chu kỳ cước đầu tiên khi đăng ký gói data mới qua website mobifone-sonla.vn.\nTrang: /tin-tuc/uu-dai-50-goi-data-dang-ky-online",
+          "score": null
+        }
+      ],
+      "sources": [
+        {
+          "title": "Gói cước MXH100",
+          "href": "/goi-cuoc/mxh100"
+        },
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "href": "/giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt"
+        }
+      ]
+    }
+  ]
+}

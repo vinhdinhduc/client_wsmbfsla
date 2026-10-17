@@ -221,6 +221,8 @@ export default function AiSettingsPage() {
     !Number.isInteger(form.daily_limit) ||
     form.daily_limit < 1 ||
     form.daily_limit > 10000 ||
+    (form.log_retention_days !== undefined &&
+      (!Number.isInteger(form.log_retention_days) || form.log_retention_days < 0 || form.log_retention_days > 3650)) ||
     !profiles.length ||
     profiles.some(
       (p) =>
@@ -762,6 +764,24 @@ export default function AiSettingsPage() {
                 onChange={(e) => setForm({ ...form, daily_limit: Number(e.target.value) })}
               />
             </label>
+            {settings.data?.log_retention_days !== undefined && (
+              <label>
+                Tự dọn lịch sử hội thoại sau (ngày)
+                <input
+                  type="number"
+                  min="0"
+                  max="3650"
+                  step="1"
+                  required
+                  value={form.log_retention_days ?? 0}
+                  onChange={(event) => setForm({ ...form, log_retention_days: Number(event.target.value) })}
+                />
+                <small>
+                  0 = tắt. Gợi ý 90 ngày. Log được xóa mềm 7 ngày trước khi xóa vĩnh viễn;
+                  thao tác dọn dẹp được ghi vào Nhật ký hệ thống.
+                </small>
+              </label>
+            )}
           </section>
           <footer className={styles.saveBar}>
             <span>

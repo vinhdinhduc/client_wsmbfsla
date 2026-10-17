@@ -8,11 +8,20 @@ export function packageDuration(pkg: Package) {
 }
 export function packageData(pkg: Package) {
   if (pkg.unlimited_data) return 'Không giới hạn';
+  const description = pkg.data_desc?.trim().replace(
+    /(\d+)[.,](\d+)(\s*GB\b)/gi,
+    (_, whole: string, fraction: string, unit: string) => {
+      const significant = fraction.replace(/0+$/, '');
+      return `${whole}${significant ? `.${significant}` : ''}${unit}`;
+    },
+  );
+  const perDay = Number(pkg.data_per_day_gb);
+  const perCycle = Number(pkg.data_per_cycle_gb);
   return (
-    pkg.data_desc?.trim() ||
+    description ||
     [
-      pkg.data_per_day_gb ? `${pkg.data_per_day_gb}GB/ngày` : '',
-      pkg.data_per_cycle_gb ? `${pkg.data_per_cycle_gb}GB/chu kỳ` : '',
+      Number.isFinite(perDay) && perDay > 0 ? `${perDay}GB/ngày` : '',
+      Number.isFinite(perCycle) && perCycle > 0 ? `${perCycle}GB/chu kỳ` : '',
     ]
       .filter(Boolean)
       .join(' · ')

@@ -115,19 +115,55 @@ test('xlsx and csv preview, duplicates, row selection and template', async ({ pa
     });
   });
   await page.goto('/admin/ai-knowledge');
+  await expect(page.getByRole('heading', { name: 'Danh sách (1)' })).toBeVisible();
+  for (const width of [1920, 1440, 1280, 1024, 768, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    const layout = await page.evaluate(() => {
+      const firstElement = document.querySelector('form');
+      const listHeading = Array.from(document.querySelectorAll('h2')).find((heading) =>
+        heading.textContent?.startsWith('Danh sách'),
+      );
+      const listElement = listHeading?.parentElement;
+      if (!firstElement || !listElement) return null;
+      const first = firstElement.getBoundingClientRect();
+      const second = listElement.getBoundingClientRect();
+      return {
+        scrollWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
+        firstBottom: first.bottom,
+        firstRight: first.right,
+        secondTop: second.top,
+        secondLeft: second.left,
+      };
+    });
+    expect(layout).not.toBeNull();
+    expect(layout!.scrollWidth).toBeLessThanOrEqual(layout!.viewportWidth);
+    if (width <= 1100) expect(layout!.secondTop).toBeGreaterThanOrEqual(layout!.firstBottom - 1);
+    else expect(layout!.secondLeft).toBeGreaterThanOrEqual(layout!.firstRight - 1);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Tải file mẫu' }).click();
   expect((await download).suggestedFilename()).toBe('mau-tri-thuc-ai.xlsx');
   const book = XLSX.utils.book_new();
+  const longTitle = `Tiêu đề dài ${'A'.repeat(220)}`;
+  const longTags = Array.from({ length: 8 }, (_, index) => `tag-dai-${index}`).join(',');
+  const rows = [
+    ['Có sẵn', 'Trùng', '', 'active'],
+    ['Mới', 'Nội dung mới', 'tag', 'active'],
+    ['Bỏ qua', 'Nội dung', '', 'inactive'],
+    ['Sai', '', '', 'active'],
+    [
+      longTitle,
+      `Thông tin cần rà soát [ĐIỀN: giờ mở/đóng cửa ...]. ${'Nội dung dài để kiểm tra hiển thị. '.repeat(35)}`,
+      longTags,
+      'active',
+    ],
+    ...Array.from({ length: 67 }, (_, index) => [`Có sẵn`, `Dòng trùng ${index}`, '', 'active']),
+  ];
   XLSX.utils.book_append_sheet(
     book,
-    XLSX.utils.aoa_to_sheet([
-      ['Tiêu đề', 'Nội dung', 'Tags', 'Trạng thái'],
-      ['Có sẵn', 'Trùng', '', 'active'],
-      ['Mới', 'Nội dung mới', 'tag', 'active'],
-      ['Bỏ qua', 'Nội dung', '', 'inactive'],
-      ['Sai', '', '', 'active'],
-    ]),
+    XLSX.utils.aoa_to_sheet([['Tiêu đề', 'Nội dung', 'Tags', 'Trạng thái'], ...rows]),
     'Data',
   );
   await page.getByLabel('File tri thức').setInputFiles({
@@ -135,13 +171,37 @@ test('xlsx and csv preview, duplicates, row selection and template', async ({ pa
     mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     buffer: XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }),
   });
+  await expect(page.getByRole('heading', { name: 'Xem trước import – 72 dòng' })).toBeVisible();
   await expect(page.getByLabel('Chọn dòng 1: Có sẵn')).not.toBeChecked();
   await expect(page.getByLabel('Chọn dòng 4: Sai')).toBeDisabled();
+  await expect(page.getByLabel(`Chọn dòng 5: ${longTitle}`)).not.toBeChecked();
+  await expect(page.getByText('Cần kiểm tra').first()).toBeVisible();
+  await expect(page.locator('mark')).toContainText('[ĐIỀN: giờ mở/đóng cửa ...]');
+  for (const width of [1920, 1440, 1280, 1024, 768, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    const dialogBox = await page.getByRole('dialog').boundingBox();
+    expect(dialogBox).not.toBeNull();
+    expect(dialogBox!.width).toBeLessThanOrEqual(width);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.getByLabel('Chọn dòng 3: Bỏ qua').uncheck();
-  await page.getByRole('button', { name: 'Lưu 1 dòng đã chọn' }).click();
-  await expect(page.getByText('Đã lưu', { exact: true })).toBeVisible();
-  expect(saved).toEqual(['Mới']);
-  await page.getByRole('button', { name: 'Đóng xem trước' }).click();
+  await page.getByLabel(`Chọn dòng 5: ${longTitle}`).check();
+  await page.getByRole('button', { name: 'Lưu 2 dòng đã chọn' }).click();
+  await expect(page.getByRole('alertdialog')).toContainText('1 dòng còn chứa nội dung');
+  await page.getByRole('button', { name: 'Quay lại sửa' }).click();
+  const placeholderRow = page.getByRole('row').filter({
+    has: page.getByLabel(`Chọn dòng 5: ${longTitle}`),
+  });
+  await placeholderRow.getByRole('button', { name: 'Sửa' }).click();
+  await page.getByRole('dialog').getByLabel('Nội dung').fill('Nội dung đã được xác nhận.');
+  await page.getByRole('button', { name: 'Xong' }).click();
+  await page.getByRole('button', { name: 'Lưu 2 dòng đã chọn' }).click();
+  await expect(page.getByText('Đã thêm 2 tri thức (bỏ qua 68 dòng trùng)')).toBeVisible();
+  expect(saved).toEqual(['Mới', longTitle]);
+  await expect(page.getByRole('dialog')).toBeHidden();
   await page.getByLabel('File tri thức').setInputFiles({
     name: 'test.csv',
     mimeType: 'text/csv',

@@ -1,5 +1,12 @@
 import { apiFetch, ApiFetchOptions } from './client';
-import { PaginatedResult, SimCatalog, SimNumber, SimStatus, SimType, SubscriptionType } from '@/types/product';
+import {
+  PaginatedResult,
+  SimCatalog,
+  SimNumber,
+  SimStatus,
+  SimType,
+  SubscriptionType,
+} from '@/types/product';
 
 export interface SimFormValues {
   phone_number: string;
@@ -30,23 +37,32 @@ export interface SimImportPreview extends SimImportResult {
 export const simsApi = {
   // ---- Public ----
   listPublic: (
-    params: { q?: string; prefix?: string; catalog?: string; sim_type?: SimType; price_range?: string; type?: SubscriptionType } = {},
+    params: {
+      q?: string;
+      prefix?: string;
+      catalog?: string;
+      sim_type?: SimType;
+      price_range?: string;
+      type?: SubscriptionType;
+    } = {},
     opts?: Pick<ApiFetchOptions, 'cache'>,
   ) => apiFetch<SimNumber[]>('/public/sims', { params, cache: 'no-store', ...opts }),
 
   getPublicById: (id: number) => apiFetch<SimNumber>(`/public/sims/${id}`, { cache: 'no-store' }),
 
   // ---- Admin ----
-  listAdmin: (params: {
-    q?: string;
-    prefix?: string;
-    catalog?: SimCatalog;
-    sim_type?: SimType;
-    type?: SubscriptionType;
-    status?: SimStatus;
-    page?: number;
-    page_size?: number;
-  } = {}) => apiFetch<PaginatedResult<SimNumber>>('/admin/sims', { params }),
+  listAdmin: (
+    params: {
+      q?: string;
+      prefix?: string;
+      catalog?: SimCatalog;
+      sim_type?: SimType;
+      type?: SubscriptionType;
+      status?: SimStatus;
+      page?: number;
+      page_size?: number;
+    } = {},
+  ) => apiFetch<PaginatedResult<SimNumber>>('/admin/sims', { params }),
 
   getById: (id: number) => apiFetch<SimNumber>(`/admin/sims/${id}`),
 
@@ -63,15 +79,20 @@ export const simsApi = {
       body: { ids, status },
     }),
 
-  bulkRemove: (ids: number[]) =>
-    apiFetch<{ deleted: number }>('/admin/sims/bulk', { method: 'DELETE', body: { ids } }),
+  bulkRemove: (ids: number[], password: string) =>
+    apiFetch<{ deleted: number }>('/admin/sims/bulk', {
+      method: 'DELETE',
+      body: { ids, password },
+    }),
 
   previewImport: (file: File, mode: 'skip' | 'update') => {
     const form = new FormData();
     form.append('file', file);
     form.append('mode', mode);
     return apiFetch<SimImportPreview>('/admin/sims/import/preview', {
-      method: 'POST', body: form, isFormData: true,
+      method: 'POST',
+      body: form,
+      isFormData: true,
     });
   },
 
@@ -94,7 +115,8 @@ export const simsApi = {
     format: 'xlsx' | 'csv',
     filters: Record<string, string | number | undefined> = {},
     options: { scope: 'filtered' | 'all'; columns: string[] },
-  ) => apiFetch<Blob>('/admin/sims/export', {
-    params: { ...filters, format, scope: options.scope, columns: options.columns.join(',') },
-  }),
+  ) =>
+    apiFetch<Blob>('/admin/sims/export', {
+      params: { ...filters, format, scope: options.scope, columns: options.columns.join(',') },
+    }),
 };

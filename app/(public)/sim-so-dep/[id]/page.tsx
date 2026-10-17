@@ -56,7 +56,7 @@ export default async function SimDetailPage({ params }: { params: Promise<{ id: 
         </div>
         <h1 className={styles.title}>{sim.phone_number}</h1>
         {sim.bundle_note && <p className={styles.note}>{sim.bundle_note}</p>}
-        <p className={styles.price}>Phí hòa mạng: {formatPrice(sim.activation_fee)} (một lần)</p>
+        <p className={styles.price}>Phí hòa mạng: {formatPrice(sim.activation_fee)}</p>
         <SimCommitment sim={sim} />
 
         <SimPurchaseButton sim={sim} className={styles.addButton}>

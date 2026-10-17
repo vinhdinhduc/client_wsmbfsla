@@ -54,8 +54,8 @@ const LABELS: Record<string, string> = {
   appointments: 'Lịch hẹn',
   settings: 'Cài đặt',
 };
-const vietnameseLabel = (label = '') =>
-  label
+const vietnameseLabel = (label: unknown = '') =>
+  (typeof label === 'string' ? label : label == null ? '' : String(label))
     .split(' / ')
     .map((part) => LABELS[part] ?? part)
     .join(' / ');

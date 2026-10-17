@@ -5,7 +5,14 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { A11y, Autoplay, EffectFade, Keyboard, Navigation, Pagination as SwiperPagination } from 'swiper/modules';
+import {
+  A11y,
+  Autoplay,
+  EffectFade,
+  Keyboard,
+  Navigation,
+  Pagination as SwiperPagination,
+} from 'swiper/modules';
 import { slidersApi } from '@/lib/api/sliders';
 import { assetUrl } from '@/lib/assets';
 import styles from './SliderZone.module.scss';
@@ -18,7 +25,7 @@ import 'swiper/css/pagination';
 interface SliderZoneProps {
   zoneCode: string;
   /** Named aspect variants keep layout sizing inside the slider module. */
-  aspect?: 'hero' | 'partners';
+  aspect?: 'hero' | 'partners' | 'testimonial';
   className?: string;
 }
 
@@ -45,7 +52,7 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
   if (isLoading) {
     return (
       <div
-        className={`${styles.loading} ${aspect === 'partners' ? styles.aspectPartners : styles.aspectHero} ${className ?? ''}`}
+        className={`${styles.loading} ${aspect === 'partners' ? styles.aspectPartners : aspect === 'testimonial' ? styles.aspectTestimonial : styles.aspectHero} ${className ?? ''}`}
       />
     );
   }
@@ -78,19 +85,29 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
       {data.items.map((item, index) => {
         const slideContent = (
           <div
-            className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : styles.aspectHero}`}
+            className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : aspect === 'testimonial' ? styles.aspectTestimonial : styles.aspectHero}`}
           >
             <picture>
-            {item.mobile_image_url && <source media="(max-width: 640px)" srcSet={assetUrl(item.mobile_image_url)!} />}
-            <Image
-              src={assetUrl(item.image_url)!}
-              alt={item.alt_text || item.title || 'MobiFone Sơn La'}
-              fill
-              sizes="100vw"
-              quality={82}
-              priority={index === 0}
-              className={zoneCode === 'partners' ? styles.partnerImage : effect === 'zoom' ? styles.imageZoom : styles.image}
-            />
+              {item.mobile_image_url && (
+                <source media="(max-width: 640px)" srcSet={assetUrl(item.mobile_image_url)!} />
+              )}
+              <Image
+                src={assetUrl(item.image_url)!}
+                alt={item.alt_text || item.title || 'MobiFone Sơn La'}
+                fill
+                sizes="100vw"
+                quality={82}
+                priority={index === 0}
+                className={
+                  zoneCode === 'partners'
+                    ? styles.partnerImage
+                    : zoneCode === 'testimonials'
+                      ? styles.testimonialImage
+                      : effect === 'zoom'
+                        ? styles.imageZoom
+                        : styles.image
+                }
+              />
             </picture>
             {(item.title || item.caption) && (
               <div className={styles.caption}>
@@ -98,12 +115,30 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
                 {item.caption && <p className={styles.captionText}>{item.caption}</p>}
               </div>
             )}
-            {zoneCode === 'testimonials' && (item.person_name || item.rating) && <div className={styles.testimonialMeta}><span aria-label={`${item.rating || 5} trên 5 sao`}>{'★'.repeat(item.rating || 5)}</span><strong>{item.person_name}</strong><small>{item.job_title}</small></div>}
+            {zoneCode === 'testimonials' && (item.person_name || item.rating) && (
+              <div className={styles.testimonialMeta}>
+                <span aria-label={`${item.rating || 5} trên 5 sao`}>
+                  {'★'.repeat(item.rating || 5)}
+                </span>
+                <strong>{item.person_name}</strong>
+                <small>{item.job_title}</small>
+              </div>
+            )}
           </div>
         );
         return (
           <SwiperSlide key={item.id}>
-            {item.link_url ? <Link href={item.link_url} target={item.open_new_tab ? '_blank' : undefined} rel={item.open_new_tab ? 'noopener noreferrer' : undefined}>{slideContent}</Link> : slideContent}
+            {item.link_url ? (
+              <Link
+                href={item.link_url}
+                target={item.open_new_tab ? '_blank' : undefined}
+                rel={item.open_new_tab ? 'noopener noreferrer' : undefined}
+              >
+                {slideContent}
+              </Link>
+            ) : (
+              slideContent
+            )}
           </SwiperSlide>
         );
       })}

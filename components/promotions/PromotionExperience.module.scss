@@ -1,0 +1,106 @@
+.giftPlacement {
+  position: fixed;
+  z-index: 1050;
+  width: 220px;
+  max-width: calc(100vw - 32px);
+  isolation: isolate;
+}
+.center { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.bottom_right { right: max(20px, env(safe-area-inset-right)); bottom: max(120px, calc(100px + env(safe-area-inset-bottom))); }
+.bottom_left { left: max(20px, env(safe-area-inset-left)); bottom: max(32px, calc(20px + env(safe-area-inset-bottom))); }
+.dismissGift, .close {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid #d9e4ee;
+  border-radius: 50%;
+  color: #33475b;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 16px #16375d14;
+}
+.dismissGift { position: absolute; top: -10px; right: -6px; z-index: 2; }
+.giftButton {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #fffef6, #f0f8ff);
+  padding: 20px 12px 16px;
+  color: #12385b;
+  cursor: pointer;
+  box-shadow: 0 16px 56px #003e7c2e, inset 0 0 0 1px #ffffffb3;
+  &:focus-visible { outline: 3px solid #087dc1; outline-offset: 4px; }
+  &:disabled { cursor: default; }
+}
+.giftArt { position: relative; display: block; width: 160px; height: 150px; }
+.halo { position: absolute; inset: 8px 0 0; border-radius: 50%; background: radial-gradient(circle, #ffdc5c55 0, #ffe89411 65%, transparent 70%); }
+.box { position: absolute; bottom: 14px; left: 32px; width: 96px; height: 76px; border-radius: 0 0 10px 10px; background: linear-gradient(110deg, #0077c8, #005eaa); box-shadow: 4px 8px 14px #0064a926, inset -10px 0 0 #00519340; }
+.lid { position: absolute; bottom: 87px; left: 24px; width: 112px; height: 26px; border-radius: 6px; background: linear-gradient(110deg, #2097e2, #0074c9); box-shadow: 0 5px 0 #00569e40; transform-origin: 15% 80%; }
+.ribbon { position: absolute; top: 0; bottom: 0; left: 39%; width: 22%; background: linear-gradient(90deg, #ffc640, #ffe49b, #ffc640); }
+.bowLeft, .bowRight { position: absolute; top: 16px; width: 42px; height: 26px; border: 9px solid #ffd169; border-radius: 60% 60% 8px 60%; box-shadow: inset 0 0 2px #b98519; }
+.bowLeft { left: 42px; transform: rotate(20deg); }
+.bowRight { right: 38px; transform: rotate(-20deg) scaleX(-1); }
+.sparkle, .sparkleSmall { position: absolute; color: #eaa711; font-size: 24px; top: 20px; left: 4px; }
+.sparkleSmall { top: 63px; left: auto; right: 2px; font-size: 17px; }
+.giftLabel { font-size: 15px; font-weight: 700; }
+.giftHint { margin-top: 4px; font-size: 12px; color: #537085; }
+.bounce .giftArt { animation: bounce 1.6s ease-in-out 3; }
+.shake .giftArt { animation: shake 1.8s ease-in-out 3; }
+.opening .giftArt { animation: none; }
+.opening .lid { animation: openLid .45s ease-out forwards; }
+.confetti { position: absolute; inset: 75px 0 auto; width: 100%; height: 1px; pointer-events: none; }
+.confetti i { position: absolute; left: 50%; width: 8px; height: 12px; background: hsl(var(--hue) 85% 60%); animation: burst .5s ease-out forwards; }
+.dialog {
+  max-width: 520px;
+  width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  margin: auto;
+  overflow: auto;
+  border-radius: 24px;
+  background: #fff;
+  color: #17364c;
+  box-shadow: 0 24px 80px #052d4e55;
+  &::backdrop { background: #08264088; }
+  &[open] { animation: appear .2s ease-out; }
+}
+.card { position: relative; }
+.close { position: absolute; top: 12px; right: 12px; z-index: 2; }
+.cardHeading { position: sticky; top: 0; z-index: 2; padding: 30px 64px 24px 28px; background: linear-gradient(125deg, #edf8ff, #fff8e7); }
+.kicker { display: flex; align-items: center; gap: 8px; color: #0966a3; font-size: 13px; font-weight: 600; }
+.cardHeading h2 { margin: 12px 0 0; color: #153958; font-size: clamp(20px, 4vw, 27px); line-height: 1.3; overflow-wrap: anywhere; }
+.cardBody { padding: 24px 28px 28px; }
+.banner { margin-bottom: 20px; overflow: hidden; border-radius: 12px; background: #f2f7fa; }
+.banner img { display: block; width: 100%; max-height: 240px; object-fit: contain; }
+.content { margin: 0 0 20px; white-space: pre-wrap; overflow-wrap: anywhere; color: #42566a; font-size: 15px; line-height: 1.7; }
+.coupon { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border: 1px dashed #79aad1; border-radius: 12px; background: #f3f9ff; }
+.coupon div { min-width: 0; }
+.coupon span { display: block; margin-bottom: 5px; color: #5a768a; font-size: 12px; }
+.coupon code { font-size: 18px; font-weight: 700; letter-spacing: 1px; color: #075c99; overflow-wrap: anywhere; user-select: all; }
+.coupon button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 12px; flex-shrink: 0; border: 1px solid #c5ddeb; border-radius: 8px; background: #fff; color: #0966a3; cursor: pointer; font-size: 13px; }
+.copyStatus { display: block; min-height: 20px; margin-top: 6px; color: #1b714e; font-size: 12px; }
+.cta { display: flex; justify-content: center; align-items: center; min-height: 48px; margin-top: 12px; border-radius: 12px; background: #006bb5; color: #fff; font-weight: 700; text-align: center; text-decoration: none; padding: 12px 20px; overflow-wrap: anywhere; &:hover { background: #005792; } }
+.previewNote { margin: 16px 0 0; color: #63798b; font-size: 12px; text-align: center; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-12px) rotate(-3deg); } 65% { transform: translateY(-4px) rotate(2deg); } }
+@keyframes shake { 0%, 65%, 100% { transform: rotate(0); } 70%, 80%, 90% { transform: rotate(-7deg); } 75%, 85%, 95% { transform: rotate(7deg); } }
+@keyframes openLid { to { transform: translateY(-40px) rotate(-28deg); opacity: 0; } }
+@keyframes burst { to { transform: rotate(var(--angle)) translateY(calc(-1 * var(--distance))) rotate(180deg); opacity: 0; } }
+@keyframes appear { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 480px) {
+  .giftPlacement { width: 190px; }
+  .bottom_right { right: 16px; bottom: 120px; }
+  .bottom_left { left: 16px; bottom: 24px; }
+  .cardHeading { padding: 28px 60px 22px 20px; }
+  .cardBody { padding: 20px; }
+  .coupon { padding: 12px; gap: 8px; }
+  .coupon button { padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .giftPlacement *, .dialog, .dialog * { animation: none !important; transition: none !important; }
+  .confetti { display: none; }
+}

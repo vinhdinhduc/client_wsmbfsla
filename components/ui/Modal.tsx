@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useId } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -12,11 +12,20 @@ interface ModalProps {
   title: string;
   children: ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  placement?: 'center' | 'right';
 }
 
 const CLOSE_ANIMATION_MS = 150;
 
-export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  maxWidth = 'lg',
+  placement = 'center',
+}: ModalProps) {
+  const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const duration = prefersReducedMotion ? 0 : undefined;
@@ -39,6 +48,41 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
   return (
     <dialog
       ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onKeyDown={(event) => {
+        if (event.key !== 'Tab') return;
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        const controls = Array.from(
+          dialog.querySelectorAll<HTMLElement>(
+            'a[href], button, input, select, textarea, [tabindex]',
+          ),
+        ).filter(
+          (element) =>
+            element.tabIndex >= 0 &&
+            !element.matches(':disabled') &&
+            element.getClientRects().length > 0,
+        );
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (!first) {
+          event.preventDefault();
+          dialog.focus();
+          return;
+        }
+        if (
+          event.shiftKey &&
+          (document.activeElement === first || document.activeElement === dialog)
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -46,7 +90,11 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}
-      className={cn(styles.dialog, styles[`maxWidth${maxWidth.toUpperCase()}`])}
+      className={cn(
+        styles.dialog,
+        styles[`maxWidth${maxWidth.toUpperCase()}`],
+        placement === 'right' && styles.drawer,
+      )}
     >
       <AnimatePresence>
         {isOpen && (
@@ -58,7 +106,9 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
             className={styles.panel}
           >
             <div className={styles.header}>
-              <h2 className={styles.title}>{title}</h2>
+              <h2 id={titleId} className={styles.title}>
+                {title}
+              </h2>
               <button type="button" onClick={onClose} aria-label="Đóng" className={styles.close}>
                 <X className={styles.closeIcon} />
               </button>

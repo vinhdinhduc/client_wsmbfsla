@@ -134,11 +134,14 @@ export function AdminSidebar({
         )}
       </nav>
       <div className={styles.sidebarFooter}>
-        <Link href="/" target="_blank" className={styles.homeLink} onClick={onClose}>
+        <Link href="/" target="_blank" rel="noopener noreferrer" className={styles.homeLink} onClick={onClose}>
           <HomeIcon className={styles.icon} />
           Xem trang chủ
         </Link>
-        <span>Hệ thống quản trị nội bộ</span>
+        <div className={styles.footerLogo}>
+          <Image src="/logo.png" alt="MobiFone" width={698} height={129} unoptimized />
+        </div>
+        <span className={styles.footerCaption}>Hệ thống quản trị nội bộ</span>
       </div>
     </aside>
   );

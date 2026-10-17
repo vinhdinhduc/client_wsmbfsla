@@ -9,12 +9,12 @@
 
 .breadcrumb {
   flex-wrap: wrap;
-  gap: $space-2 - $space-1 / 2;
+  gap: $space-2 - ($space-1 * 0.5);
   color: var(--color-neutral-500);
   font-size: $font-size-sm;
 }
 .item {
-  gap: $space-2 - $space-1 / 2;
+  gap: $space-2 - ($space-1 * 0.5);
 }
 .homeLink {
   gap: $space-1;

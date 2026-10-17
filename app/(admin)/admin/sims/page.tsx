@@ -105,6 +105,7 @@ export default function AdminSimsPage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeletePassword, setBulkDeletePassword] = useState('');
   const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
   const [monthlyFeeOption, setMonthlyFeeOption] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
@@ -230,12 +231,13 @@ export default function AdminSimsPage() {
     onError: (err: Error) => showToast(err.message, 'error'),
   });
   const bulkDeleteMutation = useMutation({
-    mutationFn: () => simsApi.bulkRemove(selectedIds),
+    mutationFn: (password: string) => simsApi.bulkRemove(selectedIds, password),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-sims'] });
       showToast(`Đã xóa mềm ${result.deleted} số sim`);
       setSelectedIds([]);
       setBulkDeleteOpen(false);
+      setBulkDeletePassword('');
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
@@ -346,6 +348,10 @@ export default function AdminSimsPage() {
     URL.revokeObjectURL(url);
   }
 
+  const currentPageIds = sims?.items.map((sim) => sim.id) ?? [];
+  const currentPageSelected =
+    currentPageIds.length > 0 && currentPageIds.every((id) => selectedIds.includes(id));
+
   const columns: TableColumn<SimNumber>[] = [
     {
       key: 'select',
@@ -454,7 +460,7 @@ export default function AdminSimsPage() {
           </select>
           <Button
             variant="outline"
-            title="File cũ: tách 150.000 24 tháng thành committed_monthly_fee = 150000 và commitment_months = 24. Để trống nếu không cam kết; phí hòa mạng là phí một lần."
+            title="File cũ: tách 150.000 24 tháng thành committed_monthly_fee = 150000 và commitment_months = 24. Để trống nếu không cam kết."
             isLoading={templateMutation.isPending}
             onClick={() => templateMutation.mutate()}
           >
@@ -513,6 +519,21 @@ export default function AdminSimsPage() {
         <div className={styles.toolbar} role="region" aria-label="Thao tác hàng loạt">
           <strong>Đã chọn {selectedIds.length} số</strong>
           <div className={styles.buttonGroup}>
+            {selectedIds.length >= 3 && currentPageIds.length > 0 && (
+              <Button
+                variant="outline"
+                title="Chọn các số đang hiển thị trên trang này"
+                onClick={() =>
+                  setSelectedIds((current) =>
+                    currentPageSelected
+                      ? current.filter((id) => !currentPageIds.includes(id))
+                      : [...new Set([...current, ...currentPageIds])],
+                  )
+                }
+              >
+                {currentPageSelected ? 'Bỏ chọn trang này' : 'Chọn tất cả'}
+              </Button>
+            )}
             <SelectField
               label="Đổi trạng thái"
               value=""
@@ -523,7 +544,13 @@ export default function AdminSimsPage() {
                 }
               }}
             />
-            <Button variant="danger" onClick={() => setBulkDeleteOpen(true)}>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setBulkDeletePassword('');
+                setBulkDeleteOpen(true);
+              }}
+            >
               Xóa các số đã chọn
             </Button>
           </div>
@@ -706,14 +733,34 @@ export default function AdminSimsPage() {
 
       <ConfirmDialog
         isOpen={bulkDeleteOpen}
-        onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={() => bulkDeleteMutation.mutate()}
+        onClose={() => {
+          setBulkDeleteOpen(false);
+          setBulkDeletePassword('');
+        }}
+        onConfirm={() => {
+          if (!bulkDeletePassword) {
+            showToast('Vui lòng nhập mật khẩu để xác nhận', 'error');
+            return;
+          }
+          bulkDeleteMutation.mutate(bulkDeletePassword);
+        }}
         isPending={bulkDeleteMutation.isPending}
         destructive
-        title="Xóa mềm nhiều số sim"
+        title="Xác nhận xóa nhiều số SIM"
         confirmLabel={`Xóa ${selectedIds.length} số`}
       >
-        Các số đã chọn sẽ bị ẩn khỏi hệ thống nhưng dữ liệu vẫn được giữ để có thể phục hồi.
+        <p role="alert">
+          Cảnh báo: {selectedIds.length} số SIM đã chọn sẽ bị xóa khỏi kho. Dữ liệu vẫn được lưu trữ
+          để có thể phục hồi. Hãy nhập mật khẩu tài khoản để xác nhận thao tác.
+        </p>
+        <TextField
+          label="Mật khẩu tài khoản"
+          type="password"
+          autoComplete="current-password"
+          value={bulkDeletePassword}
+          onChange={(event) => setBulkDeletePassword(event.target.value)}
+          required
+        />
       </ConfirmDialog>
 
       <Modal

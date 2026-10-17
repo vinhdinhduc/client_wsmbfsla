@@ -33,11 +33,15 @@
     "**/*.ts",
     "**/*.tsx",
     ".next-legal/types/**/*.ts",
+    ".next-packages-check/types/**/*.ts",
     ".next-ui-ai-production/types/**/*.ts",
     ".next-ui-dev-1790774893828/types/**/*.ts",
+    ".next-ui-dev-1790815368999/types/**/*.ts",
+    ".next-ui-dev-1791189066891/types/**/*.ts",
+    ".next-ui-dev-1791336951559/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-ui-dev-1790815368999/types/**/*.ts"
+    ".next-ui-build-1791340148571/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

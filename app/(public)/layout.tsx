@@ -6,6 +6,7 @@ import { ThemeColorInjector } from '@/components/shared/ThemeColorInjector';
 import { CookieConsent } from '@/components/shared/CookieConsent';
 import { PwaRegister } from '@/components/shared/PwaRegister';
 import { CampaignNotices } from '@/components/shared/CampaignNotices';
+import { PromotionWidget } from '@/components/promotions/PromotionWidget';
 import styles from './PublicLayout.module.scss';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <CartDrawer />
       <ChatWidget />
       <CookieConsent />
+      <PromotionWidget />
     </div>
   );
 }

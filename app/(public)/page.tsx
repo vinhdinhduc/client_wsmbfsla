@@ -8,6 +8,7 @@ import { NewsCard, SolutionCard } from '@/components/ui/Card';
 import { SliderZone } from '@/components/shared/SliderZone';
 import { HomeCatalogSections } from '@/components/home/HomeCatalogSections';
 import { utilitiesApi } from '@/lib/api/utilities';
+import { Lightbulb } from 'lucide-react';
 
 export const revalidate = 60;
 export const dynamic = 'force-dynamic';
@@ -60,7 +61,30 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {utilities.length > 0 && <section className={styles.section}><SectionHeader title="Tiện ích" href="/tien-ich"/><div className={styles.grid3}>{utilities.map((item)=><article key={item.id}><h3>{item.name}</h3><p>{item.summary}</p><Link href={`/tien-ich/${item.slug}`}>Chi tiết <ArrowRight className={styles.viewAllIcon}/></Link></article>)}</div></section>}
+      {utilities.length > 0 && (
+        <section className={styles.section}>
+          <SectionHeader title="Tiện ích" href="/tien-ich" />
+          <div className={styles.utilityGrid}>
+            {utilities.map((item) => (
+              <article
+                key={item.id}
+                className={`${styles.utilityCard} ${utilities.length === 1 ? styles.utilityCardWide : ''}`}
+              >
+                <span className={styles.utilityIcon} aria-hidden="true">
+                  <Lightbulb />
+                </span>
+                <div className={styles.utilityContent}>
+                  <h3>{item.name}</h3>
+                  <p>{item.summary}</p>
+                </div>
+                <Link href={`/tien-ich/${item.slug}`} className={styles.utilityLink}>
+                  Chi tiết <ArrowRight className={styles.viewAllIcon} />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className={styles.section}>
         <h2 className={styles.centerTitle}>Đối tác & Thương hiệu</h2>
@@ -69,7 +93,7 @@ export default async function HomePage() {
 
       <section className={styles.section}>
         <h2 className={styles.centerTitle}>Khách hàng nói gì về chúng tôi</h2>
-        <SliderZone zoneCode="testimonials" aspect="hero" />
+        <SliderZone zoneCode="testimonials" aspect="testimonial" />
       </section>
     </div>
   );

@@ -15,6 +15,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_FB_PIXEL_ID: z.string().optional().default(''),
   NEXT_PUBLIC_SITE_URL: z.string().url({ message: 'NEXT_PUBLIC_SITE_URL phải là một URL hợp lệ' }),
   NEXT_PUBLIC_ASSET_BASE_URL: z.union([z.string().url(), z.literal('')]).optional().default(''),
+  NEXT_PUBLIC_INITIAL_LOADER_ENABLED: z.enum(['true', 'false']).default('true'),
+  NEXT_PUBLIC_ADMIN_INITIAL_LOADER_ENABLED: z.enum(['true', 'false']).default('false'),
 });
 
 function loadClientEnv() {
@@ -25,6 +27,8 @@ function loadClientEnv() {
     NEXT_PUBLIC_FB_PIXEL_ID: process.env.NEXT_PUBLIC_FB_PIXEL_ID,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_ASSET_BASE_URL: process.env.NEXT_PUBLIC_ASSET_BASE_URL,
+    NEXT_PUBLIC_INITIAL_LOADER_ENABLED: process.env.NEXT_PUBLIC_INITIAL_LOADER_ENABLED,
+    NEXT_PUBLIC_ADMIN_INITIAL_LOADER_ENABLED: process.env.NEXT_PUBLIC_ADMIN_INITIAL_LOADER_ENABLED,
   });
 
   if (!parsed.success) {

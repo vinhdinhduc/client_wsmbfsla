@@ -1,0 +1,264 @@
+{
+  "recorded_at": "2026-10-06T15:12:54.825Z",
+  "scope": "Five requested internal admin/provider probes with stored prompt/profile/params and real retrieval. Ordinary provider usage is recorded; no public chat, chat logs, sessions, IP changes, quota resets, or configuration/data edits.",
+  "question_count": 5,
+  "history": "empty; each question is independent",
+  "results": [
+    {
+      "question": "Gói MXH100 giá bao nhiêu?",
+      "status": "answered",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 4254,
+      "reply": "Chào bạn, MobiFone Chi nhánh Sơn La hiện không có thông tin về gói cước MXH100 trong dữ liệu được cung cấp. Bạn vui lòng liên hệ tổng đài hoặc truy cập website chính thức của MobiFone để biết thêm chi tiết về các gói cước nhé.",
+      "usage": {
+        "inputTokens": 1261,
+        "outputTokens": 220
+      },
+      "sources": [
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Chữ ký số MobiFone CA",
+          "href": "/giai-phap-so/chu-ky-so-mobifone-ca"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        },
+        {
+          "title": "Ưu đãi 50% gói data cho khách hàng đăng ký online",
+          "href": "/tin-tuc/uu-dai-50-goi-data-dang-ky-online"
+        }
+      ]
+    },
+    {
+      "question": "Gói TK135 giá bao nhiêu? Có ưu đãi gì?",
+      "status": "answered",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 2161,
+      "reply": "Gói cước TK135 có giá 135.000 VNĐ cho 30 ngày sử dụng. Hiện tại, chúng tôi chưa có thông tin về ưu đãi cụ thể cho gói cước này.",
+      "usage": {
+        "inputTokens": 1327,
+        "outputTokens": 232
+      },
+      "sources": [
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Chữ ký số MobiFone CA",
+          "href": "/giai-phap-so/chu-ky-so-mobifone-ca"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        }
+      ]
+    },
+    {
+      "question": "Gói cước nào rẻ dưới 100.000đ?",
+      "status": "answered",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 2555,
+      "reply": "Chào bạn,\n\nDựa trên dữ liệu được cung cấp, MobiFone Chi nhánh Sơn La hiện không có gói cước nào dưới 100.000đ. Gói cước có giá thấp nhất là MXH100 với giá 100.000đ/30 ngày.",
+      "usage": {
+        "inputTokens": 1351,
+        "outputTokens": 380
+      },
+      "sources": [
+        {
+          "title": "Gói cước MXH100",
+          "href": "/goi-cuoc/mxh100"
+        },
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "href": "/giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt"
+        }
+      ]
+    },
+    {
+      "question": "Cửa hàng gần tôi ở đâu?",
+      "status": "answered",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 2741,
+      "reply": "Chào bạn, MobiFone Chi nhánh Sơn La có các cửa hàng sau:\n\n*   **MobiFone Sơn La - Trung tâm:** 96B Đường 3/2, Phường Tô Hiệu, Thành phố Sơn La. Điện thoại: [số điện thoại đã che]. Giờ mở cửa: 7:30 - 17:30 (T2 - T7).\n*   **MobiFone Mộc Châu:** Tiểu khu 1, Thị trấn Mộc Châu, Mộc Châu. Điện thoại: [số điện thoại đã che]. Giờ mở cửa: 7:30 - 17:00 (T2 - T7).\n*   **MobiFone Mai Sơn:** Tiểu khu 3, Thị trấn Hát Lót, Mai Sơn. Điện thoại: [số điện thoại đã che]. Giờ mở cửa: 8:00 - 17:00 (T2 - T7).\n*   **MobiFone Yên Châu:** Tiểu khu Chiềng An, Thị trấn Yên Châu, Yên Châu. Điện thoại: [số điện thoại đã che]. Giờ mở cửa: 8:00 - 17:00 (T2 - T7).\n\nBạn có thể tham khảo thông tin trên để tìm cửa hàng thuận tiện nhất.",
+      "usage": {
+        "inputTokens": 1590,
+        "outputTokens": 365
+      },
+      "sources": [
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Giải pháp hóa đơn điện tử MobiFone Invoice",
+          "href": "/giai-phap-so/hoa-don-dien-tu-mobifone-invoice"
+        },
+        {
+          "title": "Giải pháp truyền thanh thông minh và hệ thống nguồn",
+          "href": "/giai-phap-so/giai-phap-truyen-thanh-thong-minh"
+        },
+        {
+          "title": "Giải pháp du lịch thông minh (Smart Travel)",
+          "href": "/giai-phap-so/giai-phap-du-lich-thong-minh"
+        },
+        {
+          "title": "Nền tảng Bình dân học vụ số",
+          "href": "/giai-phap-so/nen-tang-binh-dan-hoc-vu-so"
+        },
+        {
+          "title": "Địa chỉ và giờ mở cửa",
+          "href": "/cua-hang"
+        }
+      ]
+    },
+    {
+      "question": "Gói cước nào rẻ?",
+      "status": "answered",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 1763,
+      "reply": "Trong các gói cước được cung cấp, gói MXH100 có giá 100.000 VNĐ/30 ngày.",
+      "usage": {
+        "inputTokens": 1341,
+        "outputTokens": 135
+      },
+      "sources": [
+        {
+          "title": "Gói cước MXH100",
+          "href": "/goi-cuoc/mxh100"
+        },
+        {
+          "title": "Gói cước TK135",
+          "href": "/goi-cuoc/TK135"
+        },
+        {
+          "title": "Giải pháp chính quyền số cấp xã, phường",
+          "href": "/giai-phap-so/giai-phap-chinh-quyen-so-cap-xa-phuong"
+        },
+        {
+          "title": "Giải pháp quản lý bán hàng cho hộ kinh doanh",
+          "href": "/giai-phap-so/giai-phap-quan-ly-ban-hang-ho-kinh-doanh"
+        },
+        {
+          "title": "Chỉnh lý, Số hóa tài liệu bằng AI & LLM",
+          "href": "/giai-phap-so/chinh-ly-so-hoa-tai-lieu-bang-ai-llm"
+        },
+        {
+          "title": "Dịch vụ cung cấp, lắp đặt trang thiết bị CNTT",
+          "href": "/giai-phap-so/cung-cap-lap-dat-trang-thiet-bi-cntt"
+        }
+      ]
+    }
+  ],
+  "chat_log_count_before": 28,
+  "prompt_sha256": "0c751306fe4bf84b50cadccc6273081ce118cf1e2bd55981d2a826a9061040ae",
+  "rag_enabled": true,
+  "provider_config": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "temperature": 0.4,
+      "max_tokens": 500,
+      "top_p": 1
+    }
+  ],
+  "chat_log_count_after": 28,
+  "provider_call_records": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 3619,
+      "input_tokens": 1261,
+      "output_tokens": 220
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 2144,
+      "input_tokens": 1327,
+      "output_tokens": 232
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 2546,
+      "input_tokens": 1351,
+      "output_tokens": 380
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 2697,
+      "input_tokens": 1590,
+      "output_tokens": 365
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "purpose": "chat",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 1743,
+      "input_tokens": 1341,
+      "output_tokens": 135
+    }
+  ],
+  "completed_at": "2026-10-06T15:13:08.786Z"
+}

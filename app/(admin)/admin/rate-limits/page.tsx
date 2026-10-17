@@ -6,7 +6,7 @@ import { rateLimitsApi, RatePolicy } from '@/lib/api/rateLimits';
 import { useToast } from '@/components/ui/Toast';
 import styles from './page.module.scss';
 
-const labels: Record<string, string> = { login: 'Đăng nhập', contact: 'Liên hệ', registration_ip: 'Đăng ký / IP', registration_phone: 'Đăng ký / SĐT', appointment: 'Đặt lịch', newsletter: 'Newsletter', lookup: 'Tra cứu', sim_search: 'Tìm sim', public_general: 'API công khai', chat: 'Chatbot', upload: 'Upload' };
+const labels: Record<string, string> = { login: 'Đăng nhập', contact: 'Liên hệ', job_application: 'Hồ sơ tuyển dụng / IP', registration_ip: 'Đăng ký / IP', registration_phone: 'Đăng ký / SĐT', appointment: 'Đặt lịch', newsletter: 'Newsletter', lookup: 'Tra cứu', sim_search: 'Tìm sim', public_general: 'API công khai', chat: 'Chatbot', upload: 'Upload' };
 export default function RateLimitsPage() {
   const { showToast } = useToast(); const client = useQueryClient();
   const data = useQuery({ queryKey: ['rate-limits'], queryFn: rateLimitsApi.list });

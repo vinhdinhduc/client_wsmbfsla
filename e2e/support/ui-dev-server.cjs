@@ -18,12 +18,18 @@ const stores = [1, 2].map((id) => ({
   staff: [],
 }));
 async function main() {
+  const recruitmentJobs = process.env.E2E_RECRUITMENT_FIXTURES === '1' || process.argv.includes('--recruitment')
+    ? JSON.parse(fs.readFileSync('e2e/fixtures/recruitment.json', 'utf8')) : null;
   const config = await loadConfig(PHASE_DEVELOPMENT_SERVER, process.cwd());
   const backups = ['tsconfig.json', 'next-env.d.ts'].map((file) => [file, fs.readFileSync(file)]);
   config.distDir = `.next-ui-dev-${Date.now()}`;
   const api = http.createServer((req, res) => {
     const path = new URL(req.url, 'http://localhost').pathname;
-    const data = path.endsWith('/public/stores')
+    const data = recruitmentJobs && path.endsWith('/public/jobs')
+      ? recruitmentJobs.filter((job) => job.status === 'recruiting' && job.deadline >= new Date().toISOString().slice(0, 10))
+      : recruitmentJobs && path.includes('/public/jobs/')
+        ? recruitmentJobs.find((job) => job.slug === path.split('/').pop())
+        : path.endsWith('/public/stores')
       ? stores
       : path.endsWith('/public/wards')
         ? stores.map((store) => ({ code: store.ward_code, name_with_type: store.full_address }))

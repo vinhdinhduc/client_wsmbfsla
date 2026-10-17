@@ -21,6 +21,7 @@ export interface Setting {
 export interface PublicSettings {
   site_name?: string;
   site_logo?: string;
+  email_logo_url?: string;
   hotline?: string;
   contact_email?: string;
   contact_address?: string;
@@ -30,6 +31,7 @@ export interface PublicSettings {
   theme_primary_color?: string;
   home_banner?: string;
   ai_chatbot_enabled?: string;
+  ai_chatbot_quick_replies?: string;
   footer_branch_name?: string;
   footer_address?: string;
   footer_email?: string;
@@ -47,8 +49,14 @@ export interface PublicSettings {
   ga4_id?: string;
   fb_pixel_id?: string;
   about_blocks?: string;
-  announcement_text?: string; announcement_url?: string; announcement_starts_at?: string; announcement_ends_at?: string;
-  promo_popup_enabled?: string; promo_popup_title?: string; promo_popup_content?: string; promo_popup_url?: string;
+  announcement_text?: string;
+  announcement_url?: string;
+  announcement_starts_at?: string;
+  announcement_ends_at?: string;
+  promo_popup_enabled?: string;
+  promo_popup_title?: string;
+  promo_popup_content?: string;
+  promo_popup_url?: string;
 }
 
 export const settingsApi = {
