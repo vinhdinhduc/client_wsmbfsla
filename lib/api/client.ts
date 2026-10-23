@@ -48,9 +48,16 @@ function readTokenFromBrowser(): string | undefined {
   }
 }
 
-function buildUrl(path: string, params?: ApiFetchOptions['params']): string {
-  const base = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '');
-  const url = new URL(`${base}${path.startsWith('/') ? path : `/${path}`}`);
+export function buildApiUrl(path: string, params?: ApiFetchOptions['params']): string {
+  // Server requests use the private backend address; browser requests use the public URL.
+  const base = (typeof window === 'undefined'
+    ? process.env.INTERNAL_API_URL || 'http://127.0.0.1:4000/api'
+    : env.NEXT_PUBLIC_API_URL
+  ).replace(/\/+$/, '');
+  const url = new URL(
+    `${base}${path.startsWith('/') ? path : `/${path}`}`,
+    typeof window === 'undefined' ? undefined : window.location.origin,
+  );
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -87,7 +94,7 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
 
   let response: Response;
   try {
-    response = await fetch(buildUrl(path, params), {
+    response = await fetch(buildApiUrl(path, params), {
       method,
       headers,
       body: requestBody,

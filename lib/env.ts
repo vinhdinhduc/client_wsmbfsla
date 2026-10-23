@@ -9,7 +9,10 @@ import { z } from 'zod';
  * RECAPTCHA_SECRET_KEY...) vao day - cac key do chi ton tai o backend.
  */
 const envSchema = z.object({
-  NEXT_PUBLIC_API_URL: z.string().url({ message: 'NEXT_PUBLIC_API_URL phải là một URL hợp lệ' }),
+  NEXT_PUBLIC_API_URL: z.union([
+    z.string().url({ message: 'NEXT_PUBLIC_API_URL phải là một URL hợp lệ' }),
+    z.string().regex(/^\/(?!\/)/),
+  ]).default('/api'),
   NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, 'Thiếu NEXT_PUBLIC_RECAPTCHA_SITE_KEY'),
   NEXT_PUBLIC_GA4_ID: z.string().optional().default(''),
   NEXT_PUBLIC_FB_PIXEL_ID: z.string().optional().default(''),

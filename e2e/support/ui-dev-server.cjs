@@ -64,6 +64,7 @@ async function main() {
         env: {
           ...process.env,
           NEXT_PUBLIC_API_URL: 'http://127.0.0.1:4003/api/v1',
+          INTERNAL_API_URL: 'http://127.0.0.1:4003/api/v1',
           __NEXT_PRIVATE_STANDALONE_CONFIG: JSON.stringify(config),
         },
       },

@@ -1,6 +1,8 @@
 import { env } from '@/lib/env';
 
-const apiOrigin = new URL(env.NEXT_PUBLIC_API_URL).origin;
+const apiOrigin = env.NEXT_PUBLIC_API_URL.startsWith('/')
+  ? ''
+  : new URL(env.NEXT_PUBLIC_API_URL).origin;
 
 /** Ghép duy nhất tại frontend; hỗ trợ blob/data và URL CDN bên ngoài. */
 export function assetUrl(value: string | null | undefined): string | null {

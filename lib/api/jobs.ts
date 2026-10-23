@@ -1,6 +1,4 @@
-import { apiFetch } from './client';
-import { ApiError } from './client';
-import { env } from '@/lib/env';
+import { apiFetch, ApiError, buildApiUrl } from './client';
 export interface Job {
   id: number;
   title: string;
@@ -50,7 +48,7 @@ function uploadApplication(
     });
   return new Promise<{ id: number; code: string }>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '')}/public/job-applications`);
+    xhr.open('POST', buildApiUrl('/public/job-applications'));
     xhr.timeout = 90_000;
     const abort = () => xhr.abort();
     const cleanup = () => options.signal?.removeEventListener('abort', abort);

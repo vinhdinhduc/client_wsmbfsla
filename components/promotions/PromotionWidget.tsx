@@ -4,9 +4,8 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api/client';
+import { apiFetch, buildApiUrl } from '@/lib/api/client';
 import type { PromotionEvent, PublicPromotion } from '@/lib/api/promotions';
-import { env } from '@/lib/env';
 import { canShowPromotion, isPromotionEligible, promotionVisitId, rememberPromotion } from '@/lib/promotions';
 
 const PromotionExperience = dynamic(() => import('./PromotionExperience').then((module) => module.PromotionExperience), { ssr: false });
@@ -112,7 +111,7 @@ export function PromotionWidget() {
     if (sentEvents.current.has(key)) return;
     sentEvents.current.add(key);
     // keepalive lets CTA statistics reach the API during page navigation.
-    void fetch(`${env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '')}/public/promotions/${active.promotion.id}/events`, {
+    void fetch(buildApiUrl(`/public/promotions/${active.promotion.id}/events`), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ event, visit_id: active.visitId }), keepalive: true,
     }).catch(() => { /* Analytics must not interrupt the visitor. */ });
