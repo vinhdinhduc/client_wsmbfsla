@@ -27,6 +27,8 @@
 .slide {
   position: relative;
   width: 100%;
+  isolation: isolate;
+  background: #eef4f8;
 }
 .root :global(.swiper-slide) {
   overflow: hidden;
@@ -146,15 +148,22 @@
 @media (max-width: 639px) {
   .root :global(.swiper-button-prev),
   .root :global(.swiper-button-next) {
-    width: 2rem;
-    height: 2rem;
-    margin-top: -1rem;
+    display: none;
   }
-  .root :global(.swiper-button-prev) {
-    left: 0.5rem;
+  .aspectHero {
+    aspect-ratio: 16 / 9;
   }
-  .root :global(.swiper-button-next) {
-    right: 0.5rem;
+  .slide:has(.image) .image,
+  .slide:has(.imageZoom) .imageZoom {
+    object-fit: contain;
+  }
+  .root :global(.swiper-pagination) {
+    bottom: 0.25rem;
+  }
+  .root :global(.swiper-pagination-bullet) {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-inline: 0.3rem !important;
   }
 }
 @keyframes pulse {

@@ -72,6 +72,7 @@ body {
 html {
   scrollbar-gutter: stable;
   scroll-behavior: smooth;
+  overflow-x: clip;
   background: var(--bg-main);
 }
 html[data-initial-loader],
@@ -95,6 +96,16 @@ body {
   transition:
     background-color 200ms ease,
     color 200ms ease;
+}
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+img,
+video {
+  height: auto;
 }
 a {
   color: inherit;
@@ -144,8 +155,13 @@ textarea:focus-visible,
   animation-name: theme-fade-in;
 }
 dialog {
-  max-height: 90vh;
+  max-width: min(calc(100vw - 2rem), 48rem);
+  max-height: min(90vh, 90dvh);
+  overflow: auto;
   border: 0;
+}
+main :is(table) {
+  max-width: 100%;
 }
 ::selection {
   color: #fff;
@@ -172,6 +188,19 @@ dialog {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width: 767px) {
+  main {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+  main :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    font-size: max(1rem, 16px);
+  }
+  main :is(table) {
+    display: block;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
   }
 }
 .store-map-marker span {

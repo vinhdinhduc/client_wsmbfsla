@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { MessageCircle, Phone, X } from 'lucide-react';
+import { MessageCircle, Phone, Plus, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { settingsApi } from '@/lib/api/settings';
 import { useCurrentDutyStaff } from '@/hooks/useCurrentDutyStaff';
@@ -32,7 +32,9 @@ export function ChatWidget() {
   const [hasOpened, setHasOpened] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [unread, setUnread] = useState(false);
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
   const launcherRef = useRef<HTMLButtonElement>(null);
+  const mobileSpeedDialToggleRef = useRef<HTMLButtonElement>(null);
   const phone = dutyStaff?.phone || settings?.hotline || settings?.footer_phone || '';
   const hotline = settings?.hotline || settings?.footer_phone || phone;
   const phoneHref = safeChatHref(`tel:${phone.replace(/[^\d+]/g, '')}`);
@@ -57,7 +59,12 @@ export function ChatWidget() {
 
   useEffect(() => {
     if (isOpen || !hasOpened) return;
-    const frame = requestAnimationFrame(() => launcherRef.current?.focus({ preventScroll: true }));
+    const frame = requestAnimationFrame(() => {
+      const target = window.matchMedia('(max-width: 767px)').matches
+        ? mobileSpeedDialToggleRef.current
+        : launcherRef.current;
+      target?.focus({ preventScroll: true });
+    });
     return () => cancelAnimationFrame(frame);
   }, [isOpen, hasOpened]);
 
@@ -172,6 +179,54 @@ export function ChatWidget() {
               </a>
             )}
           </div>
+        </div>
+      )}
+      {(chatbotEnabled || (contactsEnabled && (phoneHref || zaloUrl))) && (
+        <div className={styles.mobileSpeedDial}>
+          {mobileActionsOpen && (
+            <div className={styles.mobileSpeedDialActions} aria-label="Kênh hỗ trợ">
+              {chatbotEnabled && (
+                <button
+                  type="button"
+                  aria-label="Chat với trợ lý"
+                  onClick={() => {
+                    openChat();
+                    setMobileActionsOpen(false);
+                  }}
+                >
+                  <MessageCircle size={20} aria-hidden="true" />
+                  <span>Trợ lý</span>
+                </button>
+              )}
+              {contactsEnabled && zaloUrl && (
+                <a
+                  href={zaloUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Nhắn tin qua Zalo"
+                >
+                  <span aria-hidden="true">Z</span>
+                  <span>Zalo</span>
+                </a>
+              )}
+              {contactsEnabled && phoneHref && (
+                <a href={phoneHref} aria-label={`Gọi điện ${phone}`}>
+                  <Phone size={20} aria-hidden="true" />
+                  <span>Gọi</span>
+                </a>
+              )}
+            </div>
+          )}
+          <button
+            type="button"
+          ref={mobileSpeedDialToggleRef}
+            className={styles.mobileSpeedDialToggle}
+            aria-label={mobileActionsOpen ? 'Đóng kênh hỗ trợ' : 'Mở kênh hỗ trợ'}
+            aria-expanded={mobileActionsOpen}
+            onClick={() => setMobileActionsOpen((open) => !open)}
+          >
+            {mobileActionsOpen ? <X size={22} /> : <Plus size={22} />}
+          </button>
         </div>
       )}
     </div>

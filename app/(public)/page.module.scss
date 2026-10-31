@@ -4,10 +4,10 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: clamp(1.5rem, 3vw, 3rem);
   padding: 0 0 2.5rem;
   @include breakpoint(sm) {
-    gap: 4rem;
+    gap: clamp(2rem, 4vw, 4rem);
     padding-bottom: 2.5rem;
   }
 }

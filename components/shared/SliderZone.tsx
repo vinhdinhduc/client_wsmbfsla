@@ -97,6 +97,10 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
                 fill
                 sizes="100vw"
                 quality={82}
+                // Slider media is served by the backend; bypass Next's image
+                // optimizer so a slow/unreachable backend from the Next host
+                // does not leave the hero slider blank.
+                unoptimized
                 priority={index === 0}
                 className={
                   zoneCode === 'partners'

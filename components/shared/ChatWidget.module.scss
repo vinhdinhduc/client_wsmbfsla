@@ -911,6 +911,9 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
+.mobileSpeedDial {
+  display: none;
+}
 :global([data-theme='dark']) .panel {
   --text-secondary: #a9b4c3;
   .error {
@@ -926,19 +929,60 @@
 }
 @media (max-width: 767px) {
   .wrapper {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
     right: calc(12px + env(safe-area-inset-right, 0px));
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .wrapper:not([data-chat-open='true']) .chatLauncherArea,
+  .wrapper:not([data-chat-open='true']) .contactActions {
+    display: none;
+  }
+  .mobileSpeedDial {
+    display: grid;
+    justify-items: end;
+    gap: 0.5rem;
+  }
+  .mobileSpeedDialToggle {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--chat-brand);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+  }
+  .mobileSpeedDialActions {
+    display: grid;
+    justify-items: end;
+    gap: 0.5rem;
+    a,
+    button {
+      display: flex;
+      min-height: 2.75rem;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+      font: inherit;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  }
+  .wrapper[data-chat-open='true'] .mobileSpeedDial {
+    display: none;
   }
   .chatLauncherArea {
     margin-bottom: 0;
     gap: 8px;
   }
   .contactButtons {
-    flex-direction: row;
-    gap: 8px;
+    display: none;
   }
   .launcher,
   .contactButton {

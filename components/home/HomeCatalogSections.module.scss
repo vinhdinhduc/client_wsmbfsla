@@ -418,14 +418,24 @@
 .packageSection,
 .simSection {
   background: var(--public-section);
-  padding-block: 2rem;
+  padding-block: clamp(1.5rem, 3vw, 2rem);
 }
 .simSection {
   border-top: 1px solid var(--border);
 }
 .packageTabs {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.25rem 0.125rem 0.75rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
   margin-bottom: 1.25rem;
+}
+.packageTabs > * {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  scroll-snap-align: start;
 }
 .packageHeadline {
   font-size: 1.25rem;
