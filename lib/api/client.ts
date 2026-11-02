@@ -50,9 +50,10 @@ function readTokenFromBrowser(): string | undefined {
 
 export function buildApiUrl(path: string, params?: ApiFetchOptions['params']): string {
   // Server requests use the private backend address; browser requests use the public URL.
-  const base = (typeof window === 'undefined'
-    ? process.env.INTERNAL_API_URL || 'http://127.0.0.1:4001/api'
-    : env.NEXT_PUBLIC_API_URL
+  const base = (
+    typeof window === 'undefined'
+      ? process.env.INTERNAL_API_URL || 'http://127.0.0.1:4000/api'
+      : env.NEXT_PUBLIC_API_URL
   ).replace(/\/+$/, '');
   const url = new URL(
     `${base}${path.startsWith('/') ? path : `/${path}`}`,
