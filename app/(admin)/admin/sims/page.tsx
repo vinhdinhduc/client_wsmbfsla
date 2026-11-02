@@ -106,6 +106,10 @@ export default function AdminSimsPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkDeletePassword, setBulkDeletePassword] = useState('');
+  const [activationFeeEditorOpen, setActivationFeeEditorOpen] = useState(false);
+  const [activationFeeSubscriptionType, setActivationFeeSubscriptionType] =
+    useState<SimFormValues['subscription_type']>('prepaid');
+  const [activationFeeValue, setActivationFeeValue] = useState('');
   const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
   const [monthlyFeeOption, setMonthlyFeeOption] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
@@ -140,6 +144,12 @@ export default function AdminSimsPage() {
     prepaid: Number(publicSettings?.sim_activation_fee_prepaid ?? 50000),
     postpaid: Number(publicSettings?.sim_activation_fee_postpaid ?? 60000),
   };
+
+  function openActivationFeeEditor() {
+    setActivationFeeSubscriptionType('prepaid');
+    setActivationFeeValue(String(activationFees.prepaid));
+    setActivationFeeEditorOpen(true);
+  }
 
   const {
     register,
@@ -241,6 +251,36 @@ export default function AdminSimsPage() {
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
+  const updateActivationFeeMutation = useMutation({
+    mutationFn: (input: { subscriptionType: SimFormValues['subscription_type']; fee: number }) =>
+      settingsApi.update('general', [
+        {
+          key: `sim_activation_fee_${input.subscriptionType}`,
+          value: String(input.fee),
+        },
+      ]),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['public-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+      showToast('Đã cập nhật phí đấu nối');
+      setActivationFeeEditorOpen(false);
+    },
+    onError: (err: Error) => showToast(err.message, 'error'),
+  });
+
+  function submitActivationFee(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!/^\d+$/.test(activationFeeValue)) {
+      showToast('Phí đấu nối phải là số nguyên không âm', 'error');
+      return;
+    }
+    const fee = Number(activationFeeValue);
+    if (!Number.isSafeInteger(fee) || fee > 999999999999) {
+      showToast('Phí đấu nối không được vượt quá 999.999.999.999đ', 'error');
+      return;
+    }
+    updateActivationFeeMutation.mutate({ subscriptionType: activationFeeSubscriptionType, fee });
+  }
 
   const previewMutation = useMutation({
     mutationFn: (file: File) => simsApi.previewImport(file, importMode),
@@ -469,6 +509,9 @@ export default function AdminSimsPage() {
           <Button variant="outline" onClick={() => setExportOpen(true)}>
             <Download className={styles.icon} /> Xuất dữ liệu
           </Button>
+          <Button variant="outline" onClick={openActivationFeeEditor}>
+            Sửa phí đấu nối
+          </Button>
           <Button onClick={openCreate}>
             <Plus className={styles.icon} /> Thêm số sim
           </Button>
@@ -624,6 +667,51 @@ export default function AdminSimsPage() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={activationFeeEditorOpen}
+        onClose={() => setActivationFeeEditorOpen(false)}
+        title="Cập nhật phí đấu nối"
+        maxWidth="md"
+      >
+        <form onSubmit={submitActivationFee} className={styles.form}>
+          <p>
+            Mức phí mới sẽ áp dụng chung cho toàn bộ SIM thuộc hình thức thuê bao đã chọn.
+          </p>
+          <SelectField
+            label="Hình thức thuê bao"
+            value={activationFeeSubscriptionType}
+            options={SUBSCRIPTION_OPTIONS}
+            onChange={(event) => {
+              const type = event.target.value as SimFormValues['subscription_type'];
+              setActivationFeeSubscriptionType(type);
+              setActivationFeeValue(String(activationFees[type]));
+            }}
+          />
+          <TextField
+            type="number"
+            label="Phí đấu nối (đ)"
+            min={0}
+            max={999999999999}
+            step={1}
+            required
+            value={activationFeeValue}
+            onChange={(event) => setActivationFeeValue(event.target.value)}
+          />
+          <div className={styles.actions}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setActivationFeeEditorOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button type="submit" isLoading={updateActivationFeeMutation.isPending}>
+              Lưu phí đấu nối
+            </Button>
+          </div>
+        </form>
       </Modal>
 
       <Modal

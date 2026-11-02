@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 import { ShoppingCart, MapPin, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { formatStoreAddress } from '@/lib/formatStoreAddress';
 import { formatDate, formatPrice } from '@/lib/format';
 import { assetUrl } from '@/lib/assets';
 import { Badge } from './Badge';
@@ -209,6 +210,8 @@ export function StoreCard({
     address: string;
     district: string;
     full_address?: string | null;
+    street_address?: string | null;
+    ward_name?: string | null;
     open_now?: boolean | null;
     lat?: number;
     lng?: number;
@@ -233,8 +236,7 @@ export function StoreCard({
       <h3 className={styles.cardTitle}>{store.name}</h3>
       <p className={styles.storeAddress}>
         <MapPin className={styles.storeIcon} />
-        {store.full_address ??
-          (store.district ? `${store.address}, ${store.district}` : store.address)}
+        {formatStoreAddress(store)}
       </p>
       <p className={styles.muted}>Hotline: {store.phone}</p>
       {distanceKm !== undefined && (

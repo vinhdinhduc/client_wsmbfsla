@@ -6,6 +6,7 @@ import { MapPin, Phone } from 'lucide-react';
 import { packagesApi } from '@/lib/api/packages';
 import { storesApi } from '@/lib/api/stores';
 import { hasKnowledgePlaceholder, safeChatHref } from '@/lib/chat-widget';
+import { formatStoreAddress } from '@/lib/formatStoreAddress';
 import type { ChatSource } from '@/lib/api/chatbot';
 import styles from './ChatWidget.module.scss';
 
@@ -123,7 +124,7 @@ export function ChatRichCards({
         const phoneHref = safeChatHref(
           `tel:${(typeof store.phone === 'string' ? store.phone : '').replace(/[^\d+]/g, '')}`,
         );
-        const address = store.full_address || store.address;
+        const address = formatStoreAddress(store);
         const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.name}, ${address}`)}`;
         return (
           <article key={`store-${store.id}`} className={styles.richCard}>

@@ -24,12 +24,29 @@ export function StoreLocatorMap({ stores, wards }: { stores: Store[]; wards: War
     stores.forEach((store) => { if (store.ward_code) counts.set(store.ward_code, (counts.get(store.ward_code) ?? 0) + 1); });
     return counts;
   }, [stores]);
+  const typedWardOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          stores
+            .filter((store) => !store.ward_code && store.ward_name?.trim())
+            .map((store) => store.ward_name?.trim())
+            .filter((name): name is string => Boolean(name)),
+        ),
+      ),
+    [stores],
+  );
   const [ward, setWard] = useState('all');
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState('');
 
-  const filtered = (ward === 'all' ? stores : stores.filter((s) => s.ward_code === ward)).sort((a, b) => location ? distanceKm(location.lat, location.lng, Number(a.lat), Number(a.lng)) - distanceKm(location.lat, location.lng, Number(b.lat), Number(b.lng)) : a.id - b.id);
+  const filtered = (ward === 'all'
+    ? stores
+    : ward.startsWith('name:')
+      ? stores.filter((store) => store.ward_name?.trim() === ward.slice(5))
+      : stores.filter((store) => store.ward_code === ward)
+  ).sort((a, b) => location ? distanceKm(location.lat, location.lng, Number(a.lat), Number(a.lng)) - distanceKm(location.lat, location.lng, Number(b.lat), Number(b.lng)) : a.id - b.id);
   const focused = filtered.find((store) => store.id === selectedId) ?? filtered[0];
 
   function findNearMe() {
@@ -53,6 +70,11 @@ export function StoreLocatorMap({ stores, wards }: { stores: Store[]; wards: War
           <option value="all">Tất cả xã/phường</option>
           {wards.filter((item) => wardCounts.has(item.code)).map((item) => (
             <option key={item.code} value={item.code}>{item.name_with_type} ({wardCounts.get(item.code)})</option>
+          ))}
+          {typedWardOptions.map((name) => (
+            <option key={name} value={`name:${name}`}>
+              {name} ({stores.filter((store) => !store.ward_code && store.ward_name?.trim() === name).length})
+            </option>
           ))}
         </select>
         <button type="button" className={styles.select} onClick={findNearMe}>Gần tôi</button>

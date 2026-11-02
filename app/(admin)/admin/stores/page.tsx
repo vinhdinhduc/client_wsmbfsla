@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { storesApi, StoreFormValues } from '@/lib/api/stores';
 import { Store } from '@/types/product';
+import { formatStoreAddress } from '@/lib/formatStoreAddress';
 import { Table, TableColumn } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
@@ -21,7 +22,7 @@ const MapPicker = dynamic(() => import('@/components/shared/MapPicker').then((mo
 const storeSchema = z.object({
   name: z.string().min(1, 'Vui lòng nhập tên cửa hàng').max(150),
   street_address: z.string().min(1, 'Vui lòng nhập số nhà, đường, tổ/bản').max(255),
-  ward_code: z.string().regex(/^\d{5}$/, 'Vui lòng chọn xã/phường'),
+  ward_name: z.string().trim().max(120).nullable().optional(),
   phone: z.string().min(9, 'Số điện thoại không hợp lệ').max(20),
   email: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
   lat: z.coerce.number().min(8).max(24),
@@ -44,7 +45,6 @@ export default function AdminStoresPage() {
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<Store | null>(null);
-  const [wardSearch, setWardSearch] = useState('');
   const [listWard, setListWard] = useState('');
 
   const { data: stores, isLoading } = useQuery({
@@ -52,6 +52,14 @@ export default function AdminStoresPage() {
     queryFn: () => storesApi.listAdmin(),
   });
   const { data: wards = [] } = useQuery({ queryKey: ['son-la-wards'], queryFn: storesApi.listWards });
+  const typedWardNames = Array.from(
+    new Set(
+      (stores ?? [])
+        .filter((store) => !store.ward_code)
+        .map((store) => store.ward_name?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  );
 
   const {
     register,
@@ -70,11 +78,10 @@ export default function AdminStoresPage() {
   const { fields: hourFields, append: appendHour, remove: removeHour } = useFieldArray({ control, name: 'opening_hours_json' });
 
   function openCreate() {
-    setWardSearch('');
     reset({
       name: '',
       street_address: '',
-      ward_code: '',
+      ward_name: '',
       phone: '',
       email: '',
       lat: 21.3256,
@@ -87,11 +94,13 @@ export default function AdminStoresPage() {
   }
 
   function openEdit(item: Store) {
-    setWardSearch('');
     reset({
       name: item.name,
       street_address: item.street_address ?? item.address,
-      ward_code: item.ward_code ?? '',
+      ward_name:
+        item.ward_name ??
+        wards.find((ward) => ward.code === item.ward_code)?.name_with_type ??
+        '',
       phone: item.phone,
       email: item.email ?? '',
       lat: item.lat,
@@ -127,9 +136,10 @@ export default function AdminStoresPage() {
   });
   const geocodeMutation = useMutation({
     mutationFn: () => {
-      const ward = wards.find((item) => item.code === getValues('ward_code'));
-      if (!ward || !getValues('street_address')) throw new Error('Vui lòng nhập địa chỉ và chọn xã/phường trước');
-      return storesApi.geocode(`${getValues('street_address')}, ${ward.name_with_type}`);
+      const street = getValues('street_address')?.trim();
+      if (!street) throw new Error('Vui lòng nhập số nhà, đường, tổ/bản trước');
+      const wardName = getValues('ward_name')?.trim();
+      return storesApi.geocode([street, wardName, 'Tỉnh Sơn La'].filter(Boolean).join(', '));
     },
     onSuccess: (result) => {
       if (!result) { showToast('Không tìm thấy vị trí; bạn có thể chọn trên bản đồ', 'error'); return; }
@@ -142,7 +152,11 @@ export default function AdminStoresPage() {
   });
 
   function onSubmit(values: StoreSchemaValues) {
-    saveMutation.mutate({ ...values, email: values.email || null });
+    saveMutation.mutate({
+      ...values,
+      ward_name: values.ward_name?.trim() || null,
+      email: values.email || null,
+    });
   }
 
   const columns: TableColumn<Store>[] = [
@@ -150,9 +164,12 @@ export default function AdminStoresPage() {
     {
       key: 'ward',
       header: 'Xã/Phường',
-      render: (s) => s.ward_code ? (wards.find((ward) => ward.code === s.ward_code)?.name_with_type ?? 'Cần rà soát') : 'Cần rà soát',
+      render: (s) =>
+        s.ward_name?.trim() ||
+        wards.find((ward) => ward.code === s.ward_code)?.name_with_type ||
+        '—',
     },
-    { key: 'address', header: 'Địa chỉ', render: (s) => s.full_address ?? s.address },
+    { key: 'address', header: 'Địa chỉ', render: (s) => formatStoreAddress(s) },
     { key: 'phone', header: 'Hotline', render: (s) => s.phone },
     { key: 'hours', header: 'Giờ mở', render: (s) => s.opening_hours ?? 'Chưa cập nhật' },
     { key: 'staff', header: 'Giao dịch viên', render: (s) => `${s.staff_count ?? 0} người` },
@@ -193,8 +210,8 @@ export default function AdminStoresPage() {
         </Button>
       </div>
 
-      <SelectField label="Lọc theo xã/phường" value={listWard} onChange={(event) => setListWard(event.target.value)} options={[{ value: '', label: 'Tất cả xã/phường' }, ...wards.filter((ward) => stores?.some((store) => store.ward_code === ward.code)).map((ward) => ({ value: ward.code, label: ward.name_with_type }))]} />
-      <Table columns={columns} data={(stores ?? []).filter((store) => !listWard || store.ward_code === listWard)} rowKey={(s) => s.id} isLoading={isLoading} />
+      <SelectField label="Lọc theo xã/phường" value={listWard} onChange={(event) => setListWard(event.target.value)} options={[{ value: '', label: 'Tất cả xã/phường' }, ...wards.filter((ward) => stores?.some((store) => store.ward_code === ward.code)).map((ward) => ({ value: ward.code, label: ward.name_with_type })), ...typedWardNames.map((name) => ({ value: `name:${name}`, label: name }))]} />
+      <Table columns={columns} data={(stores ?? []).filter((store) => !listWard || (listWard.startsWith('name:') ? store.ward_name?.trim() === listWard.slice(5) : store.ward_code === listWard))} rowKey={(s) => s.id} isLoading={isLoading} />
 
       <Modal
         isOpen={modalState !== null}
@@ -204,13 +221,12 @@ export default function AdminStoresPage() {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <TextField label="Tên cửa hàng" error={errors.name?.message} {...register('name')} />
           <TextField label="Số nhà, đường, tổ/bản *" error={errors.street_address?.message} {...register('street_address')} />
-          <TextField label="Tìm xã/phường" value={wardSearch} onChange={(event) => setWardSearch(event.target.value)} placeholder="Nhập tên xã hoặc phường" />
           <div className={styles.grid2}>
-            <SelectField
-              label="Xã/Phường *"
-              options={[{ value: '', label: 'Chọn xã/phường' }, ...wards.filter((ward) => !wardSearch || ward.name_with_type.toLocaleLowerCase('vi-VN').includes(wardSearch.toLocaleLowerCase('vi-VN')) || ward.code === watch('ward_code')).map((ward) => ({ value: ward.code, label: ward.name_with_type }))]}
-              error={errors.ward_code?.message}
-              {...register('ward_code')}
+            <TextField
+              label="Xã/Phường"
+              placeholder="Nhập tên xã hoặc phường"
+              error={errors.ward_name?.message}
+              {...register('ward_name')}
             />
             <TextField label="Hotline" error={errors.phone?.message} {...register('phone')} />
           </div>
@@ -225,14 +241,14 @@ export default function AdminStoresPage() {
           <div className={styles.grid2}>
             <TextField
               type="number"
-              step="0.000001"
+              step="0.0000001"
               label="Vĩ độ (lat)"
               error={errors.lat?.message}
               {...register('lat')}
             />
             <TextField
               type="number"
-              step="0.000001"
+              step="0.0000001"
               label="Kinh độ (lng)"
               error={errors.lng?.message}
               {...register('lng')}

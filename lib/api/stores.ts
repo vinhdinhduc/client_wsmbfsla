@@ -4,7 +4,7 @@ import { Store } from '@/types/product';
 export interface StoreFormValues {
   name: string;
   street_address: string;
-  ward_code: string;
+  ward_name: string | null;
   phone: string;
   email?: string | null;
   lat: number;

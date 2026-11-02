@@ -167,6 +167,7 @@ export interface Store {
   opening_hours: string | null;
   province_code?: string | null;
   ward_code?: string | null;
+  ward_name?: string | null;
   street_address?: string | null;
   full_address?: string | null;
   email?: string | null;

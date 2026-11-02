@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { Store } from '@/types/product';
+import { formatStoreAddress } from '@/lib/formatStoreAddress';
 
 export function StorePublicMap({
   stores,
@@ -66,7 +67,7 @@ export function StorePublicMap({
       popup.append(
         title,
         document.createElement('br'),
-        document.createTextNode(store.full_address ?? store.address ?? ''),
+        document.createTextNode(formatStoreAddress(store)),
       );
       L.marker([Number(store.lat), Number(store.lng)], { icon })
         .bindPopup(popup)
