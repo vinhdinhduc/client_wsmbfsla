@@ -19,7 +19,9 @@ const headers = [
   'Data',
   'Thoại',
   'SMS',
+  'Cú pháp SMS',
   'Cú pháp đăng ký',
+  'Số tổng đài',
   'Trạng thái',
   'Thứ tự',
 ];
@@ -63,6 +65,8 @@ export function PackageExcel({
                 p.call_desc || '',
                 p.sms_desc || '',
                 p.sms_syntax || '',
+                p.registerSyntax || '',
+                p.registerShortcode || '',
                 statuses[p.status],
                 p.display_order,
               ].map((v) => (typeof v === 'string' && unsafe(v) ? `'${v}` : v)),
@@ -108,7 +112,9 @@ export function PackageExcel({
             data,
             call,
             sms,
-            syntax,
+            smsSyntax,
+            registerSyntax,
+            registerShortcode,
             rawStatus,
             rawOrder,
           ] = cells;
@@ -138,8 +144,15 @@ export function PackageExcel({
             !Number.isInteger(order)
           )
             throw new Error('Giá, chu kỳ hoặc thứ tự không hợp lệ');
-          if (![data, call, sms, syntax].every((v) => String(v).length <= 255))
+          if (![data, call, sms, smsSyntax, registerSyntax].every((v) => String(v).length <= 255))
             throw new Error('Ưu đãi/cú pháp tối đa 255 ký tự');
+          if (String(registerShortcode).length > 20)
+            throw new Error('Số tổng đài tối đa 20 ký tự');
+          if (
+            status === 'active' &&
+            (!String(registerSyntax).trim() || !String(registerShortcode).trim())
+          )
+            throw new Error('Gói đang bán cần có cú pháp đăng ký và số tổng đài');
           if (!['Ngày', 'Tháng', 'ngay', 'thang'].includes(String(rawUnit)))
             throw new Error('Đơn vị chu kỳ phải là Ngày hoặc Tháng');
           const existing = packages.find((p) => p.code.toUpperCase() === code);
@@ -160,7 +173,9 @@ export function PackageExcel({
               data_desc: String(data) || null,
               call_desc: String(call) || null,
               sms_desc: String(sms) || null,
-              sms_syntax: String(syntax) || null,
+              sms_syntax: String(smsSyntax) || null,
+              registerSyntax: String(registerSyntax) || null,
+              registerShortcode: String(registerShortcode) || null,
               status,
               display_order: order,
             },

@@ -204,7 +204,6 @@
 }
 .packageLink {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 0.65rem;
   color: var(--color-neutral-900);
@@ -225,11 +224,17 @@
   font-size: 0.75rem;
   line-height: 1.45;
 }
+.registrationSyntax {
+  margin-inline: 1rem;
+}
 .packagePrice {
+  display: block;
+  margin-top: auto;
   padding-top: 0.15rem;
   color: var(--color-neutral-900);
   font-size: 1.2rem;
   font-weight: 700;
+  text-decoration: none;
   span {
     color: var(--color-neutral-500);
     font-size: 0.75rem;

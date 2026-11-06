@@ -12,6 +12,7 @@ import { assetUrl } from '@/lib/assets';
 import { Badge } from './Badge';
 import { Button } from './Button';
 import { useCart } from '@/hooks/useCart';
+import { RegistrationSyntax } from '@/components/shared/RegistrationSyntax';
 import type { News, Package, SimNumber, Solution } from '@/types/product';
 import styles from './Card.module.scss';
 
@@ -80,25 +81,33 @@ export function PackageCard({ pkg, onSelect }: { pkg: Package; onSelect?: () => 
 
   return (
     <Card>
-      <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.blockLink}>
-        <CardThumbnail src={null} alt={pkg.name} />
-        <div className={styles.content}>
-          <div className={styles.badges}>
-            {pkg.group_type === 'hot' && <Badge tone="accent">HOT</Badge>}
-            <Badge tone="primary">{CATEGORY_LABEL[pkg.group_type] ?? pkg.group_type}</Badge>
-          </div>
-          <h3 className={styles.cardTitle}>{pkg.name}</h3>
-          {pkg.headline_desc && (
-            <p className={cn(styles.muted, styles.description)}>{pkg.headline_desc}</p>
-          )}
-          <p className={styles.price}>
-            {formatPrice(pkg.price)}
-            <span className={styles.priceUnit}>
-              /{pkg.duration_value} {pkg.duration_unit}
-            </span>
-          </p>
+      <CardThumbnail src={null} alt={pkg.name} />
+      <div className={styles.content}>
+        <div className={styles.badges}>
+          {pkg.group_type === 'hot' && <Badge tone="accent">HOT</Badge>}
+          <Badge tone="primary">{CATEGORY_LABEL[pkg.group_type] ?? pkg.group_type}</Badge>
         </div>
-      </Link>
+        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageTitleLink}>
+          <h3 className={styles.cardTitle}>{pkg.name}</h3>
+        </Link>
+        {pkg.headline_desc && (
+          <p className={cn(styles.muted, styles.description)}>{pkg.headline_desc}</p>
+        )}
+        <RegistrationSyntax
+          syntax={pkg.registerSyntax}
+          shortcode={pkg.registerShortcode}
+          reserveSpace
+          spacing="insideGappedCard"
+        />
+        <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.packageTitleLink}>
+          <p className={styles.price}>
+          {formatPrice(pkg.price)}
+          <span className={styles.priceUnit}>
+            /{pkg.duration_value} {pkg.duration_unit}
+          </span>
+          </p>
+        </Link>
+      </div>
       <div className={styles.action}>
         <Button
           size="sm"

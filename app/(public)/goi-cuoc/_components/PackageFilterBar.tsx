@@ -9,6 +9,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { ChevronDown, Grid2X2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import { RegistrationSyntax } from '@/components/shared/RegistrationSyntax';
 import { usePackageFilter } from '../_hooks/usePackageFilter';
 import { formatPrice } from '@/lib/format';
 import { assetUrl } from '@/lib/assets';
@@ -171,9 +172,21 @@ export function PackageShowcaseCard({ pkg, onSelect, preview = false }: { pkg: P
             <strong className={styles.packageHighlight}>{pkg.headline_desc}</strong>
           )}
           <PackageFacts pkg={pkg} />
-          <div className={styles.packagePrice}>
-            {formatPrice(pkg.price)} <span>/ {packageDuration(pkg)}</span>
-          </div>
+        </Link>
+        <RegistrationSyntax
+          syntax={pkg.registerSyntax}
+          shortcode={pkg.registerShortcode}
+          disabled={preview}
+          reserveSpace
+          className={styles.registrationSyntax}
+        />
+        <Link
+          href={`/goi-cuoc/${pkg.slug}`}
+          className={styles.packagePrice}
+          tabIndex={preview ? -1 : undefined}
+          onClick={preview ? (event) => event.preventDefault() : undefined}
+        >
+          {formatPrice(pkg.price)} <span>/ {packageDuration(pkg)}</span>
         </Link>
         <button
           type="button"
@@ -193,16 +206,6 @@ export function PackageShowcaseCard({ pkg, onSelect, preview = false }: { pkg: P
         >
           {!preview && inCart ? 'Đã thêm' : 'ĐĂNG KÝ'}
         </button>
-        {pkg.sms_syntax && (
-          <button
-            className={styles.smsButton}
-            type="button"
-            disabled={preview}
-            onClick={() => navigator.clipboard.writeText(pkg.sms_syntax!)}
-          >
-            Sao chép cú pháp SMS
-          </button>
-        )}
         <Link href={`/goi-cuoc/${pkg.slug}`} className={styles.detailLink} tabIndex={preview ? -1 : undefined} onClick={preview ? e => e.preventDefault() : undefined}>
           Xem chi tiết <span>›</span>
         </Link>

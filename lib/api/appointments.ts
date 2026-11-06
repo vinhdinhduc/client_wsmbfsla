@@ -15,6 +15,13 @@ export const appointmentsApi = {
       method: 'PATCH',
       body: changes,
     }),
+  remove: (id: number, password: string) =>
+    apiFetch<null>(`/admin/appointments/${id}`, { method: 'DELETE', body: { password } }),
+  removeMany: (ids: number[], password: string) =>
+    apiFetch<{ deleted: number }>('/admin/trash/store_appointments/bulk-delete', {
+      method: 'DELETE',
+      body: { ids, password },
+    }),
   cancel: (token: string) =>
     apiFetch<{ code: string; status: AppointmentStatus }>('/public/appointments/cancel', {
       method: 'POST',

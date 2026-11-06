@@ -6,7 +6,7 @@ import { AddToCartButton } from '@/components/shared/AddToCartButton';
 import { formatPrice } from '@/lib/format';
 import { buildMetadata } from '@/lib/metadata';
 import { PackageBadges } from '@/components/shared/PackageFacts';
-import { QuickSmsRegistration } from '@/components/shared/QuickSmsRegistration';
+import { RegistrationSyntax } from '@/components/shared/RegistrationSyntax';
 import { packageDuration, packageGroupLabel } from '@/lib/package-display';
 import { Badge } from '@/components/ui/Badge';
 import { PackageDetailTabs } from './_components/PackageDetailTabs';
@@ -81,7 +81,13 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
               image: null,
             }}
           />
-          {pkg.sms_syntax?.trim() && <QuickSmsRegistration syntax={pkg.sms_syntax} />}
+          {pkg.registerSyntax?.trim() && pkg.registerShortcode?.trim() && (
+            <RegistrationSyntax
+              syntax={pkg.registerSyntax}
+              shortcode={pkg.registerShortcode}
+              showNote
+            />
+          )}
         </aside>
       </div>
     </div>

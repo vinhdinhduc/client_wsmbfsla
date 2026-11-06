@@ -161,14 +161,14 @@ export function Header() {
             <Search className={styles.header__icon} />
           </button>
           <a
-            href={`tel:${settings?.hotline ?? dutyStaff?.phone ?? ''}`}
+            href={`tel:${settings?.hotline ?? ''}`}
             className={styles.header__contact}
             title={dutyStaff?.name}
             aria-label="Gọi hotline MobiFone"
           >
             <Phone className={styles.header__contactIcon} />
             <span className={styles.header__contactLabel}>
-              {settings?.hotline ?? dutyStaff?.phone ?? '18001090'}
+              {settings?.hotline}
             </span>
           </a>
 

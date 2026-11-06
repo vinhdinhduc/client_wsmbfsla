@@ -27,4 +27,11 @@ export const contactsApi = {
     id: number,
     body: { status?: ContactStatus; assigned_to?: number | null; internal_note?: string | null },
   ) => apiFetch<ContactMessage>(`/admin/contacts/${id}`, { method: 'PATCH', body }),
+  remove: (id: number, password: string) =>
+    apiFetch<null>(`/admin/contacts/${id}`, { method: 'DELETE', body: { password } }),
+  removeMany: (ids: number[], password: string) =>
+    apiFetch<{ deleted: number }>('/admin/trash/contacts/bulk-delete', {
+      method: 'DELETE',
+      body: { ids, password },
+    }),
 };

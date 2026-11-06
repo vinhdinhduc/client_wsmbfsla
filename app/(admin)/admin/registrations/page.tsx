@@ -9,6 +9,7 @@ import { RegistrationGroup, RegistrationStatus } from '@/types/order';
 import { useAuth } from '@/hooks/useAuth';
 import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
+import { PasswordConfirmDialog } from '@/components/shared/PasswordConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 import {
   canTransition,
@@ -69,6 +70,7 @@ export default function AdminRegistrationsPage() {
   const [confirmBulk, setConfirmBulk] = useState(false);
   const [bulkNote, setBulkNote] = useState('');
   const [detail, setDetail] = useState<RegistrationGroup | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ ids: number[]; label: string } | null>(null);
   const [exporting, setExporting] = useState(false);
   const [now, setNow] = useState(Date.now());
   const opener = useRef<HTMLElement | null>(null);
@@ -158,11 +160,24 @@ export default function AdminRegistrationsPage() {
     },
     onError: () => showToast('Không thể đổi trạng thái đã chọn.', 'error'),
   });
+  const remove = useMutation({
+    mutationFn: ({ ids, password }: { ids: number[]; password: string }) =>
+      ordersApi.removeMany(ids, password),
+    onSuccess: (result, { ids }) => {
+      setDeleteTarget(null);
+      setDetail(null);
+      setSelected((current) => current.filter((value) => !ids.includes(value)));
+      void cache.invalidateQueries({ queryKey: ['admin-registrations'] });
+      ids.forEach((id) => void cache.invalidateQueries({ queryKey: ['registration-detail', id] }));
+      showToast(`Đã chuyển ${result.deleted} đăng ký vào thùng rác`);
+    },
+    onError: (error: Error) => showToast(error.message || 'Không thể xóa đăng ký.', 'error'),
+  });
   const selectAllowed = (group: RegistrationGroup) =>
     REGISTRATION_STATUSES.some(
       (option) => option.value !== group.status && canTransition(group.status, option.value, admin),
     );
-  const selectable = visible.filter(selectAllowed);
+  const selectable = visible.filter((group) => admin || selectAllowed(group));
   function toggle(id: number) {
     setSelected((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
@@ -255,7 +270,7 @@ export default function AdminRegistrationsPage() {
         type="checkbox"
         aria-label={`Chọn ${group.code || group.id}`}
         checked={selected.includes(group.id)}
-        disabled={bulk.isPending || !selectAllowed(group)}
+        disabled={bulk.isPending || (!admin && !selectAllowed(group))}
         onClick={(event) => event.stopPropagation()}
         onChange={() => toggle(group.id)}
       />
@@ -635,6 +650,21 @@ export default function AdminRegistrationsPage() {
           >
             Đổi trạng thái
           </button>
+          {admin && (
+            <button
+              type="button"
+              className={`${styles.secondaryButton} ${styles.deleteButton}`}
+              disabled={bulk.isPending || remove.isPending}
+              onClick={() =>
+                setDeleteTarget({
+                  ids: selected,
+                  label: `${selected.length} đăng ký đã chọn`,
+                })
+              }
+            >
+              Xóa đã chọn
+            </button>
+          )}
           <button
             className={styles.secondaryButton}
             disabled={bulk.isPending}
@@ -654,6 +684,13 @@ export default function AdminRegistrationsPage() {
           target={detail}
           admin={admin}
           onClose={close}
+          onDelete={() => {
+            setDeleteTarget({
+              ids: [detail.id],
+              label: `đăng ký ${detail.code || `#${detail.id}`}`,
+            });
+            setDetail(null);
+          }}
           onSaved={() => {
             void cache.invalidateQueries({ queryKey: ['admin-registrations'] });
           }}
@@ -706,6 +743,16 @@ export default function AdminRegistrationsPage() {
           </div>
         </Modal>
       )}
+      <PasswordConfirmDialog
+        isOpen={deleteTarget !== null}
+        title="Xác nhận xóa đăng ký"
+        description={`${deleteTarget?.label} sẽ được ẩn khỏi danh sách. Dữ liệu vẫn được lưu để phục vụ kiểm tra. Nhập mật khẩu quản trị để xác nhận.`}
+        isPending={remove.isPending}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={(password) => {
+          if (deleteTarget) remove.mutate({ ids: deleteTarget.ids, password });
+        }}
+      />
     </div>
   );
 }

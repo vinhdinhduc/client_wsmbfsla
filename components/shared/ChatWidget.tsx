@@ -99,7 +99,9 @@ export function ChatWidget() {
             />
           )}
           <div className={styles.chatLauncherArea}>
-            {showIntro && !isOpen && <span className={styles.launcherLabel}>Hỏi trợ lý</span>}
+            {showIntro && !isOpen && (
+              <span className={styles.launcherLabel}>Hỏi trợ lý chatbot AI MobiFone Sơn La</span>
+            )}
             <button
               ref={launcherRef}
               type="button"
@@ -219,7 +221,7 @@ export function ChatWidget() {
           )}
           <button
             type="button"
-          ref={mobileSpeedDialToggleRef}
+            ref={mobileSpeedDialToggleRef}
             className={styles.mobileSpeedDialToggle}
             aria-label={mobileActionsOpen ? 'Đóng kênh hỗ trợ' : 'Mở kênh hỗ trợ'}
             aria-expanded={mobileActionsOpen}

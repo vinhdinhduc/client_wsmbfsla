@@ -21,6 +21,8 @@ export interface PackageFormValues {
   subscription_type?: 'prepaid' | 'postpaid' | 'none';
   badges?: Array<'hot' | 'new' | 'bestseller'>;
   sms_syntax?: string | null;
+  registerSyntax?: string | null;
+  registerShortcode?: string | null;
   image_url?: string | null;
   image?: File;
   conditions?: string | null;

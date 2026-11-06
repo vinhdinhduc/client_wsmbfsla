@@ -27,11 +27,13 @@ export function SimPurchaseButton({
   className,
   children,
   label,
+  selectedLabel,
 }: {
   sim: SimNumber;
   className?: string;
   children?: ReactNode;
   label?: string;
+  selectedLabel?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -85,10 +87,11 @@ export function SimPurchaseButton({
         type="button"
         className={className}
         disabled={soldOut || selected}
+        isLoading={open && isLoading}
         aria-label={label}
         onClick={() => setOpen(true)}
       >
-        {soldOut ? 'Hết hàng' : selected ? 'Đã chọn' : (children ?? 'Chọn số')}
+        {soldOut ? 'Hết hàng' : selected ? (selectedLabel ?? 'Đã chọn') : (children ?? 'Chọn số')}
       </Button>
       <Modal isOpen={open} onClose={() => setOpen(false)} title="Chọn gói cước" maxWidth="2xl">
         <p className={styles.summary}>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Clipboard, Eye, LoaderCircle, Mail, RefreshCw, Search } from 'lucide-react';
+import { Clipboard, Eye, LoaderCircle, Mail, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { contactsApi } from '@/lib/api/contacts';
 import { usersApi } from '@/lib/api/users';
 import { auditLogsApi } from '@/lib/api/auditLogs';
@@ -10,6 +10,7 @@ import { ContactMessage, ContactStatus } from '@/types/order';
 import { useAuth } from '@/hooks/useAuth';
 import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
+import { PasswordConfirmDialog } from '@/components/shared/PasswordConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 import shared from '../appointments/page.module.scss';
 import local from './page.module.scss';
@@ -68,6 +69,7 @@ export default function AdminContactsPage() {
   const [size, setSize] = useState(10);
   const [selected, setSelected] = useState<number[]>([]);
   const [detail, setDetail] = useState<ContactMessage | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ ids: number[]; label: string } | null>(null);
   const [status, setStatus] = useState<ContactStatus>('moi');
   const [assignee, setAssignee] = useState('');
   const [note, setNote] = useState('');
@@ -149,6 +151,19 @@ export default function AdminContactsPage() {
       showToast('Đã lưu liên hệ');
     },
     onError: () => showToast('Không thể lưu liên hệ. Vui lòng thử lại.', 'error'),
+  });
+  const remove = useMutation({
+    mutationFn: ({ ids, password }: { ids: number[]; password: string }) =>
+      contactsApi.removeMany(ids, password),
+    onSuccess: (result, { ids }) => {
+      setDeleteTarget(null);
+      setDetail(null);
+      setSelected((current) => current.filter((value) => !ids.includes(value)));
+      void queryClient.invalidateQueries({ queryKey: ['admin-contacts'] });
+      void queryClient.invalidateQueries({ queryKey: ['contact-history'] });
+      showToast(`Đã chuyển ${result.deleted} liên hệ vào thùng rác`);
+    },
+    onError: (error: Error) => showToast(error.message || 'Không thể xóa liên hệ.', 'error'),
   });
   const bulk = useMutation({
     mutationFn: async (ids: number[]) => {
@@ -296,7 +311,7 @@ export default function AdminContactsPage() {
       </div>
     );
   }
-  const selectable = visible.filter((c) => c.status !== 'da_phan_hoi');
+  const selectable = visible.filter((c) => isAdmin || c.status !== 'da_phan_hoi');
   return (
     <div className={styles.page}>
       <header>
@@ -472,7 +487,7 @@ export default function AdminContactsPage() {
                         type="checkbox"
                         aria-label={`Chọn ${c.name}`}
                         checked={selected.includes(c.id)}
-                        disabled={bulk.isPending || c.status === 'da_phan_hoi'}
+                        disabled={bulk.isPending || (!isAdmin && c.status === 'da_phan_hoi')}
                         onChange={() => toggle(c.id)}
                       />
                     </td>
@@ -512,7 +527,7 @@ export default function AdminContactsPage() {
                     <input
                       type="checkbox"
                       aria-label={`Chọn ${c.name}`}
-                      disabled={bulk.isPending || c.status === 'da_phan_hoi'}
+                      disabled={bulk.isPending || (!isAdmin && c.status === 'da_phan_hoi')}
                       checked={selected.includes(c.id)}
                       onChange={() => toggle(c.id)}
                     />
@@ -549,13 +564,33 @@ export default function AdminContactsPage() {
       {!!selected.length && (
         <div className={styles.bulkBar} role="region" aria-label="Thao tác đã chọn">
           <strong>Đã chọn {selected.length}</strong>
-          <button
-            className={styles.saveButton}
-            disabled={bulk.isPending}
-            onClick={() => mark(selected)}
-          >
-            {bulk.isPending && <LoaderCircle className={styles.spinning} />}Đánh dấu đã phản hồi
-          </button>
+          {selected.some((id) => all.find((contact) => contact.id === id)?.status !== 'da_phan_hoi') && (
+            <button
+              className={styles.saveButton}
+              disabled={bulk.isPending}
+              onClick={() =>
+                mark(
+                  selected.filter(
+                    (id) => all.find((contact) => contact.id === id)?.status !== 'da_phan_hoi',
+                  ),
+                )
+              }
+            >
+              {bulk.isPending && <LoaderCircle className={styles.spinning} />}Đánh dấu đã phản hồi
+            </button>
+          )}
+          {isAdmin && (
+            <button
+              type="button"
+              className={`${styles.secondaryButton} ${styles.deleteButton}`}
+              disabled={bulk.isPending || remove.isPending}
+              onClick={() =>
+                setDeleteTarget({ ids: selected, label: `${selected.length} liên hệ đã chọn` })
+              }
+            >
+              Xóa đã chọn
+            </button>
+          )}
           <button
             className={styles.secondaryButton}
             disabled={bulk.isPending}
@@ -704,6 +739,24 @@ export default function AdminContactsPage() {
               </p>
             </section>
             <footer className={styles.modalFooter}>
+              {isAdmin && (
+                <button
+                  type="button"
+                  className={`${styles.secondaryButton} ${styles.deleteButton}`}
+                  disabled={save.isPending}
+                  onClick={() => {
+                    if (dirty && !window.confirm('Bạn có thay đổi chưa lưu. Đóng và bỏ thay đổi?'))
+                      return;
+                    setDeleteTarget({
+                      ids: [detail.id],
+                      label: `liên hệ ${detail.code || `#${detail.id}`}`,
+                    });
+                    setDetail(null);
+                  }}
+                >
+                  <Trash2 aria-hidden="true" /> Xóa liên hệ
+                </button>
+              )}
               <button className={styles.secondaryButton} disabled={save.isPending} onClick={close}>
                 Đóng
               </button>
@@ -718,7 +771,16 @@ export default function AdminContactsPage() {
           </div>
         )}
       </Modal>
+      <PasswordConfirmDialog
+        isOpen={deleteTarget !== null}
+        title="Xác nhận xóa liên hệ"
+        description={`${deleteTarget?.label} sẽ được ẩn khỏi danh sách. Dữ liệu vẫn được lưu để phục vụ kiểm tra. Nhập mật khẩu quản trị để xác nhận.`}
+        isPending={remove.isPending}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={(password) => {
+          if (deleteTarget) remove.mutate({ ids: deleteTarget.ids, password });
+        }}
+      />
     </div>
   );
 }
-

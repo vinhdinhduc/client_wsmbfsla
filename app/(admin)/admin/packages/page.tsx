@@ -76,6 +76,8 @@ const packageSchema = z.object({
   service_type: z.enum(['mobile', 'data', 'wifi_5g', 'combo']),
   subscription_type: z.enum(['prepaid', 'postpaid', 'none']),
   sms_syntax: z.string().max(255).optional(),
+  registerSyntax: z.string().max(255).optional(),
+  registerShortcode: z.string().max(20).optional(),
   image_url: z.string().max(255).optional(),
   conditions: z.string().optional(),
   audience: z.string().max(255).optional(),
@@ -91,6 +93,22 @@ const packageSchema = z.object({
   ),
   unlimited_data: z.boolean().default(false),
   badges: z.array(z.enum(['hot', 'new', 'bestseller'])).default([]),
+}).superRefine((values, context) => {
+  if (values.status !== 'active') return;
+  if (!values.registerSyntax?.trim()) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['registerSyntax'],
+      message: 'Gói đang bán cần có cú pháp đăng ký',
+    });
+  }
+  if (!values.registerShortcode?.trim()) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['registerShortcode'],
+      message: 'Gói đang bán cần có số tổng đài',
+    });
+  }
 });
 
 type PackageSchemaValues = z.infer<typeof packageSchema>;
@@ -154,6 +172,8 @@ export default function AdminPackagesPage() {
       service_type: 'mobile',
       subscription_type: 'none',
       sms_syntax: '',
+      registerSyntax: '',
+      registerShortcode: '',
       image_url: '',
       conditions: '',
       audience: '',
@@ -190,6 +210,8 @@ export default function AdminPackagesPage() {
       service_type: item.service_type || 'mobile',
       subscription_type: item.subscription_type || 'none',
       sms_syntax: item.sms_syntax || '',
+      registerSyntax: item.registerSyntax || '',
+      registerShortcode: item.registerShortcode || '',
       image_url: item.image_url || '',
       conditions: item.conditions || '',
       audience: item.audience || '',
@@ -370,6 +392,8 @@ export default function AdminPackagesPage() {
       speed_desc: values.speed_desc || null,
       description: values.description || null,
       sms_syntax: values.sms_syntax || null,
+      registerSyntax: values.registerSyntax || null,
+      registerShortcode: values.registerShortcode || null,
       image_url: values.image_url || null,
       conditions: values.conditions || null,
       audience: values.audience || null,
@@ -880,6 +904,18 @@ export default function AdminPackagesPage() {
             label="Cú pháp SMS"
             error={errors.sms_syntax?.message}
             {...register('sms_syntax')}
+          />
+          <TextField
+            label="Cú pháp đăng ký"
+            hint="Ví dụ: MXH100"
+            error={errors.registerSyntax?.message}
+            {...register('registerSyntax')}
+          />
+          <TextField
+            label="Số tổng đài"
+            hint="Ví dụ: 999"
+            error={errors.registerShortcode?.message}
+            {...register('registerShortcode')}
           />
           <TextField label="URL ảnh" error={errors.image_url?.message} {...register('image_url')} />
           <label>

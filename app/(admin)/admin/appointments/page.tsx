@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Save,
   Search,
+  Trash2,
   X,
 } from 'lucide-react';
 import { appointmentsApi } from '@/lib/api/appointments';
@@ -23,6 +24,7 @@ import { WorkShift } from '@/types/user';
 import { useAuth } from '@/hooks/useAuth';
 import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
+import { PasswordConfirmDialog } from '@/components/shared/PasswordConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 import styles from './page.module.scss';
 
@@ -108,6 +110,8 @@ export default function AdminAppointmentsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [detail, setDetail] = useState<StoreAppointment | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ ids: number[]; label: string } | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [statusDraft, setStatusDraft] = useState<AppointmentStatus>('moi');
   const [assigneeDraft, setAssigneeDraft] = useState('');
   const [search, setSearch] = useState('');
@@ -142,6 +146,7 @@ export default function AdminAppointmentsPage() {
 
   useEffect(() => {
     setPage(1);
+    setSelectedIds([]);
   }, [search, statusFilter, storeFilter, dateFilter, dateFrom, dateTo, pageSize]);
 
   useEffect(() => {
@@ -173,6 +178,24 @@ export default function AdminAppointmentsPage() {
     },
     onError: (error: Error) => showToast(error.message, 'error'),
   });
+  const removeMutation = useMutation({
+    mutationFn: ({ ids, password }: { ids: number[]; password: string }) =>
+      appointmentsApi.removeMany(ids, password),
+    onSuccess: (result, { ids }) => {
+      setDeleteTarget(null);
+      setDetail(null);
+      setSelectedIds((current) => current.filter((value) => !ids.includes(value)));
+      void queryClient.invalidateQueries({ queryKey: ['admin-appointments'] });
+      showToast(`Đã chuyển ${result.deleted} lịch hẹn vào thùng rác`);
+    },
+    onError: (error: Error) => showToast(error.message || 'Không thể xóa lịch hẹn.', 'error'),
+  });
+
+  function toggleSelected(id: number) {
+    setSelectedIds((current) =>
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
+    );
+  }
 
   const filteredAppointments = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase('vi');
@@ -493,6 +516,27 @@ export default function AdminAppointmentsPage() {
                 <table>
                   <thead>
                     <tr>
+                      {isAdmin && (
+                        <th>
+                          <input
+                            type="checkbox"
+                            aria-label="Chọn tất cả lịch hẹn trang này"
+                            checked={
+                              visibleAppointments.length > 0 &&
+                              visibleAppointments.every((item) => selectedIds.includes(item.id))
+                            }
+                            onChange={(event) =>
+                              setSelectedIds((current) =>
+                                event.target.checked
+                                  ? [...new Set([...current, ...visibleAppointments.map((item) => item.id)])]
+                                  : current.filter(
+                                      (id) => !visibleAppointments.some((item) => item.id === id),
+                                    ),
+                              )
+                            }
+                          />
+                        </th>
+                      )}
                       <th>Khách hàng</th>
                       <th>SĐT</th>
                       <th>Cửa hàng</th>
@@ -521,6 +565,16 @@ export default function AdminAppointmentsPage() {
                         }}
                         onKeyDown={(event) => handleRowKeyDown(event, appointment)}
                       >
+                        {isAdmin && (
+                          <td onClick={(event) => event.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              aria-label={`Chọn lịch hẹn ${appointment.code || appointment.customer_name}`}
+                              checked={selectedIds.includes(appointment.id)}
+                              onChange={() => toggleSelected(appointment.id)}
+                            />
+                          </td>
+                        )}
                         <td className={styles.customerCell}>
                           <strong>{appointment.customer_name}</strong>
                           {appointment.email && <span>{appointment.email}</span>}
@@ -575,6 +629,15 @@ export default function AdminAppointmentsPage() {
                     onKeyDown={(event) => handleRowKeyDown(event, appointment)}
                   >
                     <div className={styles.cardHeading}>
+                      {isAdmin && (
+                        <input
+                          type="checkbox"
+                          aria-label={`Chọn lịch hẹn ${appointment.code || appointment.customer_name}`}
+                          checked={selectedIds.includes(appointment.id)}
+                          onClick={(event) => event.stopPropagation()}
+                          onChange={() => toggleSelected(appointment.id)}
+                        />
+                      )}
                       <div>
                         <strong>{appointment.customer_name}</strong>
                         <span>{appointment.store?.name ?? `#${appointment.store_id}`}</span>
@@ -625,6 +688,33 @@ export default function AdminAppointmentsPage() {
             </>
           )}
         </>
+      )}
+
+      {isAdmin && selectedIds.length > 0 && (
+        <div className={styles.bulkBar} role="region" aria-label="Thao tác lịch hẹn đã chọn">
+          <strong>Đã chọn {selectedIds.length} lịch hẹn</strong>
+          <button
+            type="button"
+            className={`${styles.secondaryButton} ${styles.deleteButton}`}
+            disabled={removeMutation.isPending || updateMutation.isPending}
+            onClick={() =>
+              setDeleteTarget({
+                ids: selectedIds,
+                label: `${selectedIds.length} lịch hẹn đã chọn`,
+              })
+            }
+          >
+            Xóa đã chọn
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            disabled={removeMutation.isPending}
+            onClick={() => setSelectedIds([])}
+          >
+            Bỏ chọn
+          </button>
+        </div>
       )}
 
       <Modal isOpen={detail !== null} onClose={closeDetail} title="Chi tiết lịch hẹn" maxWidth="xl">
@@ -783,6 +873,25 @@ export default function AdminAppointmentsPage() {
             </section>
 
             <footer className={styles.modalFooter}>
+              {isAdmin && (
+                <button
+                  type="button"
+                  className={`${styles.secondaryButton} ${styles.deleteButton}`}
+                  onClick={() => {
+                    if (dirty && !window.confirm('Bạn có thay đổi chưa lưu. Đóng và bỏ thay đổi?'))
+                      return;
+                    setDeleteTarget({
+                      ids: [detail.id],
+                      label: `lịch hẹn ${detail.code || `#${detail.id}`}`,
+                    });
+                    returnFocusId.current = null;
+                    setDetail(null);
+                  }}
+                  disabled={updateMutation.isPending}
+                >
+                  <Trash2 aria-hidden="true" /> Xóa lịch hẹn
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.secondaryButton}
@@ -810,6 +919,16 @@ export default function AdminAppointmentsPage() {
           </div>
         )}
       </Modal>
+      <PasswordConfirmDialog
+        isOpen={deleteTarget !== null}
+        title="Xác nhận xóa lịch hẹn"
+        description={`${deleteTarget?.label} sẽ được ẩn khỏi danh sách. Dữ liệu vẫn được lưu để phục vụ kiểm tra. Nhập mật khẩu quản trị để xác nhận.`}
+        isPending={removeMutation.isPending}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={(password) => {
+          if (deleteTarget) removeMutation.mutate({ ids: deleteTarget.ids, password });
+        }}
+      />
     </main>
   );
 }

@@ -40,9 +40,7 @@ for (const theme of ['light', 'dark']) {
   }
 }
 
-test('SIM filters preserve search and selection continues to package registration', async ({
-  page,
-}) => {
+test('SIM filters preserve search and selection continues to checkout', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/sim-so-dep');
   const consent = page.getByRole('button', { name: 'Chỉ cookie cần thiết', exact: true });
@@ -52,5 +50,49 @@ test('SIM filters preserve search and selection continues to package registratio
   await expect(page).toHaveURL(/q=8888/);
   await expect(page.locator('tbody tr')).toHaveCount(1);
   await page.getByRole('button', { name: 'Chọn số', exact: true }).click();
-  await expect(page).toHaveURL(/goi-cuoc\?sim_id=1/);
+  const packageDialog = page.getByRole('dialog', { name: 'Chọn gói cước' });
+  await expect(packageDialog).toBeVisible();
+  await packageDialog.getByRole('button', { name: 'Bỏ qua — chỉ mua SIM' }).click();
+  await expect(page).toHaveURL(/gio-hang\?step=customer/);
+});
+
+test('SIM pagination keeps the URL state, continuous row numbers and browser history', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/sim-so-dep?page=2&pageSize=10&type=postpaid&tab=all');
+  await expect(page.getByText('Hiển thị 11–20 / 28 số')).toBeVisible();
+  await expect(page.locator('tbody tr').first().locator('td').first()).toHaveText('11');
+  await expect(page.getByRole('navigation', { name: 'Phân trang' })).toBeVisible();
+  await page.getByRole('button', { name: 'Trang sau' }).click();
+  await expect(page).toHaveURL(/page=3/);
+  await expect(page.getByText('Hiển thị 21–28 / 28 số')).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/page=2/);
+  await expect(page.locator('tbody tr').first().locator('td').first()).toHaveText('11');
+  await page.goto('/sim-so-dep?page=99&pageSize=10&type=postpaid&tab=all');
+  await expect(page).toHaveURL(/page=3/);
+  await expect(page.getByText('Hiển thị 21–28 / 28 số')).toBeVisible();
+  await page.getByLabel('Số số hiển thị mỗi trang').selectOption('50');
+  await expect(page).toHaveURL(/page=1.*pageSize=50/);
+  await page.getByRole('textbox', { name: 'Tìm số thuê bao' }).fill('8888');
+  await page.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
+  await expect(page).toHaveURL(/page=1.*q=8888/);
+  await expect(page.getByText('Hiển thị 1–1 / 1 số')).toBeVisible();
+});
+
+test('package registration syntax copies the message only and opens a prepared SMS on mobile', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/goi-cuoc');
+  const copyButton = page.getByRole('button', { name: 'Sao chép cú pháp DK MXH100' }).first();
+  await expect(copyButton).toBeVisible();
+  await copyButton.click();
+  await expect(page.getByText('Đã sao chép', { exact: true }).first()).toBeVisible();
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe('DK MXH100');
+  await expect(
+    page.getByRole('link', { name: 'Cú pháp đăng ký DK MXH100 gửi 9199' }).first(),
+  ).toHaveAttribute('href', 'sms:9199?body=DK%20MXH100');
 });

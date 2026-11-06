@@ -34,6 +34,16 @@ export interface SimImportPreview extends SimImportResult {
   sample: Array<{ row: number; phone_number: string; subscription_type: string; action: string }>;
 }
 
+export interface PublicSimPage {
+  items: SimNumber[];
+  total: number;
+  totalPages: number;
+  page: number;
+  pageSize: number;
+  page_size: number;
+  hasCommitment: boolean;
+}
+
 export const simsApi = {
   // ---- Public ----
   listPublic: (
@@ -43,10 +53,32 @@ export const simsApi = {
       catalog?: string;
       sim_type?: SimType;
       price_range?: string;
-      type?: SubscriptionType;
+      type?: SubscriptionType | 'all';
+      element?: 'Kim' | 'Mộc' | 'Thủy' | 'Hỏa' | 'Thổ';
+      fit_element?: boolean;
+      page?: number;
+      pageSize?: number;
+      page_size?: number;
     } = {},
     opts?: Pick<ApiFetchOptions, 'cache'>,
-  ) => apiFetch<SimNumber[]>('/public/sims', { params, cache: 'no-store', ...opts }),
+  ) => apiFetch<PublicSimPage>('/public/sims', { params, cache: 'no-store', ...opts }),
+
+  listPublicPage: (
+    params: {
+      q?: string;
+      prefix?: string;
+      catalog?: string;
+      sim_type?: SimType;
+      price_range?: string;
+      type?: SubscriptionType | 'all';
+      element?: 'Kim' | 'Mộc' | 'Thủy' | 'Hỏa' | 'Thổ';
+      fit_element?: boolean;
+      page: number;
+      pageSize?: number;
+      page_size?: number;
+    },
+    signal?: AbortSignal,
+  ) => apiFetch<PublicSimPage>('/public/sims', { params, cache: 'no-store', signal }),
 
   getPublicById: (id: number) => apiFetch<SimNumber>(`/public/sims/${id}`, { cache: 'no-store' }),
 
@@ -60,6 +92,7 @@ export const simsApi = {
       type?: SubscriptionType;
       status?: SimStatus;
       page?: number;
+      pageSize?: number;
       page_size?: number;
     } = {},
   ) => apiFetch<PaginatedResult<SimNumber>>('/admin/sims', { params }),

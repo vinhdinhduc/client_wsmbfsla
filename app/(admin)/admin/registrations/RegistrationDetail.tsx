@@ -1,7 +1,7 @@
 ﻿'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Download, LoaderCircle } from 'lucide-react';
+import { Download, LoaderCircle, Trash2 } from 'lucide-react';
 import { ordersApi } from '@/lib/api/orders';
 import { usersApi } from '@/lib/api/users';
 import { storesApi } from '@/lib/api/stores';
@@ -28,11 +28,13 @@ export function RegistrationDetail({
   target,
   admin,
   onClose,
+  onDelete,
   onSaved,
 }: {
   target: RegistrationGroup;
   admin: boolean;
   onClose: () => void;
+  onDelete: () => void;
   onSaved: () => void;
 }) {
   const { showToast } = useToast();
@@ -373,6 +375,21 @@ export function RegistrationDetail({
           </ol>
         </section>
         <footer className={styles.modalFooter}>
+          {admin && (
+            <button
+              type="button"
+              className={`${styles.secondaryButton} ${styles.deleteButton}`}
+              disabled={save.isPending}
+              onClick={() => {
+                if (dirty && !window.confirm('Bạn có thay đổi chưa lưu. Đóng và bỏ thay đổi?'))
+                  return;
+                onDelete();
+              }}
+            >
+              <Trash2 size={16} aria-hidden="true" />
+              Xóa đăng ký
+            </button>
+          )}
           <button className={styles.secondaryButton} disabled={save.isPending} onClick={close}>
             Đóng
           </button>

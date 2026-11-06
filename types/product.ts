@@ -23,6 +23,8 @@ export interface Package {
   subscription_type?: 'prepaid' | 'postpaid' | 'none';
   badges?: Array<'hot' | 'new' | 'bestseller'>;
   sms_syntax?: string | null;
+  registerSyntax?: string | null;
+  registerShortcode?: string | null;
   image_url?: string | null;
   conditions?: string | null;
   audience?: string | null;

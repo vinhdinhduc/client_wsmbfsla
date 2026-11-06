@@ -124,6 +124,14 @@
   font-size: $font-size-lg;
   font-weight: 600;
 }
+.packageTitleLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.packageTitleLink:hover {
+  color: var(--color-primary);
+}
 .description {
   flex: 1;
 }

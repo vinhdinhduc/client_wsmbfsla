@@ -21,6 +21,9 @@ const seed = Array.from({ length: 105 }, (_, i) => ({
   data_desc: null,
   call_desc: null,
   sms_desc: null,
+  sms_syntax: null,
+  registerSyntax: 'MXH100',
+  registerShortcode: '999',
   data_per_day_gb: null,
   data_per_cycle_gb: null,
 }));
@@ -107,6 +110,21 @@ test('duplicate stays local, requires unique code, preview and unsaved Esc warni
   expect(posts).toBe(0);
 });
 
+test('active package form requires registration syntax and shortcode', async ({ page }) => {
+  let updates = 0;
+  page.on('request', (request) => {
+    if (request.method() === 'PUT' && request.url().includes('/admin/packages/')) updates += 1;
+  });
+  await page.getByRole('button', { name: 'XMH100', exact: true }).last().click();
+  const dialog = page.getByRole('dialog', { name: 'Sửa gói cước' });
+  await dialog.getByLabel('Cú pháp đăng ký').fill('');
+  await dialog.getByLabel('Số tổng đài').fill('');
+  await dialog.getByRole('button', { name: 'Lưu & đăng bán' }).click();
+  await expect(dialog.getByText('Gói đang bán cần có cú pháp đăng ký')).toBeVisible();
+  await expect(dialog.getByText('Gói đang bán cần có số tổng đài')).toBeVisible();
+  expect(updates).toBe(0);
+});
+
 test('referenced package stops selling; unreferenced delete requires code', async ({ page }) => {
   await expect(page.getByRole('columnheader', { name: 'Đăng ký' })).toBeVisible();
   await page.getByRole('button', { name: 'Xóa XMH100', exact: true }).click();
@@ -149,7 +167,9 @@ test('Excel rejects formulas and previews duplicate codes before update', async 
     'Data',
     'Thoại',
     'SMS',
+    'Cú pháp SMS',
     'Cú pháp đăng ký',
+    'Số tổng đài',
     'Trạng thái',
     'Thứ tự',
   ];
@@ -158,7 +178,22 @@ test('Excel rejects formulas and previews duplicate codes before update', async 
     wb,
     XLSX.utils.aoa_to_sheet([
       headers,
-      ['XMH100', '=BAD()', 'Trả trước', 0, 30, 'Ngày', '', '', '', '', 'Đang bán', 0],
+      [
+        'XMH100',
+        '=BAD()',
+        'Trả trước',
+        0,
+        30,
+        'Ngày',
+        '',
+        '',
+        '',
+        '',
+        'MXH100',
+        '999',
+        'Đang bán',
+        0,
+      ],
     ]),
     'Gói',
   );
@@ -178,7 +213,22 @@ test('Excel rejects formulas and previews duplicate codes before update', async 
     valid,
     XLSX.utils.aoa_to_sheet([
       headers,
-      ['XMH100', 'MXH100', 'Trả trước', 123000, 30, 'Ngày', '5GB/ngày', '', '', '', 'Đang bán', 0],
+      [
+        'XMH100',
+        'MXH100',
+        'Trả trước',
+        123000,
+        30,
+        'Ngày',
+        '5GB/ngày',
+        '',
+        '',
+        '',
+        'MXH100',
+        '999',
+        'Đang bán',
+        0,
+      ],
     ]),
     'Gói',
   );

@@ -2,48 +2,42 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { CalendarDays, Gem, Grid2X2, HelpCircle, ListFilter, Search } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import type { SimFilterParams } from '../_types/sim';
+import type { NormalizedSimFilters } from '../_types/sim';
 import styles from '../page.module.scss';
 
 const CATALOGS = [
-  { value: '', label: 'Tất cả', icon: Grid2X2 },
+  { value: 'all', label: 'Tất cả', icon: Grid2X2 },
   { value: 'so_dep', label: 'Sim số đẹp', icon: Gem },
   { value: 'phong_thuy', label: 'Sim phong thủy', icon: HelpCircle },
   { value: 'nam_sinh', label: 'Sim năm sinh', icon: CalendarDays },
 ];
 const PREFIXES = ['090', '093', '089', '070', '079', '077', '076', '078'];
 
-export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [query, setQuery] = useState(initial.q ?? '');
-  const [selectedType, setSelectedType] = useState(initial.type ?? 'postpaid');
+export function SimCatalogControls({
+  initial,
+  onChange,
+}: {
+  initial: NormalizedSimFilters;
+  onChange: (next: Partial<NormalizedSimFilters>) => void;
+}) {
+  const [query, setQuery] = useState(initial.q);
+  const [selectedType, setSelectedType] = useState(initial.type);
 
   useEffect(() => {
-    setSelectedType(initial.type ?? 'postpaid');
-  }, [initial.type]);
-  useEffect(() => {
-    setQuery(initial.q ?? '');
+    setQuery(initial.q);
   }, [initial.q]);
+  useEffect(() => {
+    setSelectedType(initial.type);
+  }, [initial.type]);
 
   function selectType(type: 'prepaid' | 'postpaid') {
     setSelectedType(type);
-    navigate({ type });
-  }
-
-  function navigate(next: Partial<SimFilterParams>) {
-    const values = { ...initial, ...next };
-    const params = new URLSearchParams();
-    Object.entries(values).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
-    router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`);
+    onChange({ type });
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    navigate({ q: query.trim() });
+    onChange({ q: query.trim() });
   }
 
   return (
@@ -54,9 +48,9 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
             key={value}
             type="button"
             role="tab"
-            aria-selected={(initial.catalog ?? '') === value}
-            className={`${styles.catalogTab} ${(initial.catalog ?? '') === value ? styles.catalogTabActive : ''}`}
-            onClick={() => navigate({ catalog: value })}
+            aria-selected={initial.tab === value}
+            className={`${styles.catalogTab} ${initial.tab === value ? styles.catalogTabActive : ''}`}
+            onClick={() => onChange({ tab: value as NormalizedSimFilters['tab'] })}
           >
             <Icon className={styles.controlIcon} />
             {label}
@@ -78,8 +72,8 @@ export function SimCatalogControls({ initial }: { initial: SimFilterParams }) {
         <label className={styles.prefixField}>
           <ListFilter className={styles.controlIcon} />
           <select
-            value={initial.prefix ?? ''}
-            onChange={(event) => navigate({ prefix: event.target.value })}
+            value={initial.prefix}
+            onChange={(event) => onChange({ prefix: event.target.value })}
             aria-label="Chọn đầu số"
           >
             <option value="">Chọn đầu số</option>

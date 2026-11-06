@@ -1,0 +1,210 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  color: var(--color-neutral-900);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+
+.description {
+  margin: 0.4rem 0 0;
+  color: var(--color-neutral-600);
+}
+
+.refreshButton,
+.toolbar button,
+.actions button,
+.error button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--color-neutral-900);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refreshButton svg,
+.actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.refreshButton:disabled,
+.actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--color-neutral-600);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.toolbar select {
+  min-height: 2.5rem;
+  min-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--color-neutral-900);
+  font: inherit;
+}
+
+.count,
+.footer {
+  color: var(--color-neutral-600);
+  font-size: 0.875rem;
+}
+
+.tableWrap {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table th {
+  color: var(--color-neutral-600);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.table td {
+  font-size: 0.875rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.actions .restoreButton {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.actions .deleteButton {
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+.empty,
+.state,
+.error {
+  padding: 2.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  text-align: center;
+}
+
+.empty svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-neutral-500);
+}
+
+.empty h2 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--color-neutral-600);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #b91c1c;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .table {
+    min-width: 780px;
+  }
+}

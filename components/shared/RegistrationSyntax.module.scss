@@ -1,0 +1,139 @@
+.wrapper,
+.placeholder {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 4.5rem;
+  margin-block: 1rem;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.placeholder {
+  display: block;
+}
+
+.insideGappedCard {
+  margin-block: 0.5rem;
+}
+
+.label {
+  color: #4b5563;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.syntaxRow {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #eaf4fb;
+}
+
+.syntaxText {
+  min-width: 0;
+  flex: 1;
+  color: #0b4f8a;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Consolas, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.mobileSms {
+  display: block;
+}
+
+.desktopSyntax {
+  display: none;
+}
+
+.copyButton {
+  position: relative;
+  display: grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: #0b4f8a;
+  cursor: pointer;
+}
+
+.copyButton:hover:not(:disabled) {
+  background: rgb(11 79 138 / 9%);
+}
+
+.copyButton:focus-visible {
+  outline: 2px solid #0b4f8a;
+  outline-offset: 1px;
+}
+
+.copyButton:disabled {
+  cursor: default;
+}
+
+.copyButton svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: calc(100% + 0.375rem);
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.375rem;
+  background: var(--color-neutral-900);
+  color: #fff;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.note {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.noteWrapper {
+  height: auto;
+  min-height: 0;
+  margin-block: 0;
+}
+
+@media (min-width: 768px) {
+  .mobileSms {
+    display: none;
+  }
+
+  .desktopSyntax {
+    display: block;
+  }
+}

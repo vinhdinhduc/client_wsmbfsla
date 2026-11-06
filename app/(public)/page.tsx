@@ -27,13 +27,23 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 }
 
 export default async function HomePage() {
-  const [packages, hotSims, solutions, newsResult, utilities] = await Promise.all([
+  const [packages, simPages, solutions, newsResult, utilities] = await Promise.all([
     packagesApi.listPublic(undefined, { next: { revalidate: 60 } }),
-    simsApi.listPublic({}, { cache: 'no-store' }),
+    Promise.all(
+      (['so_dep', 'phong_thuy', 'nam_sinh'] as const).map((catalog) =>
+        simsApi.listPublicPage({ catalog, type: 'all', page: 1, page_size: 12 }, undefined),
+      ),
+    ),
     solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }),
     newsApi.listPublic({ page_size: 3 }, { next: { revalidate: 60 } }),
     utilitiesApi.list(4).catch(() => []),
   ]);
+  const homeSims = simPages.flatMap((page) => page.items);
+  const simTotals = {
+    so_dep: simPages[0].total,
+    phong_thuy: simPages[1].total,
+    nam_sinh: simPages[2].total,
+  };
 
   return (
     <div className={styles.page}>
@@ -41,7 +51,7 @@ export default async function HomePage() {
         <SliderZone zoneCode="hero_banner" aspect="hero" className={styles.heroSlider} />
       </section>
 
-      <HomeCatalogSections packages={packages} sims={hotSims} />
+      <HomeCatalogSections packages={packages} sims={homeSims} simTotals={simTotals} />
 
       <section className={styles.section}>
         <SectionHeader title="Giải pháp số cho Doanh nghiệp / UBND" href="/giai-phap-so" />

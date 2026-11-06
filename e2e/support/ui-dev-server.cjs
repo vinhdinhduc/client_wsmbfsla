@@ -17,6 +17,50 @@ const stores = [1, 2].map((id) => ({
   opening_hours: '07:30 – 17:30',
   staff: [],
 }));
+const sims = [
+  '0762468888',
+  '0898161986',
+  '0899000111',
+  '0901888999',
+  ...Array.from({ length: 24 }, (_, index) => `090${String(index + 1).padStart(7, '0')}`),
+].map((phone_number, index) => ({
+  id: index + 1,
+  phone_number,
+  activation_fee: 60000,
+  commitment_months: index === 0 ? 6 : null,
+  committed_monthly_fee: index === 0 ? 150000 : null,
+  status: 'available',
+  subscription_type: 'postpaid',
+  catalog: 'so_dep',
+  sim_type: 'thuong',
+}));
+function simPage(requestUrl) {
+  const params = new URL(requestUrl, 'http://localhost').searchParams;
+  const query = params.get('q') || '';
+  const matcher = query.includes('*')
+    ? new RegExp(`^${query.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`)
+    : null;
+  const filtered = sims.filter((sim) =>
+    (!params.get('prefix') || sim.phone_number.startsWith(params.get('prefix')))
+      && (!query || (matcher ? matcher.test(sim.phone_number) : sim.phone_number.includes(query)))
+      && (!params.get('catalog') || sim.catalog === params.get('catalog'))
+      && (!params.get('type') || params.get('type') === 'all' || sim.subscription_type === params.get('type')),
+  );
+  const page = Number(params.get('page')) || 1;
+  const pageSize = Number(params.get('pageSize') || params.get('page_size')) || 20;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  return {
+    items: filtered.slice((page - 1) * pageSize, page * pageSize),
+    total: filtered.length,
+    totalPages,
+    page,
+    pageSize,
+    page_size: pageSize,
+    hasCommitment: filtered.some(
+      (sim) => sim.commitment_months != null || sim.committed_monthly_fee != null,
+    ),
+  };
+}
 async function main() {
   const recruitmentJobs = process.env.E2E_RECRUITMENT_FIXTURES === '1' || process.argv.includes('--recruitment')
     ? JSON.parse(fs.readFileSync('e2e/fixtures/recruitment.json', 'utf8')) : null;
@@ -36,20 +80,15 @@ async function main() {
         : path.endsWith('/public/settings')
           ? { hotline: '18001090', ai_chatbot_enabled: 'false' }
           : path.endsWith('/public/sims')
-            ? ['0762468888', '0898161986', '0899000111', '0901888999'].map((phone_number, index) => ({
-                id: index + 1, phone_number, activation_fee: 60000, commitment_months: index ? null : 6,
-                status: 'available', subscription_type: 'postpaid', catalog: 'so_dep',
-              })).filter((sim) => {
-                const params = new URL(req.url, 'http://localhost').searchParams;
-                return (!params.get('prefix') || sim.phone_number.startsWith(params.get('prefix')))
-                  && (!params.get('q') || sim.phone_number.includes(params.get('q').replaceAll('*', '')));
-              })
+            ? simPage(req.url)
             : path.endsWith('/public/packages')
               ? [90, 120, 200, 350].map((price, index) => ({
                   id: index + 1, code: `PT${price}`, name: `PT${price}`, slug: `pt${price}`,
                   group_type: 'tra_truoc', subscription_type: 'prepaid', service_type: 'mobile',
                   price: price * 1000, duration_value: 30, duration_unit: 'ngay',
                   data_desc: '4GB / ngày', call_desc: 'Miễn phí gọi nội mạng', status: 'active',
+                  registerSyntax: index === 0 ? 'MXH100' : null,
+                  registerShortcode: index === 0 ? '999' : null,
                 }))
               : [];
     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });

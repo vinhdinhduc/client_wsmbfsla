@@ -17,6 +17,7 @@ import {
   CalendarDays,
   Settings,
   ScrollText,
+  Trash2,
   BriefcaseBusiness,
   AppWindow,
   type LucideIcon,
@@ -93,6 +94,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   },
   { href: '/admin/settings', label: 'Cài đặt', icon: Settings, roles: ['admin'] },
   { href: '/admin/audit-logs', label: 'Nhật ký', icon: ScrollText, roles: ['admin'] },
+  { href: '/admin/trash', label: 'Thùng rác', icon: Trash2, roles: ['admin'] },
 ];
 
 /** Danh sach prefix route + vai tro duoc phep, dung boi middleware.ts (khong dung JSX nen tach rieng). */
@@ -104,6 +106,7 @@ export const ADMIN_ROUTE_ROLES: Array<{ prefix: string; roles: UserRole[] }> = [
   { prefix: '/admin/appointments', roles: ['admin', 'chuyen_vien', 'giao_dich_vien'] },
   { prefix: '/admin/settings', roles: ['admin'] },
   { prefix: '/admin/audit-logs', roles: ['admin'] },
+  { prefix: '/admin/trash', roles: ['admin'] },
   { prefix: '/admin/news', roles: ['admin', 'chuyen_vien'] },
   { prefix: '/admin/jobs', roles: ['admin', 'chuyen_vien'] },
   { prefix: '/admin/utilities', roles: ['admin', 'chuyen_vien'] },

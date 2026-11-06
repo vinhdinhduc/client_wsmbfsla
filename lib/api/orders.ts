@@ -18,4 +18,14 @@ export const ordersApi = {
 
   updateStatus: (id: number, dto: { status?: RegistrationStatus; assigned_to?: number | null; store_id?: number | null; note?: string }) =>
     apiFetch<RegistrationGroup>(`/admin/registration-groups/${id}`, { method: 'PATCH', body: dto }),
+  remove: (id: number, password: string) =>
+    apiFetch<null>(`/admin/registration-groups/${id}`, {
+      method: 'DELETE',
+      body: { password },
+    }),
+  removeMany: (ids: number[], password: string) =>
+    apiFetch<{ deleted: number }>('/admin/trash/registration_groups/bulk-delete', {
+      method: 'DELETE',
+      body: { ids, password },
+    }),
 };
