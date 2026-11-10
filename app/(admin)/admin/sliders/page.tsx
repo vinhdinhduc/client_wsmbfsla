@@ -243,18 +243,16 @@ export default function AdminSlidersPage() {
       return;
     }
     let desktop = selectedImage;
-    let mobile = selectedMobileImage;
     try {
-      [desktop, mobile] = await Promise.all([
-        selectedImage ? cropToAspect(selectedImage, activeZone?.code === 'hero_banner' ? 16 / 9 : 1) : Promise.resolve(null),
-        selectedMobileImage ? cropToAspect(selectedMobileImage, 4 / 5) : Promise.resolve(null),
-      ]);
+      if (selectedImage && activeZone?.code !== 'hero_banner') {
+        desktop = await cropToAspect(selectedImage, 1);
+      }
     } catch (error) { showToast((error as Error).message, 'error'); return; }
     saveItemMutation.mutate({
       ...values,
       zone_id: resolvedZoneId,
       image: desktop ?? undefined,
-      mobile_image: mobile ?? undefined,
+      mobile_image: selectedMobileImage ?? undefined,
       link_url: values.link_url || null,
       title: values.title || null,
       caption: values.caption || null,
@@ -428,6 +426,7 @@ export default function AdminSlidersPage() {
               </p>
             )}
             <p className={styles.muted}>JPG, PNG, WEBP hoặc GIF, tối đa 5MB.</p>
+            {activeZone?.code === 'hero_banner' && <p className={styles.muted}>Banner desktop nên dùng tỷ lệ 3:1 (ví dụ 2048 × 682 px). Ảnh được giữ nguyên, không cắt; đặt nội dung quan trọng cách mép ảnh để tránh vùng điều hướng. Có thể tải ảnh mobile riêng để hiển thị trên màn hình dưới 768 px.</p>}
             {selectedImage && <p className={styles.imageUrl}>Đã chọn: {selectedImage.name}</p>}
           </div>
           <div className={styles.fileField}><label htmlFor="slider-mobile-image">Ảnh mobile riêng</label><input id="slider-mobile-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setSelectedMobileImage(event.target.files?.[0] ?? null)} />{mobilePreviewUrl && <div className={local.mobilePreview}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={mobilePreviewUrl} alt="Xem trước banner mobile" /></div>}</div>

@@ -26,7 +26,7 @@ export default async function SimsPage({ searchParams }: { searchParams: Promise
     ? (tabValue as NormalizedSimFilters['tab'])
     : 'all';
   const typeValue = value(params.type);
-  const type = typeValue === 'prepaid' ? 'prepaid' : 'postpaid';
+  const type = typeValue === 'postpaid' ? 'postpaid' : 'prepaid';
   const filters: NormalizedSimFilters = {
     page: pageNumber > 0 && Number.isSafeInteger(pageNumber) ? pageNumber : 1,
     pageSize: pageSize as NormalizedSimFilters['pageSize'],

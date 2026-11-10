@@ -54,7 +54,7 @@ export function SimCatalogView({
   }
 
   function clearFilters() {
-    navigate({ q: '', prefix: '', tab: 'all', type: 'postpaid', pageSize: 20 });
+    navigate({ q: '', prefix: '', tab: 'all', type: 'prepaid', pageSize: 20 });
   }
 
   if (result.total === 0 && !isPending) {

@@ -94,21 +94,21 @@ export function SimCatalogControls({
           <input
             type="radio"
             name="subscription-type"
-            value="postpaid"
-            checked={selectedType === 'postpaid'}
-            onChange={() => selectType('postpaid')}
-          />
-          Trả sau
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="subscription-type"
             value="prepaid"
             checked={selectedType === 'prepaid'}
             onChange={() => selectType('prepaid')}
           />
           Trả trước
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="subscription-type"
+            value="postpaid"
+            checked={selectedType === 'postpaid'}
+            onChange={() => selectType('postpaid')}
+          />
+          Trả sau
         </label>
       </div>
     </div>

@@ -85,11 +85,11 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
       {data.items.map((item, index) => {
         const slideContent = (
           <div
-            className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : aspect === 'testimonial' ? styles.aspectTestimonial : styles.aspectHero}`}
+            className={`${styles.slide} ${aspect === 'partners' ? styles.aspectPartners : aspect === 'testimonial' ? styles.aspectTestimonial : styles.aspectHero} ${item.mobile_image_url ? styles.hasMobileImage : ''}`}
           >
             <picture>
               {item.mobile_image_url && (
-                <source media="(max-width: 640px)" srcSet={assetUrl(item.mobile_image_url)!} />
+                <source media="(max-width: 767px)" srcSet={assetUrl(item.mobile_image_url)!} />
               )}
               <Image
                 src={assetUrl(item.image_url)!}
@@ -103,13 +103,17 @@ export function SliderZone({ zoneCode, aspect = 'hero', className }: SliderZoneP
                 unoptimized
                 priority={index === 0}
                 className={
-                  zoneCode === 'partners'
-                    ? styles.partnerImage
-                    : zoneCode === 'testimonials'
-                      ? styles.testimonialImage
-                      : effect === 'zoom'
-                        ? styles.imageZoom
-                        : styles.image
+                  zoneCode === 'hero_banner'
+                    ? effect === 'zoom'
+                      ? styles.imageZoomHero
+                      : styles.image
+                    : zoneCode === 'partners'
+                      ? styles.partnerImage
+                      : zoneCode === 'testimonials'
+                        ? styles.testimonialImage
+                        : effect === 'zoom'
+                          ? styles.imageZoom
+                          : styles.image
                 }
               />
             </picture>
