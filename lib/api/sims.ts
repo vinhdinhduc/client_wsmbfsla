@@ -118,10 +118,9 @@ export const simsApi = {
       body: { ids, password },
     }),
 
-  previewImport: (file: File, mode: 'skip' | 'update') => {
+  previewImport: (file: File) => {
     const form = new FormData();
     form.append('file', file);
-    form.append('mode', mode);
     return apiFetch<SimImportPreview>('/admin/sims/import/preview', {
       method: 'POST',
       body: form,
@@ -129,10 +128,9 @@ export const simsApi = {
     });
   },
 
-  importExcel: (file: File, mode: 'skip' | 'update', digest: string, previewToken: string) => {
+  importExcel: (file: File, digest: string, previewToken: string) => {
     const form = new FormData();
     form.append('file', file);
-    form.append('mode', mode);
     form.append('digest', digest);
     form.append('preview_token', previewToken);
     return apiFetch<SimImportResult>('/admin/sims/import', {

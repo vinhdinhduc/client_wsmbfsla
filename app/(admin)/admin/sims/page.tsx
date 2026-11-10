@@ -110,7 +110,6 @@ export default function AdminSimsPage() {
   const [activationFeeSubscriptionType, setActivationFeeSubscriptionType] =
     useState<SimFormValues['subscription_type']>('prepaid');
   const [activationFeeValue, setActivationFeeValue] = useState('');
-  const [importMode, setImportMode] = useState<'skip' | 'update'>('skip');
   const [monthlyFeeOption, setMonthlyFeeOption] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
   const [exportScope, setExportScope] = useState<'filtered' | 'all'>('filtered');
@@ -283,7 +282,7 @@ export default function AdminSimsPage() {
   }
 
   const previewMutation = useMutation({
-    mutationFn: (file: File) => simsApi.previewImport(file, importMode),
+    mutationFn: (file: File) => simsApi.previewImport(file),
     onSuccess: (result) => setImportPreview(result),
     onError: (err: Error) => {
       setImportFile(null);
@@ -295,7 +294,6 @@ export default function AdminSimsPage() {
       if (!importFile || !importPreview) throw new Error('Vui lòng xem trước tệp Excel');
       return simsApi.importExcel(
         importFile,
-        importMode,
         importPreview.digest,
         importPreview.preview_token,
       );
@@ -305,7 +303,7 @@ export default function AdminSimsPage() {
       setImportPreview(null);
       setImportFile(null);
       setImportResult(result);
-      showToast(`Đã thêm ${result.inserted}, cập nhật ${result.updated} số sim`);
+      showToast(`Đã thay kho SIM: thêm ${result.inserted}, bỏ qua ${result.skipped} dòng`);
     },
     onError: (err: Error) => showToast(err.message, 'error'),
   });
@@ -485,19 +483,6 @@ export default function AdminSimsPage() {
           >
             <Upload className={styles.icon} /> Import Excel
           </Button>
-          <select
-            className={`${buttonStyles.button} ${buttonStyles.outline} ${buttonStyles.md}`}
-            aria-label="Xử lý số sim trùng khi import"
-            value={importMode}
-            onChange={(event) => {
-              setImportMode(event.target.value as 'skip' | 'update');
-              setImportPreview(null);
-              setImportFile(null);
-            }}
-          >
-            <option value="skip">Trùng: bỏ qua</option>
-            <option value="update">Trùng: cập nhật</option>
-          </select>
           <Button
             variant="outline"
             title="File cũ: tách 150.000 24 tháng thành committed_monthly_fee = 150000 và commitment_months = 24. Để trống nếu không cam kết."
@@ -886,10 +871,11 @@ export default function AdminSimsPage() {
             <p>
               Tệp: <strong>{importFile?.name}</strong> · {importPreview.total} dòng dữ liệu
             </p>
-            <p>
-              Dự kiến thêm {importPreview.inserted}, cập nhật {importPreview.updated}, bỏ qua{' '}
-              {importPreview.skipped} dòng. Số liệu có thể thay đổi nếu kho sim được sửa trước khi
-              xác nhận.
+            <p className={styles.errorBox}>
+              Xác nhận sẽ xóa toàn bộ SIM hiện có (kể cả đang giữ chỗ/đã bán), rồi nạp{' '}
+              {importPreview.inserted} dòng hợp lệ từ tệp. {importPreview.skipped} dòng lỗi sẽ không
+              được đưa vào kho mới. Hồ sơ đăng ký cũ vẫn được giữ, nhưng có thể không tiếp tục xử lý
+              được nếu tham chiếu đến SIM đã xóa.
             </p>
             <p>20 dòng đầu được kiểm tra:</p>
             <ul className={styles.errorList}>
@@ -931,7 +917,7 @@ export default function AdminSimsPage() {
               </Button>
               <Button
                 isLoading={importMutation.isPending}
-                disabled={importPreview.inserted + importPreview.updated === 0}
+                disabled={importPreview.inserted === 0}
                 onClick={() => importMutation.mutate()}
               >
                 Xác nhận nhập
@@ -949,9 +935,8 @@ export default function AdminSimsPage() {
         {importResult && (
           <div className={styles.form}>
             <p className={styles.confirm}>
-              Đã nhập thành công <strong>{importResult.inserted}</strong> số, bỏ qua{' '}
-              <strong>{importResult.skipped}</strong> dòng và cập nhật{' '}
-              <strong>{importResult.updated}</strong> số.
+              Đã thay kho SIM: thêm <strong>{importResult.inserted}</strong> số và bỏ qua{' '}
+              <strong>{importResult.skipped}</strong> dòng lỗi.
             </p>
             {importResult.errors.length > 0 && (
               <div className={styles.errorBox}>
