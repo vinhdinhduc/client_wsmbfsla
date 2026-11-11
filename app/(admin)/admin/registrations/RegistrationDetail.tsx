@@ -6,6 +6,7 @@ import { ordersApi } from '@/lib/api/orders';
 import { usersApi } from '@/lib/api/users';
 import { storesApi } from '@/lib/api/stores';
 import { RegistrationGroup, RegistrationStatus } from '@/types/order';
+import { UserRole } from '@/types/user';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import {
@@ -17,6 +18,14 @@ import {
   vietnamDate,
 } from '@/lib/registration-workspace';
 import { styles } from './styles';
+
+const STAFF_ROLE_LABELS: Record<Exclude<UserRole, 'admin'>, string> = {
+  chuyen_vien: 'Chuyên viên',
+  giao_dich_vien: 'Giao dịch viên',
+  nhan_vien: 'Nhân viên',
+};
+const staffRoleLabel = (role: UserRole) =>
+  role === 'admin' ? 'Quản trị viên' : STAFF_ROLE_LABELS[role];
 
 interface Draft {
   status: RegistrationStatus;
@@ -262,9 +271,7 @@ export function RegistrationDetail({
                     aria-label="Cửa hàng xử lý"
                     disabled={save.isPending || stores.isLoading || stores.isError}
                     value={draft.store}
-                    onChange={(event) =>
-                      setDraft({ ...draft, store: event.target.value, assignee: '' })
-                    }
+                    onChange={(event) => setDraft({ ...draft, store: event.target.value })}
                   >
                     <option value="">Chưa phân công</option>
                     {draft.store &&
@@ -280,6 +287,7 @@ export function RegistrationDetail({
                 </label>
                 <label className={styles.formField}>
                   <span>Người xử lý</span>
+                  <small>Chọn nhân viên đang hoạt động ở bất kỳ cửa hàng nào.</small>
                   <select
                     aria-label="Người xử lý"
                     disabled={save.isPending || staff.isLoading || staff.isError}
@@ -288,19 +296,19 @@ export function RegistrationDetail({
                   >
                     <option value="">Chưa phân công</option>
                     {draft.assignee &&
-                      !staff.data?.some((person) => String(person.id) === draft.assignee) && (
-                        <option value={draft.assignee}>Nhân viên #{draft.assignee}</option>
-                      )}
+                      !staff.data?.some(
+                        (person) =>
+                          person.role !== 'admin' && String(person.id) === draft.assignee,
+                      ) && <option value={draft.assignee}>Tài khoản cũ #{draft.assignee}</option>}
                     {staff.data
                       ?.filter(
                         (person) =>
-                          String(person.id) === draft.assignee ||
-                          (person.status === 'active' &&
-                            (!draft.store || String(person.store_id) === draft.store)),
+                          person.role !== 'admin' &&
+                          (String(person.id) === draft.assignee || person.status === 'active'),
                       )
                       .map((person) => (
                         <option key={person.id} value={person.id}>
-                          {person.full_name}
+                          {person.full_name} ({staffRoleLabel(person.role)})
                         </option>
                       ))}
                   </select>

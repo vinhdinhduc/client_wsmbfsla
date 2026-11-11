@@ -27,7 +27,7 @@ export function AddToCartButton({
       onClick={() => addItem(item)}
     >
       {inCart ? <Check className={styles.icon} /> : <ShoppingCart className={styles.icon} />}
-      {disabled ? 'Hết hàng' : inCart ? 'Đã có trong giỏ hàng' : 'Đăng ký mua'}
+      {disabled ? 'Hết hàng' : inCart ? 'Đã có trong thông tin tư vấn' : 'Đăng ký mua'}
     </Button>
   );
 }

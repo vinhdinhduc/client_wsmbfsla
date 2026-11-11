@@ -83,17 +83,17 @@ export function CartDrawer() {
                 : { type: 'spring', stiffness: 400, damping: 25 }
             }
             className={styles.aside}
-            aria-label="Giỏ hàng"
+            aria-label="SIM số/gói cước đã chọn"
           >
             <div className={styles.header}>
               <h2 className={styles.title}>
                 <ShoppingBag className={styles.titleIcon} />
-                Giỏ hàng ({items.length})
+                SIM số/gói cước đã chọn ({items.length})
               </h2>
               <button
                 type="button"
                 onClick={closeDrawer}
-                aria-label="Đóng giỏ hàng"
+                aria-label="Đóng thông tin tư vấn"
                 className={styles.closeButton}
               >
                 <X className={styles.closeIcon} />
@@ -104,7 +104,7 @@ export function CartDrawer() {
               {items.length === 0 ? (
                 <div className={styles.empty}>
                   <ShoppingBag size={48} aria-hidden="true" />
-                  <h3>Giỏ hàng đang trống</h3>
+                  <h3>Chưa có thông tin tư vấn</h3>
                   <p>Chọn SIM số đẹp hoặc gói cước phù hợp để bắt đầu.</p>
                   <Link href="/sim-so-dep" onClick={closeDrawer} className={styles.checkout}>
                     Khám phá SIM số <ArrowRight size={18} />
@@ -134,7 +134,7 @@ export function CartDrawer() {
                         <button
                           type="button"
                           onClick={() => removeItem(item.key)}
-                          aria-label={`Xóa ${item.name} khỏi giỏ hàng`}
+                          aria-label={`Xóa ${item.name} khỏi thông tin tư vấn`}
                           className={styles.removeButton}
                         >
                           <Trash2 className={styles.removeIcon} />
@@ -155,7 +155,7 @@ export function CartDrawer() {
                 {items.some((item) => item.price === null) && (
                   <p className={styles.note}>Chưa bao gồm sản phẩm cần liên hệ báo giá.</p>
                 )}
-                <Link href="/gio-hang" onClick={closeDrawer} className={styles.checkout}>
+                <Link href="/dat-hang" onClick={closeDrawer} className={styles.checkout}>
                   Tiến hành đăng ký <ArrowRight size={18} aria-hidden="true" />
                 </Link>
                 <p className={styles.note}>

@@ -159,7 +159,7 @@ test('newsletter sends explicit consent and cart submit is disabled until accept
   await footer.getByRole('checkbox').check();
   await footer.getByRole('button', { name: 'Đăng ký', exact: true }).click();
   await expect(footer.getByRole('checkbox')).not.toBeChecked();
-  await page.goto('/gio-hang?step=customer');
+  await page.goto('/dat-hang?step=customer');
   const checkbox = page.locator('main input[name="agreed_terms"]').first();
   await expect(checkbox).toBeVisible();
   const form = page.locator('main form').filter({ has: page.locator('input[name="agreed_terms"]') });

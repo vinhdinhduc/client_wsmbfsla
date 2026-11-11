@@ -2,9 +2,7 @@
 
 .row {
   display: grid;
-  grid-template-columns:
-    minmax(13rem, 2.1fr) minmax(4.5rem, 0.7fr) minmax(5.8rem, 0.85fr) minmax(5.8rem, 0.85fr)
-    minmax(6.8rem, 1fr) 2rem;
+  grid-template-columns: minmax(13rem, 2.1fr) minmax(4.5rem, 0.7fr) 2rem;
   align-items: center;
   gap: 1rem;
   min-height: 5.5rem;
@@ -41,30 +39,17 @@
   font-weight: 700;
 }
 
-.subscription,
-.setupFee,
-.packagePrice {
+.subscription {
   white-space: nowrap;
   color: var(--color-neutral-800);
   font-size: 0.875rem;
   font-weight: 600;
 }
 
-.packagePrice {
-  color: var(--color-primary);
-}
-
 .side {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-}
-
-.price {
-  margin: 0;
-  font-weight: 600;
-  color: var(--color-accent);
-  font-size: 1rem;
 }
 
 .removeButton {
@@ -103,9 +88,7 @@
     min-height: 4.5rem;
   }
 
-  .subscription,
-  .setupFee,
-  .packagePrice {
+  .subscription {
     display: none;
   }
 

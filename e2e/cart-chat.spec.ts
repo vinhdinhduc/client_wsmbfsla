@@ -49,11 +49,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const width of [390, 1440]) {
-  test(`cart drawer at ${width}px: icons, removal, scroll lock and Escape`, async ({ page }) => {
+  test(`consultation drawer at ${width}px: icons, removal, scroll lock and Escape`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/chinh-sach-bao-mat');
-    await page.getByRole('button', { name: 'Xem giỏ hàng' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Giỏ hàng', exact: true });
+    await page.getByRole('button', { name: 'Xem thông tin tư vấn' }).click();
+    const dialog = page.getByRole('dialog', { name: 'SIM số/gói cước đã chọn', exact: true });
     await expect(dialog).toBeVisible();
     await expect(dialog.locator('.lucide-card-sim')).toBeVisible();
     await expect(dialog.locator('.lucide-wifi')).toBeVisible();
@@ -63,13 +63,13 @@ for (const width of [390, 1440]) {
     expect(bounds!.x).toBeGreaterThanOrEqual(0);
     expect(bounds!.height).toBeLessThanOrEqual(900);
     await page.screenshot({ path: `test-results/cart-${width}.png` });
-    await dialog.getByRole('button', { name: 'Xóa 0762468888 khỏi giỏ hàng' }).click();
+    await dialog.getByRole('button', { name: 'Xóa 0762468888 khỏi thông tin tư vấn' }).click();
     await expect(dialog.getByText('0762468888')).toHaveCount(0);
-    await dialog.getByRole('button', { name: 'Xóa Gói data 5G khỏi giỏ hàng' }).click();
+    await dialog.getByRole('button', { name: 'Xóa Gói data 5G khỏi thông tin tư vấn' }).click();
     await dialog
-      .getByRole('button', { name: 'Xóa Gói giải pháp doanh nghiệp khỏi giỏ hàng' })
+      .getByRole('button', { name: 'Xóa Gói giải pháp doanh nghiệp khỏi thông tin tư vấn' })
       .click();
-    await expect(dialog.getByRole('heading', { name: 'Giỏ hàng đang trống' })).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: 'Chưa có thông tin tư vấn' })).toBeVisible();
     await expect(dialog.getByRole('link', { name: 'Khám phá SIM số' })).toHaveAttribute(
       'href',
       '/sim-so-dep',

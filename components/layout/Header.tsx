@@ -184,7 +184,7 @@ export function Header() {
           <button
             type="button"
             onClick={openDrawer}
-            aria-label="Xem giỏ hàng"
+            aria-label="Xem thông tin tư vấn"
             className={styles.header__iconButton}
           >
             <ShoppingCart className={styles.header__icon} />

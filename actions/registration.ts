@@ -28,12 +28,12 @@ const submitCartSchema = z.object({
   province: z.literal('Sơn La', { errorMap: () => ({ message: 'Chỉ hỗ trợ tỉnh Sơn La' }) }),
   ward: z.string().min(1, 'Vui lòng chọn xã/phường Sơn La'),
   delivery_address: z.string().max(255).optional().nullable(),
-  items: z.array(cartItemSchema).min(1, 'Giỏ hàng không được để trống'),
+  items: z.array(cartItemSchema).min(1, 'Vui lòng chọn ít nhất một sản phẩm'),
   recaptcha_token: z.string().min(1, 'Thiếu recaptcha token, vui lòng thử lại'),
 }).superRefine((value, context) => {
   if (value.delivery_method === 'address') {
     if (!value.ward) context.addIssue({ code: 'custom', path: ['ward'], message: 'Vui lòng chọn xã/phường Sơn La' });
-    if (!value.delivery_address) context.addIssue({ code: 'custom', path: ['delivery_address'], message: 'Vui lòng nhập địa chỉ nhận hàng' });
+    if (!value.delivery_address) context.addIssue({ code: 'custom', path: ['delivery_address'], message: 'Vui lòng nhập địa chỉ nhận SIM' });
   }
   if (value.delivery_method === 'store' && !value.delivery_store) {
     context.addIssue({ code: 'custom', path: ['delivery_store'], message: 'Vui lòng chọn cửa hàng nhận SIM' });
@@ -49,7 +49,7 @@ export interface RegistrationActionState {
 }
 
 /**
- * Server Action nhan FormData tu trang /gio-hang - `items` duoc client
+ * Server Action nhan FormData tu trang /dat-hang - `items` duoc client
  * serialize thanh chuoi JSON (danh sach san pham trong CartContext) truoc khi
  * submit (xem lib/cart.ts: serializeCartItemsForSubmit).
  */
@@ -61,7 +61,7 @@ export async function submitRegistrationAction(
   try {
     itemsRaw = JSON.parse(String(formData.get('items') ?? '[]'));
   } catch {
-    return { status: 'error', message: 'Dữ liệu giỏ hàng không hợp lệ, vui lòng thử lại' };
+    return { status: 'error', message: 'Dữ liệu đăng ký không hợp lệ, vui lòng thử lại' };
   }
 
   const raw = {
@@ -101,7 +101,7 @@ export async function submitRegistrationAction(
     });
     return {
       status: 'success',
-      message: 'Đăng ký thành công, nhân viên sẽ liên hệ trong thời gian sớm nhất',
+      message: 'Gửi yêu cầu đăng kí thành công, nhân viên sẽ liên hệ trong thời gian sớm nhất',
       registrationId: result.id,
       registrationCode: result.code || undefined,
     };

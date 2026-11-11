@@ -53,7 +53,7 @@ test('SIM filters preserve search and selection continues to checkout', async ({
   const packageDialog = page.getByRole('dialog', { name: 'Chọn gói cước' });
   await expect(packageDialog).toBeVisible();
   await packageDialog.getByRole('button', { name: 'Bỏ qua — chỉ mua SIM' }).click();
-  await expect(page).toHaveURL(/gio-hang\?step=customer/);
+  await expect(page).toHaveURL(/dat-hang\?step=customer/);
 });
 
 test('SIM pagination keeps the URL state, continuous row numbers and browser history', async ({

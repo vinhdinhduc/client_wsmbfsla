@@ -18,6 +18,12 @@ import { AboutBlocksEditor } from './AboutBlocksEditor';
 type FieldType = 'text' | 'textarea' | 'checkbox' | 'color' | 'number' | 'url' | 'image';
 type SettingField = { key: string; label: string; type: FieldType; hint?: string };
 type Section = { group: SettingGroup; label: string; description: string; fields: SettingField[] };
+const ENABLED_BY_DEFAULT_SETTINGS = new Set([
+  'contact_widget_enabled',
+  'contact_widget_chat_enabled',
+  'contact_widget_zalo_enabled',
+  'contact_widget_phone_enabled',
+]);
 
 const SECTIONS: Record<string, Section> = {
   site: {
@@ -77,6 +83,9 @@ const SECTIONS: Record<string, Section> = {
       { key: 'footer_zalo_url', label: 'Zalo URL', type: 'url' },
       { key: 'footer_youtube_url', label: 'YouTube URL', type: 'url' },
       { key: 'contact_widget_enabled', label: 'Hiện nút gọi điện và Zalo', type: 'checkbox' },
+      { key: 'contact_widget_chat_enabled', label: 'Hiện nút Chat với trợ lý', type: 'checkbox' },
+      { key: 'contact_widget_zalo_enabled', label: 'Hiện nút Chat Zalo', type: 'checkbox' },
+      { key: 'contact_widget_phone_enabled', label: 'Hiện nút Gọi hotline', type: 'checkbox' },
       {
         key: 'contact_widget_message',
         label: 'Lời nhắn hỗ trợ',
@@ -222,7 +231,10 @@ export default function AdminSettingsPage() {
               <CheckboxField
                 key={field.key}
                 label={field.label}
-                checked={values[field.key] === 'true'}
+                checked={
+                  values[field.key] === 'true' ||
+                  (values[field.key] === undefined && ENABLED_BY_DEFAULT_SETTINGS.has(field.key))
+                }
                 onChange={(event) =>
                   setValues((previous) => ({
                     ...previous,

@@ -60,7 +60,7 @@ export function PackageFilterBar({ packages, simId }: { packages: Package[]; sim
       image: null,
       sim_reference_id: simReferenceId,
     });
-    router.push('/gio-hang?step=customer');
+    router.push('/dat-hang?step=customer');
   }
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {

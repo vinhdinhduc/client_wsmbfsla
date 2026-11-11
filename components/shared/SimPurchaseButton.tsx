@@ -78,7 +78,7 @@ export function SimPurchaseButton({
       });
     closeDrawer();
     setOpen(false);
-    router.push('/gio-hang?step=customer');
+    router.push('/dat-hang?step=customer');
   }
 
   return (

@@ -21,6 +21,14 @@ const ChatPanel = dynamic(() => import('./ChatPanel'), {
   ),
 });
 
+const CHAT_INTRO_MESSAGES = [
+  'Hỏi trợ lý chatbot AI MobiFone Sơn La',
+  'Tìm gói cước phù hợp với bạn',
+  'Cần tư vấn SIM? Hỏi trợ lý ngay',
+  'Khám phá giải pháp số cho doanh nghiệp',
+  'Tìm cửa hàng MobiFone gần bạn',
+];
+
 export function ChatWidget() {
   const { data: settings } = useQuery({
     queryKey: ['public-settings'],
@@ -31,18 +39,24 @@ export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
+  const [introMessageIndex, setIntroMessageIndex] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const [unread, setUnread] = useState(false);
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const mobileSpeedDialToggleRef = useRef<HTMLButtonElement>(null);
-  const phone = dutyStaff?.phone || settings?.hotline || settings?.footer_phone || '';
-  const hotline = settings?.hotline || settings?.footer_phone || phone;
-  const phoneHref = safeChatHref(`tel:${phone.replace(/[^\d+]/g, '')}`);
-  const zaloUrl =
-    safeChatHref(settings?.footer_zalo_url || '') ||
-    (phone ? `https://zalo.me/${phone.replace(/\D/g, '')}` : undefined);
+  const phone = settings?.hotline || settings?.footer_phone || '';
+  const hotline = phone;
+  const phoneHref = phone ? safeChatHref(`tel:${phone.replace(/[^\d+]/g, '')}`) : undefined;
+  const zaloUrl = safeChatHref(settings?.footer_zalo_url || '');
   const chatbotEnabled = !['false', '0'].includes(settings?.ai_chatbot_enabled ?? 'true');
+  const chatButtonEnabled =
+    chatbotEnabled && !['false', '0'].includes(settings?.contact_widget_chat_enabled ?? 'true');
   const contactsEnabled = settings?.contact_widget_enabled !== 'false';
+  const zaloButtonEnabled =
+    contactsEnabled && !['false', '0'].includes(settings?.contact_widget_zalo_enabled ?? 'true');
+  const phoneButtonEnabled =
+    contactsEnabled && !['false', '0'].includes(settings?.contact_widget_phone_enabled ?? 'true');
   const staffInitial = dutyStaff?.name?.trim().charAt(0).toUpperCase() || 'M';
 
   useEffect(() => {
@@ -52,6 +66,22 @@ export function ChatWidget() {
       setShowIntro(true);
     }
   }, []);
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setReduceMotion(preference.matches);
+    updatePreference();
+    preference.addEventListener('change', updatePreference);
+    return () => preference.removeEventListener('change', updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (!showIntro || isOpen || reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setIntroMessageIndex((index) => (index + 1) % CHAT_INTRO_MESSAGES.length);
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [showIntro, isOpen, reduceMotion]);
 
   const closeChat = useCallback(() => {
     setIsOpen(false);
@@ -84,9 +114,9 @@ export function ChatWidget() {
     <div
       className={styles.wrapper}
       data-contact-widget
-      data-chat-open={isOpen && chatbotEnabled ? 'true' : 'false'}
+      data-chat-open={isOpen && chatButtonEnabled ? 'true' : 'false'}
     >
-      {chatbotEnabled && (
+      {chatButtonEnabled && (
         <>
           {hasOpened && (
             <ChatPanel
@@ -100,13 +130,17 @@ export function ChatWidget() {
           )}
           <div className={styles.chatLauncherArea}>
             {showIntro && !isOpen && (
-              <span className={styles.launcherLabel}>Hỏi trợ lý chatbot AI MobiFone Sơn La</span>
+              <span className={styles.launcherLabel} aria-hidden="true">
+                <span key={introMessageIndex} className={styles.launcherMessage}>
+                  {CHAT_INTRO_MESSAGES[introMessageIndex]}
+                </span>
+              </span>
             )}
             <button
               ref={launcherRef}
               type="button"
               onClick={isOpen ? closeChat : openChat}
-              aria-label={isOpen ? 'Đóng khung chat' : 'Chat với AI'}
+              aria-label={isOpen ? 'Đóng khung chat' : 'Chat với trợ lý'}
               aria-expanded={isOpen}
               aria-controls={hasOpened ? 'mobifone-chat-panel' : undefined}
               className={styles.launcher}
@@ -116,6 +150,9 @@ export function ChatWidget() {
               ) : (
                 <MessageCircle size={24} aria-hidden="true" />
               )}
+              <span className={styles.buttonTooltip} aria-hidden="true">
+                Chat với trợ lý
+              </span>
               {unread && (
                 <span className={styles.unreadDot}>
                   <span className={styles.srOnly}>Có tin nhắn mới</span>
@@ -125,7 +162,7 @@ export function ChatWidget() {
           </div>
         </>
       )}
-      {(phoneHref || zaloUrl) && contactsEnabled && (
+      {((phoneHref && phoneButtonEnabled) || (zaloUrl && zaloButtonEnabled)) && (
         <div className={styles.contactActions} data-contact-actions>
           {!isOpen && (
             <div className={styles.dutyStaff} data-contact-summary>
@@ -158,38 +195,45 @@ export function ChatWidget() {
             </div>
           )}
           <div className={styles.contactButtons} data-contact-buttons>
-            {zaloUrl && (
+            {zaloUrl && zaloButtonEnabled && (
               <a
                 href={zaloUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Nhắn tin qua Zalo"
-                title="Nhắn tin qua Zalo"
+                aria-label="Chat Zalo"
                 className={`${styles.contactButton} ${styles.zaloButton}`}
               >
                 <span aria-hidden="true">Zalo</span>
+                <span className={styles.buttonTooltip} aria-hidden="true">
+                  Chat Zalo
+                </span>
               </a>
             )}
-            {phoneHref && (
+            {phoneHref && phoneButtonEnabled && (
               <a
                 href={phoneHref}
-                aria-label={`Gọi điện ${phone}`}
-                title={`Gọi ${phone}`}
+                aria-label="Gọi hotline"
                 className={`${styles.contactButton} ${styles.phoneButton}`}
               >
                 <Phone size={24} aria-hidden="true" />
+                <span className={styles.buttonTooltip} aria-hidden="true">
+                  Gọi hotline
+                </span>
               </a>
             )}
           </div>
         </div>
       )}
-      {(chatbotEnabled || (contactsEnabled && (phoneHref || zaloUrl))) && (
+      {(chatButtonEnabled ||
+        (zaloUrl && zaloButtonEnabled) ||
+        (phoneHref && phoneButtonEnabled)) && (
         <div className={styles.mobileSpeedDial}>
           {mobileActionsOpen && (
             <div className={styles.mobileSpeedDialActions} aria-label="Kênh hỗ trợ">
-              {chatbotEnabled && (
+              {chatButtonEnabled && (
                 <button
                   type="button"
+                  className={styles.mobileChatButton}
                   aria-label="Chat với trợ lý"
                   onClick={() => {
                     openChat();
@@ -200,19 +244,20 @@ export function ChatWidget() {
                   <span>Trợ lý</span>
                 </button>
               )}
-              {contactsEnabled && zaloUrl && (
+              {zaloButtonEnabled && zaloUrl && (
                 <a
+                  className={styles.mobileZaloButton}
                   href={zaloUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Nhắn tin qua Zalo"
+                  aria-label="Chat Zalo"
                 >
                   <span aria-hidden="true">Z</span>
                   <span>Zalo</span>
                 </a>
               )}
-              {contactsEnabled && phoneHref && (
-                <a href={phoneHref} aria-label={`Gọi điện ${phone}`}>
+              {phoneButtonEnabled && phoneHref && (
+                <a className={styles.mobilePhoneButton} href={phoneHref} aria-label="Gọi hotline">
                   <Phone size={20} aria-hidden="true" />
                   <span>Gọi</span>
                 </a>

@@ -12,7 +12,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Chúng tôi thu thập họ tên, số điện thoại, email, địa chỉ nhận hàng và thông tin khách hàng
+          Chúng tôi thu thập họ tên, số điện thoại, email, địa chỉ nhận SIM và thông tin khách hàng
           chủ động cung cấp khi đăng ký, liên hệ, đặt lịch hoặc nhận ưu đãi. Hồ sơ ứng tuyển có thể
           gồm CV và thông tin kinh nghiệm. Khi sử dụng trợ lý AI, nội dung câu hỏi và thông tin kỹ
           thuật như địa chỉ IP có thể được ghi nhận.
@@ -144,15 +144,15 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Website sử dụng cookie và bộ nhớ trình duyệt để duy trì đăng nhập, giỏ đăng ký, cuộc trò
-          chuyện và lựa chọn quyền riêng tư. Google reCAPTCHA có thể xử lý thông tin thiết bị và
+          Website sử dụng cookie và bộ nhớ trình duyệt để duy trì đăng nhập, thông tin tư vấn, cuộc
+          trò chuyện và lựa chọn quyền riêng tư. Google reCAPTCHA có thể xử lý thông tin thiết bị và
           tương tác để ngăn chặn spam khi gửi form.
         </p>
         <p>
           Google Analytics và Meta Pixel chỉ được bật khi đã được cấu hình và khách hàng chọn đồng ý
           đo lường ở bảng lựa chọn cookie. Khách hàng có thể chọn “Chỉ cookie cần thiết”. Để thay
           đổi lựa chọn, xóa dữ liệu website trong cài đặt trình duyệt rồi tải lại và chọn lại; việc
-          này có thể đồng thời xóa giỏ hàng và phiên đăng nhập trên thiết bị.
+          này có thể đồng thời xóa thông tin tư vấn và phiên đăng nhập trên thiết bị.
         </p>
         <p>
           Khách hàng cũng có thể chặn hoặc xóa cookie trong trình duyệt. Việc chặn cookie cần thiết
