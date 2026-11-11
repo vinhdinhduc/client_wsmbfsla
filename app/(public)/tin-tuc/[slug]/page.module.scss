@@ -64,8 +64,9 @@
   flex: 0 0 72px;
   width: 72px;
   height: 64px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
+  background: var(--public-muted-surface);
 }
 .cardText {
   min-width: 0;

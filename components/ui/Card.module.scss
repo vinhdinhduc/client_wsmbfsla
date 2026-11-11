@@ -56,11 +56,7 @@
   background: color-mix(in srgb, var(--color-primary) 8%, var(--bg-card));
 }
 .thumbnailImage {
-  object-fit: cover;
-  transition: transform 300ms ease;
-  .card:hover & {
-    transform: scale(1.05);
-  }
+  object-fit: contain;
 }
 .thumbnailEmpty {
   display: flex;

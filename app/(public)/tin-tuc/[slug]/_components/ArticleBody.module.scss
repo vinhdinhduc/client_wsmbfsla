@@ -70,8 +70,7 @@
 .cover {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  height: auto;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
 }

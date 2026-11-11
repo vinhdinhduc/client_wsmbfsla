@@ -317,6 +317,7 @@ export default function AdminNewsPage() {
             label="Ảnh đại diện"
             value={watch('thumbnail')}
             onChange={setThumbnailFile}
+            hint="Nên dùng ảnh WebP đã nén, kích thước 1200×900 (4:3). Chữ và logo cần cách mép ít nhất 5%; ảnh được xem trước theo khung hiển thị trên card."
           />
           <TextField label="Tóm tắt" error={errors.summary?.message} {...register('summary')} />
           <RichTextEditor

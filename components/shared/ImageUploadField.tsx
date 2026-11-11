@@ -21,10 +21,15 @@ export function ImageUploadField({
 }: ImageUploadFieldProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(resolveImageUrl(value));
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [hasUnsupportedAspectRatio, setHasUnsupportedAspectRatio] = useState(false);
 
   useEffect(() => {
     setPreviewUrl(resolveImageUrl(value));
   }, [value]);
+
+  useEffect(() => {
+    setHasUnsupportedAspectRatio(false);
+  }, [previewUrl]);
 
   useEffect(
     () => () => {
@@ -59,9 +64,26 @@ export function ImageUploadField({
       {previewUrl && (
         <div className={styles.imagePreviewBox}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={previewUrl} alt="Ảnh xem trước" className={styles.imagePreview} />
-          <p className={styles.imagePreviewCaption}>Ảnh xem trước</p>
+          <img
+            src={previewUrl}
+            alt="Ảnh xem trước"
+            className={styles.imagePreview}
+            onLoad={(event) => {
+              const { naturalWidth, naturalHeight } = event.currentTarget;
+              const ratio = naturalWidth / naturalHeight;
+              setHasUnsupportedAspectRatio(Math.abs(ratio - 4 / 3) > (4 / 3) * 0.05);
+            }}
+          />
         </div>
+      )}
+      {previewUrl && (
+        <p className={styles.imagePreviewCaption}>Xem trước trong khung ảnh card (4:3)</p>
+      )}
+      {hasUnsupportedAspectRatio && (
+        <p className={styles.imagePreviewError} role="status">
+          Ảnh không đúng tỷ lệ 4:3. Ảnh vẫn hiển thị đầy đủ nhưng có thể xuất hiện khoảng trống;
+          nên chỉnh về 1200×900.
+        </p>
       )}
       <p className={styles.muted}>
         {isUploading ? 'Đang tải ảnh lên…' : 'JPG, PNG, WEBP hoặc GIF, tối đa 5MB.'}

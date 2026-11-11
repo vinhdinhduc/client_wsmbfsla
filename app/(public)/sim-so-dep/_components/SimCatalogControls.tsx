@@ -64,8 +64,8 @@ export function SimCatalogControls({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Nhập số cần tìm (VD: *68, 090*)..."
-            inputMode="numeric"
+            placeholder="Tìm số (VD: *68, 090*)"
+            inputMode="text"
             aria-label="Tìm số thuê bao"
           />
         </label>

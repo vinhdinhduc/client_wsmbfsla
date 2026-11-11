@@ -537,6 +537,9 @@
     border-bottom: 1px solid var(--border);
     border-radius: 0;
   }
+  .loadingRowsCompact .loadingRow {
+    grid-template-columns: 0.5fr 1.4fr 1fr 1fr;
+  }
   .phoneLink {
     font-size: 1.0625rem;
   }

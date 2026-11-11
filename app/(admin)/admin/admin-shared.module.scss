@@ -194,6 +194,9 @@
 }
 .imagePreviewBox {
   width: 100%;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
   overflow: hidden;
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-md);
@@ -225,7 +228,7 @@
 .imagePreview {
   display: block;
   width: 100%;
-  max-height: 13rem;
+  height: 100%;
   object-fit: contain;
 }
 .imagePreviewCaption {

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { packagesApi } from '@/lib/api/packages';
-import { simsApi } from '@/lib/api/sims';
 import { solutionsApi } from '@/lib/api/solutions';
 import { newsApi } from '@/lib/api/news';
 import { NewsCard, SolutionCard } from '@/components/ui/Card';
@@ -14,6 +13,7 @@ export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 import styles from './page.module.scss';
+import type { NormalizedSimFilters } from './sim-so-dep/_types/sim';
 
 function SectionHeader({ title, href }: { title: string; href: string }) {
   return (
@@ -26,24 +26,36 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
   );
 }
 
-export default async function HomePage() {
-  const [packages, simPages, solutions, newsResult, utilities] = await Promise.all([
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    tab?: string | string[];
+    q?: string | string[];
+    prefix?: string | string[];
+    type?: string | string[];
+  }>;
+}) {
+  const params = await searchParams;
+  const value = (input: string | string[] | undefined) =>
+    Array.isArray(input) ? input[0] ?? '' : input ?? '';
+  const tabValue = value(params.tab);
+  const initialSimFilters: NormalizedSimFilters = {
+    tab: ['all', 'so_dep', 'phong_thuy', 'nam_sinh'].includes(tabValue)
+      ? (tabValue as NormalizedSimFilters['tab'])
+      : 'all',
+    type: value(params.type) === 'postpaid' ? 'postpaid' : 'prepaid',
+    q: value(params.q).trim(),
+    prefix: value(params.prefix),
+    page: 1,
+    pageSize: 10,
+  };
+  const [packages, solutions, newsResult, utilities] = await Promise.all([
     packagesApi.listPublic(undefined, { next: { revalidate: 60 } }),
-    Promise.all(
-      (['so_dep', 'phong_thuy', 'nam_sinh'] as const).map((catalog) =>
-        simsApi.listPublicPage({ catalog, type: 'all', page: 1, page_size: 12 }, undefined),
-      ),
-    ),
     solutionsApi.listPublic(undefined, { next: { revalidate: 60 } }),
     newsApi.listPublic({ page_size: 3 }, { next: { revalidate: 60 } }),
     utilitiesApi.list(4).catch(() => []),
   ]);
-  const homeSims = simPages.flatMap((page) => page.items);
-  const simTotals = {
-    so_dep: simPages[0].total,
-    phong_thuy: simPages[1].total,
-    nam_sinh: simPages[2].total,
-  };
 
   return (
     <div className={styles.page}>
@@ -51,7 +63,7 @@ export default async function HomePage() {
         <SliderZone zoneCode="hero_banner" aspect="hero" className={styles.heroSlider} />
       </section>
 
-      <HomeCatalogSections packages={packages} sims={homeSims} simTotals={simTotals} />
+      <HomeCatalogSections packages={packages} initialSimFilters={initialSimFilters} />
 
       <section className={styles.section}>
         <SectionHeader title="Giải pháp số cho Doanh nghiệp / UBND" href="/giai-phap-so" />

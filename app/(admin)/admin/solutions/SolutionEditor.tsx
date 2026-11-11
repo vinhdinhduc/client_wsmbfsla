@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { Solution } from '@/types/product';
 import { SolutionFormValues, solutionsApi } from '@/lib/api/solutions';
+import { ImageUploadField } from '@/components/shared/ImageUploadField';
 import { RichTextEditor } from '@/components/shared/RichTextEditor';
 import { IconPicker } from '@/components/shared/IconPicker';
 import { useToast } from '@/components/ui/Toast';
@@ -183,14 +184,13 @@ export function SolutionEditor({ initial }: { initial?: Solution }) {
             Tóm tắt
             <textarea value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </label>
-          <label>
-            Ảnh Hero
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={(e) => set('image', e.target.files?.[0])}
-            />
-          </label>
+          <ImageUploadField
+            id="solution-thumbnail"
+            label="Ảnh card / Hero"
+            value={form.thumbnail}
+            onChange={(file) => set('image', file ?? undefined)}
+            hint="Nên dùng ảnh WebP đã nén, kích thước 1200×900 (4:3). Chữ và logo cần cách mép ít nhất 5%."
+          />
         </div>
       </section>
       <section>
